@@ -9,16 +9,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class HomeActivity extends Activity {
+public class Home extends Activity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		TextView tv = (TextView) findViewById(R.id.tvAppName);
-		
-		ActionBar actionBar = getActionBar();
-	    //actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -32,12 +29,12 @@ public class HomeActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			// app icon in action bar clicked; go home
-			Intent intent = new Intent(this, HomeActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
+		case R.id.miMyProfile:
+			Intent myProfileIntent = new Intent(this, MyProfile.class);
+			startActivity(myProfileIntent);
 			return true;
+		case R.id.miSettings:
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
