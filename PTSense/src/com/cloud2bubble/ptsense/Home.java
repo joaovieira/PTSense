@@ -1,13 +1,11 @@
 package com.cloud2bubble.ptsense;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 public class Home extends Activity {
 	/** Called when the activity is first created. */
@@ -15,7 +13,6 @@ public class Home extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		TextView tv = (TextView) findViewById(R.id.tvAppName);
 	}
 
 	@Override

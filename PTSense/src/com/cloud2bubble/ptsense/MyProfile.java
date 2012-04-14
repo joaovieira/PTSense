@@ -21,13 +21,13 @@ public class MyProfile extends Activity{
 
 	    Tab tab = actionBar.newTab()
 	            .setText(R.string.preferences)
-	            .setTabListener(new ProfileTabListener<PreferencesFragment>(
+	            .setTabListener(new MyTabListener<PreferencesFragment>(
 	                    this, "preferences", PreferencesFragment.class));
 	    actionBar.addTab(tab);
 
 	    tab = actionBar.newTab()
 	        .setText(R.string.routines)
-	        .setTabListener(new ProfileTabListener<RoutinesFragment>(
+	        .setTabListener(new MyTabListener<RoutinesFragment>(
 	                this, "routines", RoutinesFragment.class));
 	    actionBar.addTab(tab);
 	    
