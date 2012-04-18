@@ -3,22 +3,18 @@
     
     <header
         android:fragment="com.cloud2bubble.ptsense.Settings$StockPreferenceFragment"
-        android:summary="An example of some preferences."
-        android:title="Prefs 1" >
-    	<extra android:name="resource" android:value="fragmented_preferences" />
+        android:title="@string/settings.header1" >
+    	<extra android:name="resource" android:value="sensor_preferences" />
     </header>
     <header
         android:fragment="com.cloud2bubble.ptsense.Settings$StockPreferenceFragment"
-        android:summary="Some other preferences you can see."
-        android:title="Prefs 2" >
-        <extra android:name="resource" android:value="preference_dependencies" />
+        android:title="@string/settings.header2" >
+        <extra android:name="resource" android:value="inferencing_preferences" />
     </header>
     <header
-        android:summary="Launches an Intent."
-        android:title="Intent" >
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="http://www.android.com" />
+        android:fragment="com.cloud2bubble.ptsense.Settings$StockPreferenceFragment"
+        android:title="@string/settings.header3" >
+        <extra android:name="resource" android:value="web_services_preferences" />
     </header>
 
 </preference-headers>

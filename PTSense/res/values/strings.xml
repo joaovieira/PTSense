@@ -12,5 +12,20 @@
     <string name="sensing.tab2">Now</string>
     <string name="trip_reviews.tab1">System Reviews</string>
     <string name="trip_reviews.tab2">User Feedback</string>
+    <string name="settings.header1">Sensors</string>
+    <string name="settings.header2">Inferencing</string>
+    <string name="settings.header3">Web Services</string>
+    
+    
+    <string name="settings.header1.smartphone.title">Smartphone Sensors</string>
+    <string name="settings.header1.smartphone.summary">Choose smartphone sensors to use</string>
+    <string name="settings.header1.devices.title">Setup Devices</string>
+    <string name="settings.header1.devices.summary">Manage external sensing devices</string><string name="settings.header1.devices.scan.title">Scan For Devices</string><string name="settings.header2.automatic_routines.title">Automatic Routines</string><string name="settings.header2.automatic_routines.summary">Allow the system to automatically find routines</string>
+    <string name="settings.header2.notifications.title">Receive Notifications</string>
+    <string name="settings.header2.notifications.summary">All</string>
+    <string name="settings.header2.transportation_systems">Transportation Systems</string>
+    <string name="add_more">Add More</string>
+    
+    <string name="settings.header1.devices.connected">Connected Devices</string>
 
 </resources>

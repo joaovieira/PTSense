@@ -5,6 +5,8 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class Sensing extends Activity{
@@ -33,6 +35,14 @@ public class Sensing extends Activity{
 	    
 	    actionBar.setDisplayHomeAsUpEnabled(true);
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.sensing_activity, menu);
+		return true;
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -42,6 +52,15 @@ public class Sensing extends Activity{
 			Intent homeIntent = new Intent(this, Home.class);
 			homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(homeIntent);
+			return true;
+		case R.id.miSettingsSensing:
+			Intent settingsIntent = new Intent(this, Settings.class);
+			startActivity(settingsIntent);
+			return true;
+		case R.id.miSetupDevices:
+			//TODO open Setup Devices preference pane
+			Intent devicesIntent = new Intent(this, Settings.class);
+			startActivity(devicesIntent);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
