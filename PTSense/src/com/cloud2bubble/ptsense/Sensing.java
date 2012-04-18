@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-public class MyProfile extends Activity{
+public class Sensing extends Activity{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -20,15 +20,15 @@ public class MyProfile extends Activity{
 	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 	    Tab tab = actionBar.newTab()
-	            .setText(R.string.my_profile_tab1)
-	            .setTabListener(new MyTabListener<PreferencesFragment>(
-	                    this, "preferences", PreferencesFragment.class));
+	            .setText(R.string.sensing_tab1)
+	            .setTabListener(new MyTabListener<ThisLineFragment>(
+	                    this, "this_line", ThisLineFragment.class));
 	    actionBar.addTab(tab);
 
 	    tab = actionBar.newTab()
-	        .setText(R.string.my_profile_tab2)
-	        .setTabListener(new MyTabListener<RoutinesFragment>(
-	                this, "routines", RoutinesFragment.class));
+	        .setText(R.string.sensing_tab2)
+	        .setTabListener(new MyTabListener<NowFragment>(
+	                this, "now", NowFragment.class));
 	    actionBar.addTab(tab);
 	    
 	    actionBar.setDisplayHomeAsUpEnabled(true);

@@ -23,14 +23,10 @@
              inside of the overall preferences UI.
         -->
         <PreferenceScreen
-            android:fragment="com.cloud2bubble.ptsense.Settings$Prefs1FragmentInner"
+            android:fragment="com.cloud2bubble.ptsense.Settings$StockPreferenceFragment"
             android:summary="summary_fragment_preference"
             android:title="title_fragment_preference" >
-
-            <!-- Arbitrary key/value pairs can be included for fragment arguments -->
-            <extra
-                android:name="someKey"
-                android:value="somePrefValue" />
+            <extra android:name="resource" android:value="fragmented_preferences_inner" />
         </PreferenceScreen>
 
         <!--

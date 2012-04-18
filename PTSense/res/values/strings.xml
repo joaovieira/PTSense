@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PTSense</string>
-    <string name="my_profile">My Profile</string>
-    <string name="settings">Settings</string>
-    <string name="preferences">Preferences</string>
-    <string name="routines">Routines</string>
+    
+    <string name="settings">Settings</string><string name="my_profile.self">My Profile</string>
+    <string name="my_profile.tab1">Preferences</string>
+    <string name="my_profile.tab2">Routines</string>
+    <string name="home.option1">Sensing</string>
+    <string name="home.option2">Trip Reviews</string>
+    <string name="home.option3">Plan Trip</string>
+    <string name="sensing.tab1">This Line</string>
+    <string name="sensing.tab2">Now</string>
+    <string name="trip_reviews.tab1">System Reviews</string>
+    <string name="trip_reviews.tab2">User Feedback</string>
 
 </resources>

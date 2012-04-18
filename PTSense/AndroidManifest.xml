@@ -21,21 +21,25 @@
         </activity>
         <activity
             android:name=".MyProfile"
-            android:label="@string/my_profile" >
-            <intent-filter>
-                <action android:name="android.intent.action.PROFILE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:label="@string/my_profile.self" >
         </activity>
         <activity
             android:name=".Settings"
-            android:label="@string/settings" >
-            <intent-filter>
-                <action android:name="android.intent.action.SETTINGS" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:label="@string/settings"
+            android:theme="@android:style/Theme.Holo"
+            android:hardwareAccelerated="true" >
+        </activity>
+        <activity
+            android:name=".Sensing"
+            android:label="@string/home.option1" >
+        </activity>
+        <activity
+            android:name=".TripReviews"
+            android:label="@string/home.option2" >
+        </activity>
+        <activity
+            android:name=".PlanTrip"
+            android:label="@string/home.option3" >
         </activity>
     </application>
 
