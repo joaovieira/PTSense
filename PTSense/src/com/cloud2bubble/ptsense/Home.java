@@ -31,7 +31,9 @@ public class Home extends Activity {
 			startActivity(myProfileIntent);
 			return true;
 		case R.id.miSettings:
-			
+			Intent settingsIntent = new Intent(this, Settings.class);
+			startActivity(settingsIntent);
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
