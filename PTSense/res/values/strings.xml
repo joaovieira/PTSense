@@ -27,5 +27,6 @@
     <string name="add_more">Add More</string>
     
     <string name="settings.header1.devices.connected">Connected Devices</string>
+    <string name="stop">Stop</string>
 
 </resources>

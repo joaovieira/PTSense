@@ -27,7 +27,7 @@
     </style>
 
     <style name="MyActionBar.TabTextStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabText">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/actionbar_tab_text</item>
     </style>
 
 </resources>
