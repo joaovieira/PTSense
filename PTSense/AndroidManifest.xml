@@ -9,10 +9,11 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.App_Custom" >
+        android:theme="@style/Theme.PTSense" >
         <activity
             android:name=".Home"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:theme="@style/Theme.PTSense.Home" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

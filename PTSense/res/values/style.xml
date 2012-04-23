@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
-    <style name="Theme.App_Custom" parent="@android:style/Theme.Holo.Light">
-        
+
+    <style name="Theme.PTSense.Home" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/MyActionBar.Home</item>
     </style>
-    
+
+    <style name="Theme.PTSense" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@android:style/Widget.Holo.Light.ActionBar.Solid</item>
+        <item name="android:actionBarTabStyle">@style/MyActionBar.TabStyle</item>
+        <item name="android:actionBarTabBarStyle">@style/MyActionBar.TabBarStyle</item>
+        <item name="android:actionBarTabTextStyle">@style/MyActionBar.TabTextStyle</item>
+        <item name="android:actionBarWidgetTheme">@android:style/Theme.Holo</item>
+    </style>
+
+    <style name="MyActionBar.Home" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/light_blue</item>
+    </style>
+
+    <style name="MyActionBar.TabStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
+        <item name="android:background">@color/actionbar_tab_bg</item>
+    </style>
+
+    <style name="MyActionBar.TabBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabBar">
+        <item name="android:background">@drawable/tab_bottom</item>
+        <item name="android:divider">@drawable/list_divider_holo_dark</item>
+    </style>
+
+    <style name="MyActionBar.TabTextStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabText">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>
