@@ -10,6 +10,8 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.PTSense" >
+        
+        <!-- Activities -->
         <activity
             android:name=".Home"
             android:label="@string/app_name"
@@ -42,6 +44,9 @@
             android:name=".PlanTrip"
             android:label="@string/home.option3" >
         </activity>
+        
+        <!-- Services -->
+        <service android:name=".SmartphoneSensingService" />
     </application>
 
 </manifest>

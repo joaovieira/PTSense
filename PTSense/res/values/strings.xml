@@ -28,5 +28,9 @@
     
     <string name="settings.header1.devices.connected">Connected Devices</string>
     <string name="stop">Stop</string>
+    <string name="notification.sensing.ticker_text">Ongoing sensing environment conditions</string>
+    <string name="notification.sensing.title">Sensing Running</string>
+    <string name="notification.sensing.message">Touch for details</string>
+    <string name="start">Start</string>
 
 </resources>
