@@ -13,7 +13,7 @@ import android.widget.Button;
 public class Home extends Activity implements OnClickListener {
 	
 	Button bOption1, bOption2, bOption3, bToggleSensing;
-	boolean isSensing = false;
+	boolean isSensing;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -28,7 +28,14 @@ public class Home extends Activity implements OnClickListener {
 		bOption1.setOnClickListener(this);
 		bOption2.setOnClickListener(this);
 		bOption3.setOnClickListener(this);
-		bToggleSensing.setOnClickListener(this);
+		bToggleSensing.setOnClickListener(this);	
+		isSensing = SmartphoneSensingService.IS_RUNNING;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		toggleSensingButtons();
 	}
 
 	@Override
@@ -71,20 +78,38 @@ public class Home extends Activity implements OnClickListener {
 			break;
 		case R.id.bToggleSensing:
 			if(!isSensing){
-				bToggleSensing.setText(getText(R.string.stop));
 				isSensing = true;
-				
 				Intent i=new Intent(this, SmartphoneSensingService.class);
 			    startService(i);
 			    Intent sensingIntent = new Intent(this, Sensing.class);
 				startActivity(sensingIntent);
 			}else{
-				bToggleSensing.setText(getText(R.string.start));
 				isSensing = false;
-				
 				stopService(new Intent(this, SmartphoneSensingService.class));
 			}
 			break;
+		}
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		isSensing = savedInstanceState.getBoolean("isSensing");
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean("isSensing", isSensing);
+	}
+	
+	private void toggleSensingButtons() {
+		if(isSensing){
+			bOption1.setEnabled(true);
+			bToggleSensing.setText(getText(R.string.stop));
+		}else{
+			bOption1.setEnabled(false);
+			bToggleSensing.setText(getText(R.string.start));
 		}
 	}
 }

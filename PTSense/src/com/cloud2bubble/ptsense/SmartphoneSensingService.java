@@ -12,6 +12,7 @@ import android.widget.Toast;
 public class SmartphoneSensingService extends Service {
 
 	private static final int ONGOING_NOTIFICATION = 1;
+	public static boolean IS_RUNNING; 
 	
 	/**
      * Class for clients to access.  Because we know this service always
@@ -28,6 +29,7 @@ public class SmartphoneSensingService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("SmartphoneSensingService", "Received start id " + startId + ": " + intent);
         
+        IS_RUNNING = true;
         startOnGoingNotification();
         collectDataFromSensors();
         
@@ -39,6 +41,7 @@ public class SmartphoneSensingService extends Service {
 	@Override
     public void onDestroy() {
     	stop();
+    	IS_RUNNING = false;
     }
 
 	@Override
