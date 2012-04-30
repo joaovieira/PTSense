@@ -84,8 +84,9 @@ public class Home extends Activity implements OnClickListener {
 			    Intent sensingIntent = new Intent(this, Sensing.class);
 				startActivity(sensingIntent);
 			}else{
-				isSensing = false;
 				stopService(new Intent(this, SmartphoneSensingService.class));
+				isSensing = false;
+				toggleSensingButtons();
 			}
 			break;
 		}
