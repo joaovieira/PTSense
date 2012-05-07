@@ -1,19 +1,16 @@
 package com.cloud2bubble.ptsense;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.ListIterator;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,14 +20,26 @@ public class SmartphoneSensingService extends Service implements
 
 	private static final int ONGOING_NOTIFICATION = 1;
 	public static boolean IS_RUNNING;
-	private Thread sensorThread = null;
-	SensorManager sensorManager = null;
-	float x, y, z;
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+	private Thread sensorThread = null;
+	private SensorManager mSensorManager;
+	private Sensor mLinearAcceleration, mAmbTemperature, mLight, mPressure,
+			mProximity, mRelHumidity = null;
+
+	public static ArrayList<Float> lightValues; //lux units
+	public static ArrayList<Float> accelerationsX, accelerationsY, accelerationsZ; //ms2
+	public static ArrayList<Float> pressureValues; //hPa (millibar)
+	public static ArrayList<Float> relHumidityValues;//percent %
+	public static ArrayList<Float> ambTemperatureValues; //celsius ¼C
+	
+	Float avgLight, avgAccelX, avgAccelY, avgAccelZ, avgPressure, avgHumidity, avgTemperature;
+
+	public SmartphoneSensingService() {
+		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		
+		lightValues = pressureValues = relHumidityValues = ambTemperatureValues = new ArrayList<Float>();
+		accelerationsX = accelerationsY = accelerationsZ = new ArrayList<Float>();
+		avgLight = avgAccelX = avgAccelY = avgAccelZ = avgPressure = avgHumidity = avgTemperature = new Float(0);
 	}
 
 	@Override
@@ -73,20 +82,39 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void registerSensorListeners() {
-		sensorManager.registerListener(this,
-				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-				SensorManager.SENSOR_DELAY_NORMAL);
-		sensorManager.registerListener(this,
-				sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-				SensorManager.SENSOR_DELAY_NORMAL);
-		x = y = z = 0;
+		if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
+			mLinearAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+			mSensorManager.registerListener(this, mLinearAcceleration, SensorManager.SENSOR_DELAY_NORMAL);
+		}
+
+		if (mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null) {
+			mAmbTemperature = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+			mSensorManager.registerListener(this, mAmbTemperature, SensorManager.SENSOR_DELAY_NORMAL);
+		}
+
+		if (mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null) {
+			mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+			mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
+		}
+
+		if (mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null) {
+			mPressure = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+			mSensorManager.registerListener(this, mPressure, SensorManager.SENSOR_DELAY_NORMAL);
+		}
+
+		if (mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null) {
+			mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+			mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
+		}
+
+		if (mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null) {
+			mRelHumidity = mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+			mSensorManager.registerListener(this, mRelHumidity, SensorManager.SENSOR_DELAY_NORMAL);
+		}
 	}
 
 	private void unregisterSensorListeners() {
-		sensorManager.unregisterListener(this,
-				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
-		sensorManager.unregisterListener(this,
-				sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
+		mSensorManager.unregisterListener(this);
 	}
 
 	private void collectDataFromSensors() {
@@ -102,6 +130,37 @@ public class SmartphoneSensingService extends Service implements
 		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
 	}
 
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		// Do something here if sensor accuracy changes.
+	}
+
+	public void onSensorChanged(SensorEvent event) {
+		synchronized (this) {
+			switch (event.sensor.getType()) {
+			case Sensor.TYPE_LINEAR_ACCELERATION:
+				accelerationsX.add(Float.valueOf(event.values[0]));
+				accelerationsY.add(Float.valueOf(event.values[1]));
+				accelerationsZ.add(Float.valueOf(event.values[2]));
+				break;
+			case Sensor.TYPE_AMBIENT_TEMPERATURE:
+				ambTemperatureValues.add(Float.valueOf(event.values[0]));
+				break;
+			case Sensor.TYPE_LIGHT:
+				lightValues.add(Float.valueOf(event.values[0]));
+				break;
+			case Sensor.TYPE_PRESSURE:
+				pressureValues.add(Float.valueOf(event.values[0]));
+				break;
+			case Sensor.TYPE_RELATIVE_HUMIDITY:
+				relHumidityValues.add(Float.valueOf(event.values[0]));
+				break;
+			case Sensor.TYPE_PROXIMITY:
+				// TODO cancel readings from light, humidity, pressure when close to things for more than 10sec
+				break;
+			}
+		}
+	};
+	
 	private class PreProcessThread extends Thread {
 		@Override
 		public void run() {
@@ -109,32 +168,27 @@ public class SmartphoneSensingService extends Service implements
 				try {
 					sleep(10000);
 					Log.d("SmartphoneSensingService", "Thread run 10sec message");
-					// TODO pre process buffer and store results in database
+					
+					//pre process buffers and store results in database
+					ListIterator<Float> iter = lightValues.listIterator();
+				    while (iter.hasNext()) {
+				      avgLight += iter.next();
+				    }
+				    // TODO put in database
+					
+					// clear buffers
+					lightValues.clear();
+					accelerationsX.clear();
+					accelerationsY.clear();
+					accelerationsZ.clear();
+					pressureValues.clear();
+					relHumidityValues.clear();
+					ambTemperatureValues.clear();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 	}
-
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-	}
-
-	public void onSensorChanged(SensorEvent event) {
-		synchronized (this) {
-			switch (event.sensor.getType()) {
-			case Sensor.TYPE_ACCELEROMETER:
-				x = event.values[0];
-				y = event.values[1];
-				z = event.values[2];
-				// TODO store variables in buffer
-				break;
-			case Sensor.TYPE_LIGHT:
-				break;
-
-			}
-		}
-	};
 
 }
