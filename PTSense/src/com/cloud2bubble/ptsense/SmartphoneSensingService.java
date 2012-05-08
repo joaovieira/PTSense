@@ -1,6 +1,8 @@
 package com.cloud2bubble.ptsense;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.ListIterator;
 
 import android.app.Notification;
@@ -22,7 +24,7 @@ public class SmartphoneSensingService extends Service implements
 	public static boolean IS_RUNNING;
 
 	private Thread sensorThread = null;
-	private SensorManager mSensorManager;
+	private SensorManager sensorManager;
 	private Sensor mLinearAcceleration, mAmbTemperature, mLight, mPressure,
 			mProximity, mRelHumidity = null;
 
@@ -33,13 +35,17 @@ public class SmartphoneSensingService extends Service implements
 	public static ArrayList<Float> ambTemperatureValues; //celsius ¼C
 	
 	Float avgLight, avgAccelX, avgAccelY, avgAccelZ, avgPressure, avgHumidity, avgTemperature;
+	
+	SensorDatabaseHandler sensorDatabase;
 
 	public SmartphoneSensingService() {
-		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		sensorDatabase = new SensorDatabaseHandler(this);
 		
 		lightValues = pressureValues = relHumidityValues = ambTemperatureValues = new ArrayList<Float>();
 		accelerationsX = accelerationsY = accelerationsZ = new ArrayList<Float>();
-		avgLight = avgAccelX = avgAccelY = avgAccelZ = avgPressure = avgHumidity = avgTemperature = new Float(0);
+		avgLight = avgAccelX = avgAccelY = avgAccelZ = 
+				avgPressure = avgHumidity = avgTemperature = new Float(0);
 	}
 
 	@Override
@@ -82,39 +88,39 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void registerSensorListeners() {
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
-			mLinearAcceleration = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-			mSensorManager.registerListener(this, mLinearAcceleration, SensorManager.SENSOR_DELAY_NORMAL);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
+			mLinearAcceleration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+			sensorManager.registerListener(this, mLinearAcceleration, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null) {
-			mAmbTemperature = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-			mSensorManager.registerListener(this, mAmbTemperature, SensorManager.SENSOR_DELAY_NORMAL);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null) {
+			mAmbTemperature = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+			sensorManager.registerListener(this, mAmbTemperature, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null) {
-			mLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-			mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null) {
+			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+			sensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null) {
-			mPressure = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
-			mSensorManager.registerListener(this, mPressure, SensorManager.SENSOR_DELAY_NORMAL);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null) {
+			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+			sensorManager.registerListener(this, mPressure, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null) {
-			mProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-			mSensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null) {
+			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+			sensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null) {
-			mRelHumidity = mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
-			mSensorManager.registerListener(this, mRelHumidity, SensorManager.SENSOR_DELAY_NORMAL);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null) {
+			mRelHumidity = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+			sensorManager.registerListener(this, mRelHumidity, SensorManager.SENSOR_DELAY_NORMAL);
 		}
 	}
 
 	private void unregisterSensorListeners() {
-		mSensorManager.unregisterListener(this);
+		sensorManager.unregisterListener(this);
 	}
 
 	private void collectDataFromSensors() {
@@ -169,25 +175,65 @@ public class SmartphoneSensingService extends Service implements
 					sleep(10000);
 					Log.d("SmartphoneSensingService", "Thread run 10sec message");
 					
-					//pre process buffers and store results in database
-					ListIterator<Float> iter = lightValues.listIterator();
-				    while (iter.hasNext()) {
-				      avgLight += iter.next();
-				    }
-				    // TODO put in database
+					String currentTime = getCurrentTimeStamp();
+					SensorData data = new SensorData(currentTime);
 					
-					// clear buffers
-					lightValues.clear();
-					accelerationsX.clear();
-					accelerationsY.clear();
-					accelerationsZ.clear();
-					pressureValues.clear();
-					relHumidityValues.clear();
-					ambTemperatureValues.clear();
+					data.setType("LIGHT");
+					data.setData(getAverageData(lightValues));
+				    sensorDatabase.addSensorData(data);
+				    data.setType("ACCELERATION_X");
+				    data.setData(getAverageData(accelerationsX));
+				    sensorDatabase.addSensorData(data);
+				    data.setType("ACCELERATION_Y");
+				    data.setData(getAverageData(accelerationsX));
+				    sensorDatabase.addSensorData(data);
+				    data.setType("ACCELERATION_Z");
+				    data.setData(getAverageData(accelerationsX));
+				    sensorDatabase.addSensorData(data);
+				    data.setType("PRESSURE");
+				    data.setData(getAverageData(pressureValues));
+				    sensorDatabase.addSensorData(data);
+				    data.setType("HUMIDITY");
+				    data.setData(getAverageData(relHumidityValues));
+				    sensorDatabase.addSensorData(data);
+				    data.setType("TEMPERATURE");
+				    data.setData(getAverageData(ambTemperatureValues));
+				    sensorDatabase.addSensorData(data);
+					
+				    clearBuffers();
+		
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
+		}
+		
+		private Float getAverageData(ArrayList<Float> valuesList) {
+			ListIterator<Float> iter = valuesList.listIterator();
+			int size = valuesList.size();
+			Float average = new Float(0);
+			
+		    while (iter.hasNext()) {
+		    	average += iter.next();
+		    }
+		    return average / size;
+		}
+
+		private void clearBuffers() {
+			lightValues.clear();
+			accelerationsX.clear();
+			accelerationsY.clear();
+			accelerationsZ.clear();
+			pressureValues.clear();
+			relHumidityValues.clear();
+			ambTemperatureValues.clear();
+		}
+
+		private String getCurrentTimeStamp() {
+		    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		    Date now = new Date();
+		    String strDate = sdfDate.format(now);
+		    return strDate;
 		}
 	}
 
