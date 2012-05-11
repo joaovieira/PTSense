@@ -217,12 +217,10 @@ public class SmartphoneSensingService extends Service implements
 
 		private void sendIntentWithSensorData() {
 			if (mAcceleration != null) {
-				intent.putExtra("accelX",
-						String.valueOf(accelerationsX.getLast()));
-				intent.putExtra("accelY",
-						String.valueOf(accelerationsY.getLast()));
-				intent.putExtra("accelZ",
-						String.valueOf(accelerationsZ.getLast()));
+				String oscilation = "x:" + String.valueOf(accelerationsX.getLast()) + 
+									" y:" + String.valueOf(accelerationsY.getLast()) +
+									" z:" + String.valueOf(accelerationsZ.getLast());
+				intent.putExtra("oscilation", oscilation);
 			}
 
 			if (mAmbTemperature != null)

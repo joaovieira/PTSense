@@ -6,8 +6,10 @@
     android:orientation="vertical" >
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/lvSensingNow"
+        style="@style/MyListView"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </LinearLayout>
