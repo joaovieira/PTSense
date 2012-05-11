@@ -26,29 +26,31 @@ public class SmartphoneSensingService extends Service implements
 
 	private Thread sensorThread = null;
 	private SensorManager sensorManager;
-	public static Sensor mLinearAcceleration, mAmbTemperature, mLight, mPressure,
+	public static Sensor mAcceleration, mAmbTemperature, mLight, mPressure,
 			mProximity, mRelHumidity = null;
 
-	public static LinkedList<Float> lightValues; //lux units
-	public static LinkedList<Float> accelerationsX, accelerationsY, accelerationsZ; //ms2
-	public static LinkedList<Float> pressureValues; //hPa (millibar)
-	public static LinkedList<Float> relHumidityValues;//percent %
-	public static LinkedList<Float> ambTemperatureValues; //celsius ¼C
-	
-	Float avgLight, avgAccelX, avgAccelY, avgAccelZ, avgPressure, avgHumidity, avgTemperature;
-	
+	public static LinkedList<Float> lightValues; // lux units
+	public static LinkedList<Float> accelerationsX, accelerationsY,
+			accelerationsZ; // ms2
+	public static LinkedList<Float> pressureValues; // hPa (millibar)
+	public static LinkedList<Float> relHumidityValues;// percent %
+	public static LinkedList<Float> ambTemperatureValues; // celsius ¼C
+
+	Float avgLight, avgAccelX, avgAccelY, avgAccelZ, avgPressure, avgHumidity,
+			avgTemperature;
+
 	SensorDatabaseHandler sensorDatabase;
-	
-    public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.displayevent";
-    private final Handler handler = new Handler();
-    Intent intent;
+
+	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.displayevent";
+	private final Handler handler = new Handler();
+	Intent intent;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		//sensorDatabase = new SensorDatabaseHandler(this);
-		
+		// sensorDatabase = new SensorDatabaseHandler(this);
+
 		lightValues = new LinkedList<Float>();
 		pressureValues = new LinkedList<Float>();
 		relHumidityValues = new LinkedList<Float>();
@@ -56,17 +58,15 @@ public class SmartphoneSensingService extends Service implements
 		accelerationsX = new LinkedList<Float>();
 		accelerationsY = new LinkedList<Float>();
 		accelerationsZ = new LinkedList<Float>();
-		avgLight = avgAccelX = avgAccelY = avgAccelZ = 
-				avgPressure = avgHumidity = avgTemperature = 0.0f;
-		
+		avgLight = avgAccelX = avgAccelY = avgAccelZ = avgPressure = avgHumidity = avgTemperature = 0.0f;
+
 		intent = new Intent(BROADCAST_ACTION);
 	}
-
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		IS_RUNNING = true;
-		
+
 		startOnGoingNotification();
 		registerSensorListeners();
 		collectDataFromSensors();
@@ -104,34 +104,43 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void registerSensorListeners() {
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
-			mLinearAcceleration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-			sensorManager.registerListener(this, mLinearAcceleration, SensorManager.SENSOR_DELAY_NORMAL);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+			mAcceleration = sensorManager
+					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			sensorManager.registerListener(this, mAcceleration,
+					SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null) {
-			mAmbTemperature = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-			sensorManager.registerListener(this, mAmbTemperature, SensorManager.SENSOR_DELAY_NORMAL);
+			mAmbTemperature = sensorManager
+					.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+			sensorManager.registerListener(this, mAmbTemperature,
+					SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null) {
 			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-			sensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
+			sensorManager.registerListener(this, mLight,
+					SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null) {
 			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
-			sensorManager.registerListener(this, mPressure, SensorManager.SENSOR_DELAY_NORMAL);
+			sensorManager.registerListener(this, mPressure,
+					SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null) {
 			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-			sensorManager.registerListener(this, mProximity, SensorManager.SENSOR_DELAY_NORMAL);
+			sensorManager.registerListener(this, mProximity,
+					SensorManager.SENSOR_DELAY_NORMAL);
 		}
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null) {
-			mRelHumidity = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
-			sensorManager.registerListener(this, mRelHumidity, SensorManager.SENSOR_DELAY_NORMAL);
+			mRelHumidity = sensorManager
+					.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+			sensorManager.registerListener(this, mRelHumidity,
+					SensorManager.SENSOR_DELAY_NORMAL);
 		}
 	}
 
@@ -140,11 +149,11 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void collectDataFromSensors() {
-		//print values on Sensing Now activity UI every 2 seconds
+		// print values on Sensing Now activity UI every 2 seconds
 		handler.removeCallbacks(sendUpdatesToUI);
-        handler.postDelayed(sendUpdatesToUI, 1000); // 1 second
-		
-        //calculate average and insert store into database every 20 seconds 
+		handler.postDelayed(sendUpdatesToUI, 1000); // 1 second
+
+		// calculate average and insert store into database every 20 seconds
 		sensorThread = new PreProcessThread();
 		sensorThread.start();
 	}
@@ -165,7 +174,7 @@ public class SmartphoneSensingService extends Service implements
 	public void onSensorChanged(SensorEvent event) {
 		synchronized (this) {
 			switch (event.sensor.getType()) {
-			case Sensor.TYPE_LINEAR_ACCELERATION:
+			case Sensor.TYPE_ACCELEROMETER:
 				accelerationsX.add(Float.valueOf(event.values[0]));
 				accelerationsY.add(Float.valueOf(event.values[1]));
 				accelerationsZ.add(Float.valueOf(event.values[2]));
@@ -183,99 +192,123 @@ public class SmartphoneSensingService extends Service implements
 				relHumidityValues.add(Float.valueOf(event.values[0]));
 				break;
 			case Sensor.TYPE_PROXIMITY:
-				// TODO cancel readings from light, humidity, pressure when close to things for more than 10sec
+				// TODO cancel readings from light, humidity, pressure when
+				// close to things for more than 10sec
 				break;
 			}
 		}
 	};
-	
+
 	private Runnable sendUpdatesToUI = new Runnable() {
-    	public void run() {
-    	    sendIntentWithSensorData();    		
-    	    handler.postDelayed(this, 1000); // 2 seconds
-    	}
+		public void run() {
+			sendIntentWithSensorData();
+			handler.postDelayed(this, 1000); // 2 seconds
+		}
 
 		private void sendIntentWithSensorData() {
-			if (mLinearAcceleration != null){
-				intent.putExtra("accelX", String.valueOf(accelerationsX.getLast()));
-				intent.putExtra("accelY", String.valueOf(accelerationsY.getLast()));
-				intent.putExtra("accelZ", String.valueOf(accelerationsZ.getLast()));
+			if (mAcceleration != null) {
+				intent.putExtra("accelX",
+						String.valueOf(accelerationsX.getLast()));
+				intent.putExtra("accelY",
+						String.valueOf(accelerationsY.getLast()));
+				intent.putExtra("accelZ",
+						String.valueOf(accelerationsZ.getLast()));
 			}
-			
+
 			if (mAmbTemperature != null)
-				intent.putExtra("temperature", String.valueOf(ambTemperatureValues.getLast()));
-			
+				intent.putExtra("temperature",
+						String.valueOf(ambTemperatureValues.getLast()));
+
 			if (mLight != null)
 				intent.putExtra("light", String.valueOf(lightValues.getLast()));
-			
+
 			if (mPressure != null)
-				intent.putExtra("pressure", String.valueOf(pressureValues.getLast()));
-			
+				intent.putExtra("pressure",
+						String.valueOf(pressureValues.getLast()));
+
 			if (mRelHumidity != null)
-				intent.putExtra("humidity", String.valueOf(relHumidityValues.getLast()));
-			
-	    	sendBroadcast(intent);
+				intent.putExtra("humidity",
+						String.valueOf(relHumidityValues.getLast()));
+
+			sendBroadcast(intent);
 		}
-    };
-	
+	};
+
 	private class PreProcessThread extends Thread {
 		@Override
 		public void run() {
 			while (IS_RUNNING) {
 				try {
 					sleep(20000);
-					Log.d("SmartphoneSensingService", "Starting to update SensorDatabase");
-					
-					/*String currentTime = getCurrentTimeStamp();
-					SensorData data = new SensorData(currentTime);
-					
-					data.setType("LIGHT");
-					data.setData(getAverageData(lightValues));
-				    sensorDatabase.addSensorData(data);
-				    Log.d("SmartphoneSensingService", "Updated database with: LIGHT " + getAverageData(lightValues));
-				    data.setType("ACCELERATION_X");
-				    data.setData(getAverageData(accelerationsX));
-				    sensorDatabase.addSensorData(data);
-				    Log.d("SmartphoneSensingService", "Updated database with: ACCELERATION_X " + getAverageData(accelerationsX));
-				    data.setType("ACCELERATION_Y");
-				    data.setData(getAverageData(accelerationsY));
-				    sensorDatabase.addSensorData(data);
-				    Log.d("SmartphoneSensingService", "Updated database with: ACCELERATION_Y " + getAverageData(accelerationsY));
-				    data.setType("ACCELERATION_Z");
-				    data.setData(getAverageData(accelerationsZ));
-				    sensorDatabase.addSensorData(data);
-				    Log.d("SmartphoneSensingService", "Updated database with: ACCELERATION_Z " + getAverageData(accelerationsZ));
-				    data.setType("PRESSURE");
-				    data.setData(getAverageData(pressureValues));
-				    sensorDatabase.addSensorData(data);
-				    Log.d("SmartphoneSensingService", "Updated database with: PRESSURE " + getAverageData(pressureValues));
-				    data.setType("HUMIDITY");
-				    data.setData(getAverageData(relHumidityValues));
-				    sensorDatabase.addSensorData(data);
-				    Log.d("SmartphoneSensingService", "Updated database with: HUMIDITY " + getAverageData(relHumidityValues));
-				    data.setType("TEMPERATURE");
-				    data.setData(getAverageData(ambTemperatureValues));
-				    sensorDatabase.addSensorData(data);
-				    Log.d("SmartphoneSensingService", "Updated database with: TEMPERATURE " + getAverageData(ambTemperatureValues));
-					
-				    clearBuffers();
-				    Log.d("SmartphoneSensingService", "Finished updating SensorDatabase");*/
-		
+					Log.d("SmartphoneSensingService",
+							"Starting to update SensorDatabase");
+
+					/*
+					 * String currentTime = getCurrentTimeStamp(); SensorData
+					 * data = new SensorData(currentTime);
+					 * 
+					 * data.setType("LIGHT");
+					 * data.setData(getAverageData(lightValues));
+					 * sensorDatabase.addSensorData(data);
+					 * Log.d("SmartphoneSensingService",
+					 * "Updated database with: LIGHT " +
+					 * getAverageData(lightValues));
+					 * data.setType("ACCELERATION_X");
+					 * data.setData(getAverageData(accelerationsX));
+					 * sensorDatabase.addSensorData(data);
+					 * Log.d("SmartphoneSensingService",
+					 * "Updated database with: ACCELERATION_X " +
+					 * getAverageData(accelerationsX));
+					 * data.setType("ACCELERATION_Y");
+					 * data.setData(getAverageData(accelerationsY));
+					 * sensorDatabase.addSensorData(data);
+					 * Log.d("SmartphoneSensingService",
+					 * "Updated database with: ACCELERATION_Y " +
+					 * getAverageData(accelerationsY));
+					 * data.setType("ACCELERATION_Z");
+					 * data.setData(getAverageData(accelerationsZ));
+					 * sensorDatabase.addSensorData(data);
+					 * Log.d("SmartphoneSensingService",
+					 * "Updated database with: ACCELERATION_Z " +
+					 * getAverageData(accelerationsZ));
+					 * data.setType("PRESSURE");
+					 * data.setData(getAverageData(pressureValues));
+					 * sensorDatabase.addSensorData(data);
+					 * Log.d("SmartphoneSensingService",
+					 * "Updated database with: PRESSURE " +
+					 * getAverageData(pressureValues));
+					 * data.setType("HUMIDITY");
+					 * data.setData(getAverageData(relHumidityValues));
+					 * sensorDatabase.addSensorData(data);
+					 * Log.d("SmartphoneSensingService",
+					 * "Updated database with: HUMIDITY " +
+					 * getAverageData(relHumidityValues));
+					 * data.setType("TEMPERATURE");
+					 * data.setData(getAverageData(ambTemperatureValues));
+					 * sensorDatabase.addSensorData(data);
+					 * Log.d("SmartphoneSensingService",
+					 * "Updated database with: TEMPERATURE " +
+					 * getAverageData(ambTemperatureValues));
+					 * 
+					 * clearBuffers(); Log.d("SmartphoneSensingService",
+					 * "Finished updating SensorDatabase");
+					 */
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		
+
 		private Float getAverageData(LinkedList<Float> valuesList) {
 			ListIterator<Float> iter = valuesList.listIterator();
 			int size = valuesList.size();
 			Float average = new Float(0);
-			
-		    while (iter.hasNext()) {
-		    	average += iter.next();
-		    }
-		    return average / size;
+
+			while (iter.hasNext()) {
+				average += iter.next();
+			}
+			return average / size;
 		}
 
 		private void clearBuffers() {
@@ -289,10 +322,11 @@ public class SmartphoneSensingService extends Service implements
 		}
 
 		private String getCurrentTimeStamp() {
-		    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		    Date now = new Date();
-		    String strDate = sdfDate.format(now);
-		    return strDate;
+			SimpleDateFormat sdfDate = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
+			Date now = new Date();
+			String strDate = sdfDate.format(now);
+			return strDate;
 		}
 	}
 

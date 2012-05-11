@@ -10,22 +10,63 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class NowFragment extends Fragment {
-	
-	//TextView x,y,z;
+
 	private Activity sensingActivity;
-	
-	TextView test;
+
+	// remove
+	LinearLayout sensingNowEnvironment;
+	TextView tvLight, tvAccelX, tvAccelY, tvAccelZ, tvPressure, tvHumidity,
+			tvTemperature;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.now_fragment, container, false);
-		
+
 		sensingActivity = getActivity();
+
+		sensingNowEnvironment = (LinearLayout) v.findViewById(R.id.llSensingNow);
+
+		if (SmartphoneSensingService.mAcceleration != null) {
+			tvAccelX = new TextView(sensingActivity);
+			sensingNowEnvironment.addView(tvAccelX);
+			tvAccelY = new TextView(sensingActivity);
+			sensingNowEnvironment.addView(tvAccelY);
+			tvAccelZ = new TextView(sensingActivity);
+			sensingNowEnvironment.addView(tvAccelZ);
+		}
+
+		if (SmartphoneSensingService.mAmbTemperature != null) {
+			tvTemperature = new TextView(sensingActivity);
+			sensingNowEnvironment.addView(tvTemperature);
+		}
+
+		if (SmartphoneSensingService.mLight != null) {
+			tvLight = new TextView(sensingActivity);
+			sensingNowEnvironment.addView(tvLight);
+		}
+
+		if (SmartphoneSensingService.mPressure != null) {
+			tvPressure = new TextView(sensingActivity);
+			sensingNowEnvironment.addView(tvPressure);
+		}
+
+		if (SmartphoneSensingService.mRelHumidity != null) {
+			tvHumidity = new TextView(sensingActivity);
+			sensingNowEnvironment.addView(tvHumidity);
+		}
+
 		return v;
 	}
 
@@ -49,8 +90,26 @@ public class NowFragment extends Fragment {
 	}
     
     private void updateUI(Intent intent) {
-    	String light = intent.getStringExtra("light");
+    	String sensedData = "";
+    	if((sensedData = intent.getStringExtra("accelX")) != null)
+    		tvAccelX.setText(sensedData);
 
-    	test.setText(light);
+    	if((sensedData = intent.getStringExtra("accelY")) != null)
+    		tvAccelY.setText(sensedData);
+    	
+    	if((sensedData = intent.getStringExtra("accelZ")) != null)
+    		tvAccelZ.setText(sensedData);
+    	
+    	if((sensedData = intent.getStringExtra("temperature")) != null)
+    		tvTemperature.setText(sensedData);
+
+    	if((sensedData = intent.getStringExtra("light")) != null)
+    		tvLight.setText(sensedData);
+    	
+    	if((sensedData = intent.getStringExtra("pressure")) != null)
+    		tvPressure.setText(sensedData);
+    	
+    	if((sensedData = intent.getStringExtra("humidity")) != null)
+    		tvHumidity.setText(sensedData);
     }
 }

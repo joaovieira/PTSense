@@ -3,12 +3,8 @@ package com.cloud2bubble.ptsense;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,7 +23,6 @@ public class Sensing extends Activity{
 		// Notice that setContentView() is not used, because we use the root
 	    // android.R.id.content as the container for each fragment
 		
-		/*
 		// setup action bar for tabs
 	    ActionBar actionBar = getActionBar();
 	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -44,96 +39,8 @@ public class Sensing extends Activity{
 	                this, "now", NowFragment.class));
 	    actionBar.addTab(tab);
 	    
-	    actionBar.setDisplayHomeAsUpEnabled(true);*/
-		
-		
-		/* ------- START REMOVE ---------- */
-		setContentView(R.layout.now_fragment);
-			
-		sensingNowEnvironment = (LinearLayout) findViewById(R.id.llSensingNow);
-		
-		if (SmartphoneSensingService.mLinearAcceleration != null){
-			tvAccelX = new TextView(this);
-			tvAccelX.setText("0.0");
-			sensingNowEnvironment.addView(tvAccelX);
-			tvAccelY = new TextView(this);
-			tvAccelY.setText("0.0");
-			sensingNowEnvironment.addView(tvAccelY);
-			tvAccelZ = new TextView(this);
-			tvAccelZ.setText("0.0");
-			sensingNowEnvironment.addView(tvAccelZ);
-		}
-		
-		if (SmartphoneSensingService.mAmbTemperature != null){
-			tvTemperature = new TextView(this);
-			tvTemperature.setText("0.0");
-			sensingNowEnvironment.addView(tvTemperature);
-		}
-			
-		if (SmartphoneSensingService.mLight != null){
-			tvLight = new TextView(this);
-			tvLight.setText("0.0");
-			sensingNowEnvironment.addView(tvLight);
-		}
-		
-		if (SmartphoneSensingService.mPressure != null){
-			tvPressure = new TextView(this);
-			tvPressure.setText("0.0");
-			sensingNowEnvironment.addView(tvPressure);
-		}
-		
-		if (SmartphoneSensingService.mRelHumidity != null){
-			tvHumidity = new TextView(this);
-			tvHumidity.setText("0.0");
-			sensingNowEnvironment.addView(tvHumidity);
-		}
+	    actionBar.setDisplayHomeAsUpEnabled(true);
 	}
-	
-	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-        	updateUI(intent); 
-        }
-    };
-    
-    @Override
-	public void onResume() {
-		super.onResume();
-		registerReceiver(broadcastReceiver, new IntentFilter(SmartphoneSensingService.BROADCAST_ACTION));
-	}
-    
-    @Override
-	protected void onPause() {
-		super.onPause();
-		unregisterReceiver(broadcastReceiver);
-	}
-    
-    private void updateUI(Intent intent) {
-    	String sensedData = "";
-    	if((sensedData = intent.getStringExtra("accelX")) != null)
-    		tvAccelX.setText(sensedData);
-
-    	if((sensedData = intent.getStringExtra("accelY")) != null)
-    		tvAccelY.setText(sensedData);
-    	
-    	if((sensedData = intent.getStringExtra("accelZ")) != null)
-    		tvAccelZ.setText(sensedData);
-    	
-    	if((sensedData = intent.getStringExtra("temperature")) != null)
-    		tvTemperature.setText(sensedData);
-
-    	if((sensedData = intent.getStringExtra("light")) != null)
-    		tvLight.setText(sensedData);
-    	
-    	if((sensedData = intent.getStringExtra("pressure")) != null)
-    		tvPressure.setText(sensedData);
-    	
-    	if((sensedData = intent.getStringExtra("humidity")) != null)
-    		tvHumidity.setText(sensedData);
-    }
-    
-    /* ------- STOP REMOVE ---------- */
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
