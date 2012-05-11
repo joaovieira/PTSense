@@ -8,14 +8,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class Sensing extends Activity{
-	
-	//remove
-	LinearLayout sensingNowEnvironment;
-	TextView tvLight, tvAccelX, tvAccelY, tvAccelZ, tvPressure, tvHumidity, tvTemperature;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +47,8 @@ public class Sensing extends Activity{
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.miStopSensing:
+			stopService(new Intent(this, SmartphoneSensingService.class));
 		case android.R.id.home:
 			// app icon in action bar clicked; go home
 			Intent homeIntent = new Intent(this, Home.class);

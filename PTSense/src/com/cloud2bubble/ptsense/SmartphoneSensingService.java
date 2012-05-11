@@ -1,6 +1,7 @@
 package com.cloud2bubble.ptsense;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -35,6 +36,8 @@ public class SmartphoneSensingService extends Service implements
 	public static LinkedList<Float> pressureValues; // hPa (millibar)
 	public static LinkedList<Float> relHumidityValues;// percent %
 	public static LinkedList<Float> ambTemperatureValues; // celsius ¼C
+	
+	Float x, y, z;
 
 	Float avgLight, avgAccelX, avgAccelY, avgAccelZ, avgPressure, avgHumidity,
 			avgTemperature;
@@ -55,10 +58,11 @@ public class SmartphoneSensingService extends Service implements
 		pressureValues = new LinkedList<Float>();
 		relHumidityValues = new LinkedList<Float>();
 		ambTemperatureValues = new LinkedList<Float>();
-		accelerationsX = new LinkedList<Float>();
-		accelerationsY = new LinkedList<Float>();
-		accelerationsZ = new LinkedList<Float>();
+		accelerationsX = new LinkedList<Float>(Arrays.asList(0.0f));
+		accelerationsY = new LinkedList<Float>(Arrays.asList(0.0f));
+		accelerationsZ = new LinkedList<Float>(Arrays.asList(0.0f));
 		avgLight = avgAccelX = avgAccelY = avgAccelZ = avgPressure = avgHumidity = avgTemperature = 0.0f;
+		x = y = z = 0.0f;
 
 		intent = new Intent(BROADCAST_ACTION);
 	}
@@ -175,9 +179,15 @@ public class SmartphoneSensingService extends Service implements
 		synchronized (this) {
 			switch (event.sensor.getType()) {
 			case Sensor.TYPE_ACCELEROMETER:
-				accelerationsX.add(Float.valueOf(event.values[0]));
-				accelerationsY.add(Float.valueOf(event.values[1]));
-				accelerationsZ.add(Float.valueOf(event.values[2]));
+				float dX = event.values[0] - x;
+				x = event.values[0];
+				accelerationsX.add(dX);
+				float dY = event.values[1] - y;
+				y = event.values[1];
+				accelerationsY.add(dY);
+				float dZ = event.values[2] - z;
+				z = event.values[2];
+				accelerationsZ.add(dZ);
 				break;
 			case Sensor.TYPE_AMBIENT_TEMPERATURE:
 				ambTemperatureValues.add(Float.valueOf(event.values[0]));
