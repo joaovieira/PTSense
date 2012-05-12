@@ -1,6 +1,10 @@
 package com.cloud2bubble.ptsense;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,17 +14,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class Home extends Activity implements OnClickListener {
-	
+public class Home extends Activity implements OnClickListener, SensingManager {
+
 	Button bOption1, bOption2, bOption3, bToggleSensing;
 	boolean isSensing;
-	
+	static final int DIALOG_STOP_SENSING_ID = 0;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+
 		bOption1 = (Button) findViewById(R.id.bHomeOption1);
 		bOption2 = (Button) findViewById(R.id.bHomeOption2);
 		bOption3 = (Button) findViewById(R.id.bHomeOption3);
@@ -28,7 +33,7 @@ public class Home extends Activity implements OnClickListener {
 		bOption1.setOnClickListener(this);
 		bOption2.setOnClickListener(this);
 		bOption3.setOnClickListener(this);
-		bToggleSensing.setOnClickListener(this);	
+		bToggleSensing.setOnClickListener(this);
 		isSensing = SmartphoneSensingService.IS_RUNNING;
 	}
 
@@ -77,21 +82,19 @@ public class Home extends Activity implements OnClickListener {
 			startActivity(option3Intent);
 			break;
 		case R.id.bToggleSensing:
-			if(!isSensing){
+			if (!isSensing) {
 				isSensing = true;
-				Intent i=new Intent(this, SmartphoneSensingService.class);
-			    startService(i);
-			    Intent sensingIntent = new Intent(this, Sensing.class);
+				Intent i = new Intent(this, SmartphoneSensingService.class);
+				startService(i);
+				Intent sensingIntent = new Intent(this, Sensing.class);
 				startActivity(sensingIntent);
-			}else{
-				stopService(new Intent(this, SmartphoneSensingService.class));
-				isSensing = false;
-				toggleSensingButtons();
+			} else {
+				showDialog();
 			}
 			break;
 		}
 	}
-	
+
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
@@ -103,14 +106,26 @@ public class Home extends Activity implements OnClickListener {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean("isSensing", isSensing);
 	}
-	
+
 	private void toggleSensingButtons() {
-		if(isSensing){
+		if (isSensing) {
 			bOption1.setEnabled(true);
 			bToggleSensing.setText(getText(R.string.stop));
-		}else{
+		} else {
 			bOption1.setEnabled(false);
 			bToggleSensing.setText(getText(R.string.start));
 		}
+	}
+
+	public void showDialog() {
+		DialogFragment newFragment = StopSensingDialog.newInstance(this,
+                R.string.stop_sensing_dialog);
+        newFragment.show(getFragmentManager(), "dialog");
+	}
+
+	public void doPositiveClick() {
+		stopService(new Intent(Home.this, SmartphoneSensingService.class));
+		isSensing = false;
+		toggleSensingButtons();
 	}
 }

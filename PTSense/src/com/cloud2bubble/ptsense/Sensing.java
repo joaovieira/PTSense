@@ -1,6 +1,7 @@
 package com.cloud2bubble.ptsense;
 
 import android.app.ActionBar;
+import android.app.DialogFragment;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-public class Sensing extends Activity{
+public class Sensing extends Activity implements SensingManager {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,8 @@ public class Sensing extends Activity{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.miStopSensing:
-			stopService(new Intent(this, SmartphoneSensingService.class));
+			showDialog();
+			return true;
 		case android.R.id.home:
 			// app icon in action bar clicked; go home
 			Intent homeIntent = new Intent(this, Home.class);
@@ -67,5 +69,18 @@ public class Sensing extends Activity{
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	public void showDialog() {
+		DialogFragment newFragment = StopSensingDialog.newInstance(this,
+                R.string.stop_sensing_dialog);
+        newFragment.show(getFragmentManager(), "dialog");
+	}
+
+	public void doPositiveClick() {
+		stopService(new Intent(this, SmartphoneSensingService.class));
+		Intent homeIntent = new Intent(this, Home.class);
+		homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(homeIntent);
 	}
 }

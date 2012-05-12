@@ -32,5 +32,7 @@
     <string name="notification.sensing.title">Sensing Running</string>
     <string name="notification.sensing.message">Touch for details</string>
     <string name="start">Start</string>
+    <string name="stop_sensing_dialog">Stop Sensing Dialog</string>
+    <string name="alert_dialog_cancel">Cancel</string>
 
 </resources>
