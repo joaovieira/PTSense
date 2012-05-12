@@ -14,11 +14,11 @@ public class SectionItem implements Item {
 		return title;
 	}
 
-	public boolean isSection() {
-		return true;
-	}
-
 	public String getKey() {
 		return key;
+	}
+
+	public int getType() {
+		return Item.SECTION;
 	}
 }

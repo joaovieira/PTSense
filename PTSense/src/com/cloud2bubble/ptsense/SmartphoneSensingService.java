@@ -1,5 +1,6 @@
 package com.cloud2bubble.ptsense;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -14,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -29,6 +31,7 @@ public class SmartphoneSensingService extends Service implements
 	private SensorManager sensorManager;
 	public static Sensor mAcceleration, mAmbTemperature, mLight, mPressure,
 			mProximity, mRelHumidity = null;
+	public static MediaRecorder soundRecorder = null;
 
 	public static LinkedList<Float> lightValues; // lux units
 	public static LinkedList<Float> accelerationsX, accelerationsY,
@@ -36,7 +39,8 @@ public class SmartphoneSensingService extends Service implements
 	public static LinkedList<Float> pressureValues; // hPa (millibar)
 	public static LinkedList<Float> relHumidityValues;// percent %
 	public static LinkedList<Float> ambTemperatureValues; // celsius ¼C
-	
+	public static LinkedList<Double> soundValues; //dB
+
 	Float x, y, z;
 
 	Float avgLight, avgAccelX, avgAccelY, avgAccelZ, avgPressure, avgHumidity,
@@ -61,6 +65,7 @@ public class SmartphoneSensingService extends Service implements
 		accelerationsX = new LinkedList<Float>(Arrays.asList(0.0f));
 		accelerationsY = new LinkedList<Float>(Arrays.asList(0.0f));
 		accelerationsZ = new LinkedList<Float>(Arrays.asList(0.0f));
+		soundValues = new LinkedList<Double>();
 		avgLight = avgAccelX = avgAccelY = avgAccelZ = avgPressure = avgHumidity = avgTemperature = 0.0f;
 		x = y = z = 0.0f;
 
@@ -73,6 +78,7 @@ public class SmartphoneSensingService extends Service implements
 
 		startOnGoingNotification();
 		registerSensorListeners();
+		startSoundRecording();
 		collectDataFromSensors();
 
 		// We want this service to continue running until it is explicitly
@@ -146,6 +152,16 @@ public class SmartphoneSensingService extends Service implements
 			sensorManager.registerListener(this, mRelHumidity,
 					SensorManager.SENSOR_DELAY_NORMAL);
 		}
+		
+		Log.d("coco", "preparing to register soundRecorder");
+		if (soundRecorder == null){
+			soundRecorder = new MediaRecorder();
+			soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+			soundRecorder.setOutputFile("/dev/null");
+		}
+		Log.d("coco", "registered soundRecorder");
 	}
 
 	private void unregisterSensorListeners() {
@@ -164,11 +180,31 @@ public class SmartphoneSensingService extends Service implements
 
 	private void stop() {
 		unregisterSensorListeners();
+		stopSoundRecording();
+
 		handler.removeCallbacks(sendUpdatesToUI);
 		stopForeground(true);
 
 		// Tell the user we stopped.
 		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
+	}
+
+	private void startSoundRecording() {
+		Log.d("coco", "preparing to start recording");
+		try {
+			soundRecorder.prepare();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		soundRecorder.start();
+		Log.d("coco", "started recording");
+	}
+
+	private void stopSoundRecording() {
+		soundRecorder.stop();
+		soundRecorder.release();
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -212,14 +248,21 @@ public class SmartphoneSensingService extends Service implements
 	private Runnable sendUpdatesToUI = new Runnable() {
 		public void run() {
 			sendIntentWithSensorData();
-			handler.postDelayed(this, 1000); // 2 seconds
+			handler.postDelayed(this, 1000); // 1 second
 		}
 
 		private void sendIntentWithSensorData() {
+			if (soundRecorder != null){
+				double amp = getPowerDB();
+				soundValues.add(Double.valueOf(amp));
+				intent.putExtra("sound", String.valueOf(amp));
+			}
+			
 			if (mAcceleration != null) {
-				String oscilation = "x:" + String.valueOf(accelerationsX.getLast()) + 
-									" y:" + String.valueOf(accelerationsY.getLast()) +
-									" z:" + String.valueOf(accelerationsZ.getLast());
+				String oscilation = "x:"
+						+ String.valueOf(accelerationsX.getLast()) + " y:"
+						+ String.valueOf(accelerationsY.getLast()) + " z:"
+						+ String.valueOf(accelerationsZ.getLast());
 				intent.putExtra("oscilation", oscilation);
 			}
 
@@ -239,6 +282,11 @@ public class SmartphoneSensingService extends Service implements
 						String.valueOf(relHumidityValues.getLast()));
 
 			sendBroadcast(intent);
+		}
+
+		private double getPowerDB() {
+			double power_db = 20 * Math.log10(soundRecorder.getMaxAmplitude() / MediaRecorder.getAudioSourceMax());
+			return power_db;
 		}
 	};
 
@@ -337,5 +385,4 @@ public class SmartphoneSensingService extends Service implements
 			return strDate;
 		}
 	}
-
 }

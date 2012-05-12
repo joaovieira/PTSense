@@ -14,15 +14,15 @@ public class EntryItem implements Item {
 		this.value = "";
 	}
 
-	public boolean isSection() {
-		return false;
-	}
-
 	public String getKey() {
 		return key;
 	}
 	
 	public String toString(){
 		return value + " " + unit;
+	}
+
+	public int getType() {
+		return Item.ENTRY;
 	}
 }

@@ -27,7 +27,8 @@ public class HeadedListAdapter extends ArrayAdapter<Item> {
 
 		final Item i = items.get(position);
 		if (i != null) {
-			if (i.isSection()) {
+			switch (i.getType()){
+			case Item.SECTION:
 				SectionItem si = (SectionItem) i;
 				v = vi.inflate(android.R.layout.preference_category, null);
 
@@ -38,18 +39,29 @@ public class HeadedListAdapter extends ArrayAdapter<Item> {
 				final TextView sectionView = (TextView) v
 						.findViewById(android.R.id.title);
 				sectionView.setText(si.getTitle());
-			} else {
+				break;
+			case Item.ENTRY:
 				EntryItem ei = (EntryItem) i;
 				v = vi.inflate(android.R.layout.simple_list_item_2, null);
 				final TextView title = (TextView) v
 						.findViewById(android.R.id.text1);
-				final TextView subtitle = (TextView) v
+				final TextView value = (TextView) v
 						.findViewById(android.R.id.text2);
 
 				if (title != null)
 					title.setText(ei.title);
-				if (subtitle != null)
-					subtitle.setText(ei.toString());
+				if (value != null)
+					value.setText(ei.toString());
+				break;
+			case Item.EMPTY:
+				EmptyItem emi = (EmptyItem) i;
+				v = vi.inflate(android.R.layout.simple_list_item_1, null);
+				final TextView text = (TextView) v
+						.findViewById(android.R.id.text1);
+
+				if (text != null)
+					text.setText(emi.getText());
+				break;
 			}
 		}
 		return v;

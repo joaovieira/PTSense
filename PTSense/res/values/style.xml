@@ -13,6 +13,7 @@
         <item name="android:actionBarWidgetTheme">@android:style/Theme.Holo</item>
         <item name="android:listSeparatorTextViewStyle">@style/MyListViewSeparator</item>
         <item name="android:textAppearanceListItem">?android:attr/textAppearanceMedium</item>
+        <item name="android:textAppearanceListItemSmall">@style/MyTextAppearance.ListItem.Small</item>
         <item name="android:textAppearanceSmall">@style/MyTextAppearance.Small</item>
     </style>
 
@@ -32,12 +33,12 @@
     <style name="MyActionBar.TabTextStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabText">
         <item name="android:textColor">@color/actionbar_tab_text</item>
     </style>
-    
+
     <style name="MyListView" parent="@android:style/Widget.Holo.Light.ListView">
         <item name="android:paddingLeft">16dip</item>
         <item name="android:paddingRight">16dip</item>
     </style>
-    
+
     <style name="MyListViewSeparator">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -55,4 +56,10 @@
     <style name="MyTextAppearance.Small" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">?android:attr/textColorHintInverse</item>
     </style>
+
+    <style name="MyTextAppearance.ListItem.Small" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 </resources>
