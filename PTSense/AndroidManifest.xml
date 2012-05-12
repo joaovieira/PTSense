@@ -37,7 +37,7 @@
         </activity>
         <activity
             android:name=".Sensing"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboardHidden|orientation"
             android:label="@string/home.option1"
             android:launchMode="singleTop" >
         </activity>

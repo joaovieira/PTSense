@@ -1,5 +1,6 @@
 package com.cloud2bubble.ptsense;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaRecorder;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -39,7 +41,7 @@ public class SmartphoneSensingService extends Service implements
 	public static LinkedList<Float> pressureValues; // hPa (millibar)
 	public static LinkedList<Float> relHumidityValues;// percent %
 	public static LinkedList<Float> ambTemperatureValues; // celsius ¼C
-	public static LinkedList<Double> soundValues; //dB
+	public static LinkedList<Double> soundValues; // dB
 
 	Float x, y, z;
 
@@ -58,14 +60,52 @@ public class SmartphoneSensingService extends Service implements
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		// sensorDatabase = new SensorDatabaseHandler(this);
 
-		lightValues = new LinkedList<Float>();
-		pressureValues = new LinkedList<Float>();
-		relHumidityValues = new LinkedList<Float>();
-		ambTemperatureValues = new LinkedList<Float>();
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
+			mAcceleration = sensorManager
+					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null)
+			mAmbTemperature = sensorManager
+					.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null)
+			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null)
+			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
+			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null)
+			mRelHumidity = sensorManager
+					.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+
+		if (soundRecorder == null) {
+			soundRecorder = new MediaRecorder();
+			soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+			File sampleDir = Environment.getExternalStorageDirectory();
+			File audiofile = null;
+			try {
+				audiofile = File.createTempFile("PTSense_output", ".3gp", sampleDir);
+			} catch (IOException e) {
+				audiofile = getFileStreamPath("PTSense_output.3gp");
+			}
+
+			soundRecorder.setOutputFile(audiofile.getAbsolutePath());
+		}
+
+		lightValues = new LinkedList<Float>(Arrays.asList(0.0f));
+		pressureValues = new LinkedList<Float>(Arrays.asList(0.0f));
+		relHumidityValues = new LinkedList<Float>(Arrays.asList(0.0f));
+		ambTemperatureValues = new LinkedList<Float>(Arrays.asList(0.0f));
 		accelerationsX = new LinkedList<Float>(Arrays.asList(0.0f));
 		accelerationsY = new LinkedList<Float>(Arrays.asList(0.0f));
 		accelerationsZ = new LinkedList<Float>(Arrays.asList(0.0f));
-		soundValues = new LinkedList<Double>();
+		soundValues = new LinkedList<Double>(Arrays.asList(0.0));
 		avgLight = avgAccelX = avgAccelY = avgAccelZ = avgPressure = avgHumidity = avgTemperature = 0.0f;
 		x = y = z = 0.0f;
 
@@ -114,54 +154,29 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void registerSensorListeners() {
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
-			mAcceleration = sensorManager
-					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		if (mAcceleration != null)
 			sensorManager.registerListener(this, mAcceleration,
 					SensorManager.SENSOR_DELAY_NORMAL);
-		}
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null) {
-			mAmbTemperature = sensorManager
-					.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+		if (mAmbTemperature != null)
 			sensorManager.registerListener(this, mAmbTemperature,
 					SensorManager.SENSOR_DELAY_NORMAL);
-		}
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null) {
-			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+		if (mLight != null)
 			sensorManager.registerListener(this, mLight,
 					SensorManager.SENSOR_DELAY_NORMAL);
-		}
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null) {
-			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+		if (mLight != null)
 			sensorManager.registerListener(this, mPressure,
 					SensorManager.SENSOR_DELAY_NORMAL);
-		}
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null) {
-			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+		if (mProximity != null)
 			sensorManager.registerListener(this, mProximity,
 					SensorManager.SENSOR_DELAY_NORMAL);
-		}
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null) {
-			mRelHumidity = sensorManager
-					.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+		if (mRelHumidity != null)
 			sensorManager.registerListener(this, mRelHumidity,
 					SensorManager.SENSOR_DELAY_NORMAL);
-		}
-		
-		Log.d("coco", "preparing to register soundRecorder");
-		if (soundRecorder == null){
-			soundRecorder = new MediaRecorder();
-			soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-			soundRecorder.setOutputFile("/dev/null");
-		}
-		Log.d("coco", "registered soundRecorder");
 	}
 
 	private void unregisterSensorListeners() {
@@ -190,16 +205,14 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void startSoundRecording() {
-		Log.d("coco", "preparing to start recording");
 		try {
 			soundRecorder.prepare();
+			soundRecorder.start();
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		soundRecorder.start();
-		Log.d("coco", "started recording");
 	}
 
 	private void stopSoundRecording() {
@@ -252,12 +265,12 @@ public class SmartphoneSensingService extends Service implements
 		}
 
 		private void sendIntentWithSensorData() {
-			if (soundRecorder != null){
+			if (soundRecorder != null) {
 				double amp = getPowerDB();
 				soundValues.add(Double.valueOf(amp));
 				intent.putExtra("sound", String.valueOf(amp));
 			}
-			
+
 			if (mAcceleration != null) {
 				String oscilation = "x:"
 						+ String.valueOf(accelerationsX.getLast()) + " y:"
@@ -285,7 +298,8 @@ public class SmartphoneSensingService extends Service implements
 		}
 
 		private double getPowerDB() {
-			double power_db = 20 * Math.log10(soundRecorder.getMaxAmplitude() / MediaRecorder.getAudioSourceMax());
+			double power_db = 20 * Math.log10(soundRecorder.getMaxAmplitude()
+					/ MediaRecorder.getAudioSourceMax());
 			return power_db;
 		}
 	};
@@ -345,10 +359,11 @@ public class SmartphoneSensingService extends Service implements
 					 * Log.d("SmartphoneSensingService",
 					 * "Updated database with: TEMPERATURE " +
 					 * getAverageData(ambTemperatureValues));
-					 * 
-					 * clearBuffers(); Log.d("SmartphoneSensingService",
-					 * "Finished updating SensorDatabase");
 					 */
+					clearBuffers();
+					soundRecorder.reset();
+					Log.d("SmartphoneSensingService",
+							"Finished updating SensorDatabase");
 
 				} catch (InterruptedException e) {
 					e.printStackTrace();
