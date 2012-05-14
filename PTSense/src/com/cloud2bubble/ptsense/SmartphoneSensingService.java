@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +19,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaRecorder;
-import android.media.MediaRecorder.OnInfoListener;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -50,8 +48,9 @@ public class SmartphoneSensingService extends Service implements
 			tmpAmbTemperatureValues;
 	private List<Double> tmpSoundValues;
 
-	private Float currentX, currentY, currentZ, currentLight, currentPressure,
-			currentTemp, currentHumidity;
+	private Float currentX, currentdX, currentY, currentdY, currentZ,
+			currentdZ, currentLight, currentPressure, currentTemp,
+			currentHumidity;
 
 	private SensorDatabaseHandler sensorDatabase;
 
@@ -60,7 +59,7 @@ public class SmartphoneSensingService extends Service implements
 	Intent intent;
 
 	private final String outputFile = "PTSense_output";
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -208,7 +207,7 @@ public class SmartphoneSensingService extends Service implements
 		// Tell the user we stopped.
 		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
 	}
-	
+
 	private void setupSoundRecorder() {
 		soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -242,12 +241,15 @@ public class SmartphoneSensingService extends Service implements
 			case Sensor.TYPE_ACCELEROMETER:
 				float dX = event.values[0] - currentX;
 				currentX = event.values[0];
+				currentdX = dX;
 				accelerationsX.offer(dX);
 				float dY = event.values[1] - currentY;
 				currentY = event.values[1];
+				currentdY = dY;
 				accelerationsY.offer(dY);
 				float dZ = event.values[2] - currentZ;
 				currentZ = event.values[2];
+				currentdZ = dZ;
 				accelerationsZ.offer(dZ);
 				break;
 			case Sensor.TYPE_AMBIENT_TEMPERATURE:
@@ -288,9 +290,9 @@ public class SmartphoneSensingService extends Service implements
 			}
 
 			if (mAcceleration != null) {
-				String oscilation = "x:" + String.valueOf(currentX) + " y:"
-						+ String.valueOf(currentY) + " z:"
-						+ String.valueOf(currentZ);
+				String oscilation = "x:" + String.valueOf(currentdX) + " y:"
+						+ String.valueOf(currentdY) + " z:"
+						+ String.valueOf(currentdZ);
 				intent.putExtra("oscilation", oscilation);
 			}
 
@@ -322,14 +324,14 @@ public class SmartphoneSensingService extends Service implements
 			while (IS_RUNNING) {
 				try {
 					sleep(20000);
-					Log.d("SmartphoneSensingService",
-							"Starting to update SensorDatabase");
+					Log.d("SmartphoneSensingService", "Updating SensorDatabase");
 
 					drainBuffers();
+
+					String currentTime = getCurrentTimeStamp();
+					SensorData data = new SensorData(currentTime);
+
 					/*
-					 * String currentTime = getCurrentTimeStamp(); SensorData
-					 * data = new SensorData(currentTime);
-					 * 
 					 * data.setType("LIGHT");
 					 * data.setData(getAverageData(lightValues));
 					 * sensorDatabase.addSensorData(data);
@@ -373,10 +375,9 @@ public class SmartphoneSensingService extends Service implements
 					 * "Updated database with: TEMPERATURE " +
 					 * getAverageData(ambTemperatureValues));
 					 */
-					//restartRecording();
-					// TODO define listener to reset file when reached max file size
-					Log.d("SmartphoneSensingService",
-							"Finished updating SensorDatabase");
+					// restartRecording();
+					// TODO define listener to reset file when reached max file
+					// size
 
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -404,10 +405,10 @@ public class SmartphoneSensingService extends Service implements
 		private void drainBuffers() {
 			lightValues.drainTo(tmpLightValues);
 			accelerationsX.drainTo(tmpAccelerationsX);
-			accelerationsY.drainTo(tmpAccelerationsX);
-			accelerationsZ.drainTo(tmpAccelerationsX);
+			accelerationsY.drainTo(tmpAccelerationsY);
+			accelerationsZ.drainTo(tmpAccelerationsZ);
 			pressureValues.drainTo(tmpPressureValues);
-			relHumidityValues.drainTo(tmpPressureValues);
+			relHumidityValues.drainTo(tmpRelHumidityValues);
 			ambTemperatureValues.drainTo(tmpAmbTemperatureValues);
 			soundValues.drainTo(tmpSoundValues);
 		}
