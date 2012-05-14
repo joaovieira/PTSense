@@ -34,6 +34,7 @@
     <string name="start">Start</string>
     <string name="stop_sensing_dialog">Stop Sensing Dialog</string>
     <string name="alert_dialog_cancel">Cancel</string>
+    <string name="empty_feedback_list">You don\'t have any feedback to respond.</string>
     
     
     

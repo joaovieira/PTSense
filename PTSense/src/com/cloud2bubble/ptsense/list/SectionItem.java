@@ -1,6 +1,6 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.list;
 
-public class SectionItem implements Item {
+public class SectionItem implements SensorDataItem {
 
 	private final String title;
 	private final String key;
@@ -19,6 +19,6 @@ public class SectionItem implements Item {
 	}
 
 	public int getType() {
-		return Item.SECTION;
+		return SensorDataItem.SECTION;
 	}
 }

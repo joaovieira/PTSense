@@ -1,4 +1,11 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.activity;
+
+import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.dialog.SensingManager;
+import com.cloud2bubble.ptsense.dialog.StopSensingDialog;
+import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
+import com.cloud2bubble.ptsense.tabfragment.NowFragment;
+import com.cloud2bubble.ptsense.tabfragment.ThisLineFragment;
 
 import android.app.ActionBar;
 import android.app.DialogFragment;
@@ -49,7 +56,7 @@ public class Sensing extends Activity implements SensingManager {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.miStopSensing:
-			showDialog();
+			showSenseDialog(SensingManager.DIALOG_STOP_SENSING);
 			return true;
 		case android.R.id.home:
 			// app icon in action bar clicked; go home
@@ -71,13 +78,13 @@ public class Sensing extends Activity implements SensingManager {
 		}
 	}
 
-	public void showDialog() {
+	public void showSenseDialog(int dialog) {
 		DialogFragment newFragment = StopSensingDialog.newInstance(this,
                 R.string.stop_sensing_dialog);
         newFragment.show(getFragmentManager(), "dialog");
 	}
 
-	public void doPositiveClick() {
+	public void doPositiveClick(int dialog) {
 		stopService(new Intent(this, SmartphoneSensingService.class));
 		Intent homeIntent = new Intent(this, Home.class);
 		homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

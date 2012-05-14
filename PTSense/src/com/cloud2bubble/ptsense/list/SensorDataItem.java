@@ -1,6 +1,6 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.list;
 
-public interface Item {
+public interface SensorDataItem {
 	
 	static final int SECTION = 1;
 	static final int EMPTY = 2;

@@ -1,4 +1,4 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.database;
 
 import java.util.ArrayList;
 import java.util.List;

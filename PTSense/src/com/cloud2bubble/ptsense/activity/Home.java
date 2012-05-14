@@ -1,4 +1,10 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.activity;
+
+import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.dialog.SensingManager;
+import com.cloud2bubble.ptsense.dialog.StartSensingDialog;
+import com.cloud2bubble.ptsense.dialog.StopSensingDialog;
+import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -99,13 +105,9 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 			break;
 		case R.id.bToggleSensing:
 			if (!isSensing) {
-				isSensing = true;
-				Intent i = new Intent(this, SmartphoneSensingService.class);
-				startService(i);
-				Intent sensingIntent = new Intent(this, Sensing.class);
-				startActivity(sensingIntent);
+				showSenseDialog(SensingManager.DIALOG_START_SENSING);
 			} else {
-				showDialog();
+				showSenseDialog(SensingManager.DIALOG_STOP_SENSING);
 			}
 			break;
 		}
@@ -134,16 +136,36 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 			bToggleSensing.setBackgroundResource(R.color.sense_button_start);
 		}
 	}
-
-	public void showDialog() {
-		DialogFragment newFragment = StopSensingDialog.newInstance(this,
-                R.string.stop_sensing_dialog);
-        newFragment.show(getFragmentManager(), "dialog");
+	
+	public void showSenseDialog(int dialog) {
+		switch (dialog){
+		case SensingManager.DIALOG_START_SENSING:
+			DialogFragment startDialogFragment = StartSensingDialog.newInstance(this,
+	                R.string.stop_sensing_dialog);
+			startDialogFragment.show(getFragmentManager(), "start_dialog");
+			break;
+		case SensingManager.DIALOG_STOP_SENSING:
+			DialogFragment stopDialogFragment = StopSensingDialog.newInstance(this,
+	                R.string.stop_sensing_dialog);
+			stopDialogFragment.show(getFragmentManager(), "stop_dialog");
+			break;
+		}
 	}
 
-	public void doPositiveClick() {
-		stopService(new Intent(Home.this, SmartphoneSensingService.class));
-		isSensing = false;
-		toggleSensingButtons();
+	public void doPositiveClick(int dialog) {
+		switch (dialog){
+		case SensingManager.DIALOG_START_SENSING:
+			isSensing = true;
+			Intent i = new Intent(this, SmartphoneSensingService.class);
+			startService(i);
+			Intent sensingIntent = new Intent(this, Sensing.class);
+			startActivity(sensingIntent);
+			break;
+		case SensingManager.DIALOG_STOP_SENSING:
+			stopService(new Intent(Home.this, SmartphoneSensingService.class));
+			isSensing = false;
+			toggleSensingButtons();
+			break;
+		}
 	}
 }

@@ -1,6 +1,6 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.list;
 
-public class EntryItem implements Item {
+public class EntryItem implements SensorDataItem {
 
 	public final String title;
 	public final String key;
@@ -23,6 +23,6 @@ public class EntryItem implements Item {
 	}
 
 	public int getType() {
-		return Item.ENTRY;
+		return SensorDataItem.ENTRY;
 	}
 }

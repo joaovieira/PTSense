@@ -1,4 +1,4 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.activity;
 
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;

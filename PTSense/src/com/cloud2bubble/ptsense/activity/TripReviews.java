@@ -1,4 +1,8 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.activity;
+
+import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.tabfragment.SystemReviewsFragment;
+import com.cloud2bubble.ptsense.tabfragment.UserFeedbackFragment;
 
 import android.app.ActionBar;
 import android.app.Activity;

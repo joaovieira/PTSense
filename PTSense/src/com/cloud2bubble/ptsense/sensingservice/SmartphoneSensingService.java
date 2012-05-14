@@ -1,4 +1,4 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.sensingservice;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.activity.Sensing;
+import com.cloud2bubble.ptsense.database.SensorData;
+import com.cloud2bubble.ptsense.database.SensorDatabaseHandler;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -190,7 +195,7 @@ public class SmartphoneSensingService extends Service implements
 	private void collectDataFromSensors() {
 		// print values on Sensing Now activity UI every 2 seconds
 		handler.removeCallbacks(sendUpdatesToUI);
-		handler.postDelayed(sendUpdatesToUI, 1000); // 1 second
+		handler.postDelayed(sendUpdatesToUI, 500); // 1 second
 
 		// calculate average and insert store into database every 20 seconds
 		sensorThread = new PreProcessThread();

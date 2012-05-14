@@ -1,6 +1,8 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.activity;
 
 import java.util.List;
+
+import com.cloud2bubble.ptsense.R;
 
 import android.app.ActionBar;
 import android.content.Intent;

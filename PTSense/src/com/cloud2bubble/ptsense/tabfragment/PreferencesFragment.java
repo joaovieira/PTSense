@@ -1,4 +1,6 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.tabfragment;
+
+import com.cloud2bubble.ptsense.R;
 
 import android.app.Fragment;
 import android.os.Bundle;

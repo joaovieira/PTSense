@@ -1,4 +1,6 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.dialog;
+
+import com.cloud2bubble.ptsense.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,12 +22,6 @@ public class StopSensingDialog extends DialogFragment {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Holo);
-	}
-
-	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		return new AlertDialog.Builder(new ContextThemeWrapper(getActivity(),
 				android.R.style.Theme_Holo_Dialog))
@@ -34,7 +30,7 @@ public class StopSensingDialog extends DialogFragment {
 				.setPositiveButton(R.string.stop,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-								((SensingManager) activity).doPositiveClick();
+								((SensingManager) activity).doPositiveClick(SensingManager.DIALOG_STOP_SENSING);
 							}
 						})
 				.setNegativeButton(R.string.alert_dialog_cancel,
