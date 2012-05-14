@@ -31,18 +31,17 @@ public class ReviewListAdapter extends ArrayAdapter<ReviewItem> {
 		if (ri != null) {
 			switch (ri.getType()){
 			case ReviewItem.USER_FEEDBACK:
-				SystemReviewItem ufi = (SystemReviewItem) ri;
-				vi.inflate(R.layout.userfeedback_list_item, null);
+				v = vi.inflate(R.layout.userfeedback_list_item, null);
 				final TextView service = (TextView) v.findViewById(R.id.tvService);
 				final TextView direction = (TextView) v.findViewById(R.id.tvDirection);
 				final TextView date = (TextView) v.findViewById(R.id.tvDate);
 
 				if (service != null)
-					service.setText(ufi.serviceToString());
+					service.setText(ri.serviceToString());
 				if (direction != null)
-					direction.setText(ufi.directionToString());
+					direction.setText(ri.directionToString());
 				if (date != null)
-					date.setText(ufi.dateToString());
+					date.setText(ri.dateToString());
 				break;
 			case ReviewItem.SYSTEM_REVIEW:
 				break;

@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:mode="twoLine" >
+    android:orientation="horizontal"
+    android:padding="8dip"
+    android:weightSum="5" >
 
-    <TextView
-        android:id="@+id/tvService"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:paddingTop="8dip"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_weight="1" >
 
-    <TextView
-        android:id="@+id/tvDirection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@android:id/text1"
-        android:layout_below="@android:id/text1"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/tvService"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/tvDirection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tvService"
+            android:layout_below="@id/tvService"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tvDate"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:layout_gravity="center_vertical"
+        android:layout_weight="4"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-</TwoLineListItem>
+</LinearLayout>

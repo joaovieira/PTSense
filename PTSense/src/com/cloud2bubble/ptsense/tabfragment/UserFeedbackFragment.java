@@ -1,8 +1,10 @@
 package com.cloud2bubble.ptsense.tabfragment;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.list.EntryItem;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.list.ReviewListAdapter;
 
@@ -32,7 +34,12 @@ public class UserFeedbackFragment extends Fragment {
 
 		items = new ArrayList<ReviewItem>();
 		
-		//fill items
+		// TODO fetch user feedbacks from database and add to items
+		
+		items.add(new ReviewItem("District Line", "Transport For London - Underground", 
+				"Paddingtion", "Bayswater", new GregorianCalendar()));
+		items.add(new ReviewItem("436 Line", "Transport For London - Buses", 
+				"Victoria", "Marble Arch (Park Lane)", new GregorianCalendar()));
 		
 		adapter = new ReviewListAdapter(tripReviewsActivity, items);
 	}
