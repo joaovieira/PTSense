@@ -2,38 +2,48 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="10dip" >
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/bHomeOption1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_weight="1"
+        android:background="@color/home_sensing_button"
+        android:clickable="true"
+        android:layout_marginBottom="10dip" >
 
-        <Button
-            android:id="@+id/bHomeOption1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/home.option1" />
+        <include
+            android:id="@+id/tvHomeButtonSensing"
+            layout="@layout/home_button_title_1" />
+    </RelativeLayout>
 
-        <Button
-            android:id="@+id/bToggleSensing"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/start" />
-    </LinearLayout>
-
-    <Button
+    <RelativeLayout
         android:id="@+id/bHomeOption2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/home.option2" />
+        android:layout_weight="1"
+        android:background="@color/home_trip_reviews_button"
+        android:clickable="true"
+        android:layout_marginBottom="10dip" >
 
-    <Button
+        <include
+            android:id="@+id/tvHomeButtonTrips"
+            layout="@layout/home_button_title_2" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/bHomeOption3"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/home.option3" />
+        android:layout_weight="1"
+        android:background="@color/home_plan_button"
+        android:clickable="true" >
+
+        <include
+            android:id="@+id/tvHomeButtonPlan"
+            layout="@layout/home_button_title_2" />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="58dip"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentLeft="true"
+    android:background="#DD888888"
+    android:mode="twoLine" >
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:includeFontPadding="false"
+        android:paddingTop="8dip"
+        android:textAppearance="?android:attr/textAppearanceLargeInverse" />
+
+    <TextView
+        android:id="@android:id/text2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@android:id/text1"
+        android:layout_below="@android:id/text1"
+        android:includeFontPadding="false"
+        android:textAppearance="?android:attr/textAppearanceSmallInverse" />
+
+    <Button
+        android:id="@+id/bToggleSensing"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@color/sense_button_start"
+        android:text="@string/start"
+        android:textAppearance="?android:attr/textAppearanceLargeInverse"
+        android:textColor="?android:attr/textColorPrimaryInverse"
+        android:paddingLeft="14dip" 
+        android:paddingRight="14dip"/>
+
+</TwoLineListItem>

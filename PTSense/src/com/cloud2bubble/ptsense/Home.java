@@ -1,10 +1,7 @@
 package com.cloud2bubble.ptsense;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,13 +10,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class Home extends Activity implements OnClickListener, SensingManager {
 
-	Button bOption1, bOption2, bOption3, bToggleSensing;
+	RelativeLayout bOption1, bOption2, bOption3;
+	TextView tvTitle1, tvTitle2, tvTitle3;
+	TextView tvSubTitle1, tvSubTitle2, tvSubTitle3;
+	Button bToggleSensing;
 	boolean isSensing;
-	static final int DIALOG_STOP_SENSING_ID = 0;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -27,11 +27,26 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		bOption1 = (Button) findViewById(R.id.bHomeOption1);
-		bOption2 = (Button) findViewById(R.id.bHomeOption2);
-		bOption3 = (Button) findViewById(R.id.bHomeOption3);
+		bOption1 = (RelativeLayout) findViewById(R.id.bHomeOption1);
+		tvTitle1 = (TextView) findViewById(R.id.tvHomeButtonSensing).findViewById(android.R.id.text1);
+		tvSubTitle1 = (TextView) findViewById(R.id.tvHomeButtonSensing).findViewById(android.R.id.text2);
+		tvTitle1.setText(R.string.home_title1);
+		tvSubTitle1.setText(R.string.home_subtitle1);
 		bToggleSensing = (Button) findViewById(R.id.bToggleSensing);
 		bOption1.setOnClickListener(this);
+
+		bOption2 = (RelativeLayout) findViewById(R.id.bHomeOption2);
+		tvTitle2 = (TextView) findViewById(R.id.tvHomeButtonTrips).findViewById(android.R.id.text1);
+		tvSubTitle2 = (TextView) findViewById(R.id.tvHomeButtonTrips).findViewById(android.R.id.text2);
+		tvTitle2.setText(R.string.home_title2);
+		tvSubTitle2.setText(R.string.home_subtitle2);
+		
+		bOption3 = (RelativeLayout) findViewById(R.id.bHomeOption3);
+		tvTitle3 = (TextView) findViewById(R.id.tvHomeButtonPlan).findViewById(android.R.id.text1);
+		tvSubTitle3 = (TextView) findViewById(R.id.tvHomeButtonPlan).findViewById(android.R.id.text2);
+		tvTitle3.setText(R.string.home_title3);
+		tvSubTitle3.setText(R.string.home_subtitle3);
+		
 		bOption2.setOnClickListener(this);
 		bOption3.setOnClickListener(this);
 		bToggleSensing.setOnClickListener(this);
@@ -112,9 +127,11 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 		if (isSensing) {
 			bOption1.setEnabled(true);
 			bToggleSensing.setText(getText(R.string.stop));
+			bToggleSensing.setBackgroundResource(R.color.sense_button_stop);
 		} else {
 			bOption1.setEnabled(false);
 			bToggleSensing.setText(getText(R.string.start));
+			bToggleSensing.setBackgroundResource(R.color.sense_button_start);
 		}
 	}
 

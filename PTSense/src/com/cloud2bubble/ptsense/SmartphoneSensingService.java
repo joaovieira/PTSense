@@ -3,10 +3,13 @@ package com.cloud2bubble.ptsense;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -17,6 +20,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.OnInfoListener;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,26 +38,29 @@ public class SmartphoneSensingService extends Service implements
 	public static Sensor mAcceleration, mAmbTemperature, mLight, mPressure,
 			mProximity, mRelHumidity = null;
 	public static MediaRecorder soundRecorder = null;
+	String soundOutputPath;
 
-	public static LinkedList<Float> lightValues; // lux units
-	public static LinkedList<Float> accelerationsX, accelerationsY,
-			accelerationsZ; // ms2
-	public static LinkedList<Float> pressureValues; // hPa (millibar)
-	public static LinkedList<Float> relHumidityValues;// percent %
-	public static LinkedList<Float> ambTemperatureValues; // celsius ¼C
-	public static LinkedList<Double> soundValues; // dB
+	private ArrayBlockingQueue<Float> lightValues, accelerationsX,
+			accelerationsY, accelerationsZ, pressureValues, relHumidityValues,
+			ambTemperatureValues;
+	private ArrayBlockingQueue<Double> soundValues;
 
-	Float x, y, z;
+	private List<Float> tmpLightValues, tmpAccelerationsX, tmpAccelerationsY,
+			tmpAccelerationsZ, tmpPressureValues, tmpRelHumidityValues,
+			tmpAmbTemperatureValues;
+	private List<Double> tmpSoundValues;
 
-	Float avgLight, avgAccelX, avgAccelY, avgAccelZ, avgPressure, avgHumidity,
-			avgTemperature;
+	private Float currentX, currentY, currentZ, currentLight, currentPressure,
+			currentTemp, currentHumidity;
 
-	SensorDatabaseHandler sensorDatabase;
+	private SensorDatabaseHandler sensorDatabase;
 
 	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.displayevent";
 	private final Handler handler = new Handler();
 	Intent intent;
 
+	private final String outputFile = "PTSense_output";
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -81,33 +88,31 @@ public class SmartphoneSensingService extends Service implements
 			mRelHumidity = sensorManager
 					.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
 
-		if (soundRecorder == null) {
-			soundRecorder = new MediaRecorder();
-			soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		soundRecorder = new MediaRecorder();
+		File sampleDir = Environment.getExternalStorageDirectory();
+		soundOutputPath = sampleDir + File.separator + outputFile + ".3gp";
+		setupSoundRecorder();
 
-			File sampleDir = Environment.getExternalStorageDirectory();
-			File audiofile = null;
-			try {
-				audiofile = File.createTempFile("PTSense_output", ".3gp", sampleDir);
-			} catch (IOException e) {
-				audiofile = getFileStreamPath("PTSense_output.3gp");
-			}
+		lightValues = new ArrayBlockingQueue<Float>(60); // 200ms * 10sec = 50
+															// values
+		pressureValues = new ArrayBlockingQueue<Float>(60);
+		relHumidityValues = new ArrayBlockingQueue<Float>(60);
+		ambTemperatureValues = new ArrayBlockingQueue<Float>(60);
+		accelerationsX = new ArrayBlockingQueue<Float>(60);
+		accelerationsY = new ArrayBlockingQueue<Float>(60);
+		accelerationsZ = new ArrayBlockingQueue<Float>(60);
+		soundValues = new ArrayBlockingQueue<Double>(60);
 
-			soundRecorder.setOutputFile(audiofile.getAbsolutePath());
-		}
+		tmpLightValues = new ArrayList<Float>(60);
+		tmpPressureValues = new ArrayList<Float>(60);
+		tmpRelHumidityValues = new ArrayList<Float>(60);
+		tmpAmbTemperatureValues = new ArrayList<Float>(60);
+		tmpAccelerationsX = new ArrayList<Float>(60);
+		tmpAccelerationsY = new ArrayList<Float>(60);
+		tmpAccelerationsZ = new ArrayList<Float>(60);
+		tmpSoundValues = new ArrayList<Double>(60);
 
-		lightValues = new LinkedList<Float>(Arrays.asList(0.0f));
-		pressureValues = new LinkedList<Float>(Arrays.asList(0.0f));
-		relHumidityValues = new LinkedList<Float>(Arrays.asList(0.0f));
-		ambTemperatureValues = new LinkedList<Float>(Arrays.asList(0.0f));
-		accelerationsX = new LinkedList<Float>(Arrays.asList(0.0f));
-		accelerationsY = new LinkedList<Float>(Arrays.asList(0.0f));
-		accelerationsZ = new LinkedList<Float>(Arrays.asList(0.0f));
-		soundValues = new LinkedList<Double>(Arrays.asList(0.0));
-		avgLight = avgAccelX = avgAccelY = avgAccelZ = avgPressure = avgHumidity = avgTemperature = 0.0f;
-		x = y = z = 0.0f;
+		currentX = currentY = currentZ = currentLight = currentPressure = currentTemp = currentHumidity = 0.0f;
 
 		intent = new Intent(BROADCAST_ACTION);
 	}
@@ -203,6 +208,13 @@ public class SmartphoneSensingService extends Service implements
 		// Tell the user we stopped.
 		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
 	}
+	
+	private void setupSoundRecorder() {
+		soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+		soundRecorder.setOutputFile(soundOutputPath);
+	}
 
 	private void startSoundRecording() {
 		try {
@@ -228,27 +240,31 @@ public class SmartphoneSensingService extends Service implements
 		synchronized (this) {
 			switch (event.sensor.getType()) {
 			case Sensor.TYPE_ACCELEROMETER:
-				float dX = event.values[0] - x;
-				x = event.values[0];
-				accelerationsX.add(dX);
-				float dY = event.values[1] - y;
-				y = event.values[1];
-				accelerationsY.add(dY);
-				float dZ = event.values[2] - z;
-				z = event.values[2];
-				accelerationsZ.add(dZ);
+				float dX = event.values[0] - currentX;
+				currentX = event.values[0];
+				accelerationsX.offer(dX);
+				float dY = event.values[1] - currentY;
+				currentY = event.values[1];
+				accelerationsY.offer(dY);
+				float dZ = event.values[2] - currentZ;
+				currentZ = event.values[2];
+				accelerationsZ.offer(dZ);
 				break;
 			case Sensor.TYPE_AMBIENT_TEMPERATURE:
-				ambTemperatureValues.add(Float.valueOf(event.values[0]));
+				currentTemp = event.values[0];
+				ambTemperatureValues.offer(currentTemp);
 				break;
 			case Sensor.TYPE_LIGHT:
-				lightValues.add(Float.valueOf(event.values[0]));
+				currentLight = event.values[0];
+				lightValues.offer(currentLight);
 				break;
 			case Sensor.TYPE_PRESSURE:
-				pressureValues.add(Float.valueOf(event.values[0]));
+				currentPressure = event.values[0];
+				pressureValues.offer(currentPressure);
 				break;
 			case Sensor.TYPE_RELATIVE_HUMIDITY:
-				relHumidityValues.add(Float.valueOf(event.values[0]));
+				currentHumidity = event.values[0];
+				relHumidityValues.offer(currentHumidity);
 				break;
 			case Sensor.TYPE_PROXIMITY:
 				// TODO cancel readings from light, humidity, pressure when
@@ -267,32 +283,28 @@ public class SmartphoneSensingService extends Service implements
 		private void sendIntentWithSensorData() {
 			if (soundRecorder != null) {
 				double amp = getPowerDB();
-				soundValues.add(Double.valueOf(amp));
+				soundValues.offer(Double.valueOf(amp));
 				intent.putExtra("sound", String.valueOf(amp));
 			}
 
 			if (mAcceleration != null) {
-				String oscilation = "x:"
-						+ String.valueOf(accelerationsX.getLast()) + " y:"
-						+ String.valueOf(accelerationsY.getLast()) + " z:"
-						+ String.valueOf(accelerationsZ.getLast());
+				String oscilation = "x:" + String.valueOf(currentX) + " y:"
+						+ String.valueOf(currentY) + " z:"
+						+ String.valueOf(currentZ);
 				intent.putExtra("oscilation", oscilation);
 			}
 
 			if (mAmbTemperature != null)
-				intent.putExtra("temperature",
-						String.valueOf(ambTemperatureValues.getLast()));
+				intent.putExtra("temperature", String.valueOf(currentTemp));
 
 			if (mLight != null)
-				intent.putExtra("light", String.valueOf(lightValues.getLast()));
+				intent.putExtra("light", String.valueOf(currentLight));
 
 			if (mPressure != null)
-				intent.putExtra("pressure",
-						String.valueOf(pressureValues.getLast()));
+				intent.putExtra("pressure", String.valueOf(currentPressure));
 
 			if (mRelHumidity != null)
-				intent.putExtra("humidity",
-						String.valueOf(relHumidityValues.getLast()));
+				intent.putExtra("humidity", String.valueOf(currentHumidity));
 
 			sendBroadcast(intent);
 		}
@@ -313,6 +325,7 @@ public class SmartphoneSensingService extends Service implements
 					Log.d("SmartphoneSensingService",
 							"Starting to update SensorDatabase");
 
+					drainBuffers();
 					/*
 					 * String currentTime = getCurrentTimeStamp(); SensorData
 					 * data = new SensorData(currentTime);
@@ -360,8 +373,8 @@ public class SmartphoneSensingService extends Service implements
 					 * "Updated database with: TEMPERATURE " +
 					 * getAverageData(ambTemperatureValues));
 					 */
-					clearBuffers();
-					soundRecorder.reset();
+					//restartRecording();
+					// TODO define listener to reset file when reached max file size
 					Log.d("SmartphoneSensingService",
 							"Finished updating SensorDatabase");
 
@@ -369,6 +382,12 @@ public class SmartphoneSensingService extends Service implements
 					e.printStackTrace();
 				}
 			}
+		}
+
+		private void restartRecording() {
+			stopSoundRecording();
+			setupSoundRecorder();
+			startSoundRecording();
 		}
 
 		private Float getAverageData(LinkedList<Float> valuesList) {
@@ -382,14 +401,15 @@ public class SmartphoneSensingService extends Service implements
 			return average / size;
 		}
 
-		private void clearBuffers() {
-			lightValues.clear();
-			accelerationsX.clear();
-			accelerationsY.clear();
-			accelerationsZ.clear();
-			pressureValues.clear();
-			relHumidityValues.clear();
-			ambTemperatureValues.clear();
+		private void drainBuffers() {
+			lightValues.drainTo(tmpLightValues);
+			accelerationsX.drainTo(tmpAccelerationsX);
+			accelerationsY.drainTo(tmpAccelerationsX);
+			accelerationsZ.drainTo(tmpAccelerationsX);
+			pressureValues.drainTo(tmpPressureValues);
+			relHumidityValues.drainTo(tmpPressureValues);
+			ambTemperatureValues.drainTo(tmpAmbTemperatureValues);
+			soundValues.drainTo(tmpSoundValues);
 		}
 
 		private String getCurrentTimeStamp() {

@@ -7,6 +7,7 @@
     <uses-sdk android:minSdkVersion="10" />
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -37,18 +38,18 @@
         </activity>
         <activity
             android:name=".Sensing"
-            android:configChanges="keyboardHidden|orientation"
-            android:label="@string/home.option1"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/home.title1"
             android:launchMode="singleTop" >
         </activity>
         <activity
             android:name=".TripReviews"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/home.option2" >
+            android:label="@string/home.title2" >
         </activity>
         <activity
             android:name=".PlanTrip"
-            android:label="@string/home.option3" >
+            android:label="@string/home.title3" >
         </activity>
 
         <!-- Services -->
