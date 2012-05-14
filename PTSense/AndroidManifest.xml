@@ -51,6 +51,8 @@
             android:name=".activity.PlanTrip"
             android:label="@string/home.title3" >
         </activity>
+        <activity android:name=".activity.UserFeedback" >
+        </activity>
 
         <!-- Services -->
         <service android:name=".sensingservice.SmartphoneSensingService" />

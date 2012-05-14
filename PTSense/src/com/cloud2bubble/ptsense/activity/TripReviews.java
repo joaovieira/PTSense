@@ -10,8 +10,11 @@ import android.app.ActionBar.Tab;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class TripReviews extends Activity {
+	
+	public static final int REQUEST_FEEDBACK_CODE = 10;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,14 @@ public class TripReviews extends Activity {
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_FEEDBACK_CODE) {
+			Toast.makeText(this, R.string.feedback_saved,
+						Toast.LENGTH_SHORT).show();
 		}
 	}
 }

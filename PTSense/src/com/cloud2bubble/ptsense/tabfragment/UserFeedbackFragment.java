@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import com.cloud2bubble.ptsense.R;
-import com.cloud2bubble.ptsense.list.EntryItem;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.list.ReviewListAdapter;
 
@@ -18,7 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class UserFeedbackFragment extends Fragment {
-	
+
 	private Activity tripReviewsActivity;
 	
 	ArrayList<ReviewItem> items;

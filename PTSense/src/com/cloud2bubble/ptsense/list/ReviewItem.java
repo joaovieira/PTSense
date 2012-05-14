@@ -1,9 +1,11 @@
 package com.cloud2bubble.ptsense.list;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
-public class ReviewItem {
+public class ReviewItem implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	static final int SYSTEM_REVIEW = 1;
 	static final int USER_FEEDBACK = 2;
 	
@@ -34,7 +36,7 @@ public class ReviewItem {
 	}
 	
 	public String dateToString(){
-		String stringDate = date.get(Calendar.DAY_OF_MONTH) + " " + formatMonth(date.get(Calendar.MONTH)) + "\n";
+		String stringDate =  formatMonth(date.get(Calendar.MONTH)) + " " + date.get(Calendar.DAY_OF_MONTH) + "\n";
 		stringDate += formatTime(date.get(Calendar.HOUR), date.get(Calendar.MINUTE), date.get(Calendar.AM_PM));
 		return stringDate;
 	}
