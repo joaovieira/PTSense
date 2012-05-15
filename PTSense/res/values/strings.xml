@@ -36,6 +36,7 @@
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="empty_feedback_list">You don\'t have any feedback to respond.</string>
     <string name="feedback_saved">Feedback was saved successfully</string>
+    <string name="done">Done</string>
     
     
     

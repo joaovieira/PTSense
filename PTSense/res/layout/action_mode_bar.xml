@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/tvActionModeCloseButton"
+        style="?android:attr/actionModeCloseButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginRight="16dip"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingLeft="8dip"
+        android:drawableLeft="?android:attr/actionModeCloseDrawable"
+        android:text="@string/done"
+        android:textAppearance="@android:style/TextAppearance.Holo.Widget.ActionBar.Menu" >
+    </TextView>
+
+</LinearLayout>

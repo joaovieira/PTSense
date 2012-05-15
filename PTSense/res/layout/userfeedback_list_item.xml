@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/feedbackListItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dip"
+    android:padding="10dip"
     android:weightSum="5" >
 
     <RelativeLayout
@@ -15,7 +16,8 @@
             android:id="@+id/tvService"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorHintInverse" />
 
         <TextView
             android:id="@+id/tvDirection"
