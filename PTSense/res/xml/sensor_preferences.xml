@@ -10,7 +10,7 @@
     </MultiSelectListPreference>
 
     <PreferenceScreen
-        android:fragment="com.cloud2bubble.ptsense.Settings$StockPreferenceFragment"
+        android:fragment="com.cloud2bubble.ptsense.activity.Settings$StockPreferenceFragment"
         android:summary="@string/settings.header1.devices.summary"
         android:title="@string/settings.header1.devices.title" >
         <extra android:name="resource" android:value="devices_preferences" />
