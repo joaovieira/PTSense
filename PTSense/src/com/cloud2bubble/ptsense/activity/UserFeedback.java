@@ -1,7 +1,12 @@
 package com.cloud2bubble.ptsense.activity;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.cloud2bubble.ptsense.R;
-import com.cloud2bubble.ptsense.UserFeedBack;
+import com.cloud2bubble.ptsense.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.ActionBar;
@@ -23,9 +28,12 @@ import android.widget.TextView;
 
 public class UserFeedback extends Activity implements OnClickListener {
 
-	LinearLayout sbHappy, sbRelaxed, sbNoisy, sbCrowded, sbSmoothness, sbLight,
-			sbTemperature, sbFast, sbReliable;
-	UserFeedBack feedback;
+	LinearLayout sbHappy, sbRelaxed, sbNoisy, sbCrowded, sbSmoothness,
+			sbAmbience, sbFast, sbReliable;
+	ReviewItem trip;
+	Map<String, SeekBar> inputs = new HashMap<String, SeekBar>();
+	EditText etFeedback;
+	TripFeedback feedback;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +53,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 		if (extras == null) {
 			return;
 		}
-		ReviewItem trip = (ReviewItem) extras.get("review_item");
+		trip = (ReviewItem) extras.get("review_item");
 		if (trip != null) {
 			TextView tvService = (TextView) findViewById(R.id.tvService);
 			TextView tvDirection = (TextView) findViewById(R.id.tvDirection);
@@ -68,7 +76,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			sepFeedback
 					.setText(getString(R.string.feedback_separator_feedback));
 
-			final EditText etFeedback = (EditText) findViewById(R.id.eTFeedback);
+			etFeedback = (EditText) findViewById(R.id.eTFeedback);
 
 			sbHappy = (LinearLayout) findViewById(R.id.sbHappy);
 			TextView happyTitle = (TextView) sbHappy.findViewById(R.id.tvTitle);
@@ -77,6 +85,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar happySB = (SeekBar) sbHappy.findViewById(R.id.sbInput);
 			happyTitle.setText(getString(R.string.feedback_title_happy));
 			happyProgress.setText(progressToString(happySB.getProgress()));
+			inputs.put("happy", happySB);
 
 			happySB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -99,6 +108,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar relaxedSB = (SeekBar) sbRelaxed.findViewById(R.id.sbInput);
 			relaxedTitle.setText(getString(R.string.feedback_title_relaxed));
 			relaxedProgress.setText(progressToString(relaxedSB.getProgress()));
+			inputs.put("relaxed", relaxedSB);
 
 			relaxedSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -120,6 +130,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar noisySB = (SeekBar) sbNoisy.findViewById(R.id.sbInput);
 			noisyTitle.setText(getString(R.string.feedback_title_noisy));
 			noisyProgress.setText(progressToString(noisySB.getProgress()));
+			inputs.put("noisy", noisySB);
 
 			noisySB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -142,6 +153,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar crowdedSB = (SeekBar) sbCrowded.findViewById(R.id.sbInput);
 			crowdedTitle.setText(getString(R.string.feedback_title_crowded));
 			crowdedProgress.setText(progressToString(crowdedSB.getProgress()));
+			inputs.put("crowded", crowdedSB);
 
 			crowdedSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -167,6 +179,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 					.setText(getString(R.string.feedback_title_smoothness));
 			smoothnessProgress
 					.setText(progressToString(relaxedSB.getProgress()));
+			inputs.put("smoothness", smoothnessSB);
 
 			smoothnessSB
 					.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -183,18 +196,19 @@ public class UserFeedback extends Activity implements OnClickListener {
 						}
 					});
 
-			sbLight = (LinearLayout) findViewById(R.id.sbLight);
-			TextView lightTitle = (TextView) sbLight.findViewById(R.id.tvTitle);
-			final TextView lightProgress = (TextView) sbLight
+			sbAmbience = (LinearLayout) findViewById(R.id.sbAmbience);
+			TextView ambienceTitle = (TextView) sbAmbience.findViewById(R.id.tvTitle);
+			final TextView ambienceProgress = (TextView) sbAmbience
 					.findViewById(R.id.tvProgress);
-			SeekBar lightSB = (SeekBar) sbLight.findViewById(R.id.sbInput);
-			lightTitle.setText(getString(R.string.feedback_title_light));
-			lightProgress.setText(progressToString(relaxedSB.getProgress()));
+			SeekBar ambienceSB = (SeekBar) sbAmbience.findViewById(R.id.sbInput);
+			ambienceTitle.setText(getString(R.string.feedback_title_ambience));
+			ambienceProgress.setText(progressToString(relaxedSB.getProgress()));
+			inputs.put("ambience", ambienceSB);
 
-			lightSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			ambienceSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
 						boolean fromUser) {
-					lightProgress.setText(progressToString(progress));
+					ambienceProgress.setText(progressToString(progress));
 				}
 
 				public void onStartTrackingTouch(SeekBar seekBar) {
@@ -204,33 +218,6 @@ public class UserFeedback extends Activity implements OnClickListener {
 				}
 			});
 
-			sbTemperature = (LinearLayout) findViewById(R.id.sbTemperature);
-			TextView temperatureTitle = (TextView) sbTemperature
-					.findViewById(R.id.tvTitle);
-			final TextView temperatureProgress = (TextView) sbTemperature
-					.findViewById(R.id.tvProgress);
-			SeekBar temperatureSB = (SeekBar) sbTemperature
-					.findViewById(R.id.sbInput);
-			temperatureTitle
-					.setText(getString(R.string.feedback_title_temperature));
-			temperatureProgress.setText(progressToString(relaxedSB
-					.getProgress()));
-
-			temperatureSB
-					.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-						public void onProgressChanged(SeekBar seekBar,
-								int progress, boolean fromUser) {
-							temperatureProgress
-									.setText(progressToString(progress));
-						}
-
-						public void onStartTrackingTouch(SeekBar seekBar) {
-						}
-
-						public void onStopTrackingTouch(SeekBar seekBar) {
-						}
-					});
-
 			sbFast = (LinearLayout) findViewById(R.id.sbFast);
 			TextView fastTitle = (TextView) sbFast.findViewById(R.id.tvTitle);
 			final TextView fastProgress = (TextView) sbFast
@@ -238,6 +225,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar fastSB = (SeekBar) sbFast.findViewById(R.id.sbInput);
 			fastTitle.setText(getString(R.string.feedback_title_fast));
 			fastProgress.setText(progressToString(fastSB.getProgress()));
+			inputs.put("fast", fastSB);
 
 			fastSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -262,6 +250,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			reliableTitle.setText(getString(R.string.feedback_title_reliable));
 			reliableProgress
 					.setText(progressToString(reliableSB.getProgress()));
+			inputs.put("reliable", reliableSB);
 
 			reliableSB
 					.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -285,7 +274,6 @@ public class UserFeedback extends Activity implements OnClickListener {
 					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputManager.hideSoftInputFromWindow(
 							etFeedback.getWindowToken(), 0);
-					etFeedback.clearFocus();
 					return true;
 				}
 			});
@@ -300,9 +288,22 @@ public class UserFeedback extends Activity implements OnClickListener {
 		switch (view.getId()) {
 		case R.id.tvActionModeCloseButton:
 			Intent data = new Intent();
+			processUserInput();
+			data.putExtra("feedback", feedback);
 			setResult(RESULT_OK, data);
 			finish();
 			break;
 		}
+	}
+
+	private void processUserInput() {
+		feedback = new TripFeedback(trip);
+		Iterator<Entry<String, SeekBar>> it = inputs.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry<String, SeekBar> input = (Map.Entry<String, SeekBar>)it.next();
+	        SeekBar seekBar = input.getValue();
+	        feedback.addInput(input.getKey(), seekBar.getProgress()/10.0);
+	    }
+	    feedback.addComment(etFeedback.getText().toString());
 	}
 }

@@ -102,11 +102,7 @@
                     layout="@layout/seekbar_user_feedback_list_item" />
 
                 <include
-                    android:id="@+id/sbLight"
-                    layout="@layout/seekbar_user_feedback_list_item" />
-
-                <include
-                    android:id="@+id/sbTemperature"
+                    android:id="@+id/sbAmbience"
                     layout="@layout/seekbar_user_feedback_list_item" />
 
                 <include

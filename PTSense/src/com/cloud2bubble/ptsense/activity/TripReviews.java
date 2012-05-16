@@ -1,6 +1,8 @@
 package com.cloud2bubble.ptsense.activity;
 
 import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.TripFeedback;
+import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.tabfragment.SystemReviewsFragment;
 import com.cloud2bubble.ptsense.tabfragment.UserFeedbackFragment;
 
@@ -13,32 +15,36 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class TripReviews extends Activity {
-	
+
 	public static final int REQUEST_FEEDBACK_CODE = 10;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// Notice that setContentView() is not used, because we use the root
-	    // android.R.id.content as the container for each fragment
-		
+		// android.R.id.content as the container for each fragment
+
 		// setup action bar for tabs
-	    ActionBar actionBar = getActionBar();
-	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		ActionBar actionBar = getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-	    Tab tab = actionBar.newTab()
-	            .setText(R.string.trip_reviews_tab1)
-	            .setTabListener(new MyTabListener<SystemReviewsFragment>(
-	                    this, "system_reviews", SystemReviewsFragment.class));
-	    actionBar.addTab(tab);
+		Tab tab = actionBar
+				.newTab()
+				.setText(R.string.trip_reviews_tab1)
+				.setTabListener(
+						new MyTabListener<SystemReviewsFragment>(this,
+								"system_reviews", SystemReviewsFragment.class));
+		actionBar.addTab(tab);
 
-	    tab = actionBar.newTab()
-	        .setText(R.string.trip_reviews_tab2)
-	        .setTabListener(new MyTabListener<UserFeedbackFragment>(
-	                this, "user_feedback", UserFeedbackFragment.class));
-	    actionBar.addTab(tab);
-	    
-	    actionBar.setDisplayHomeAsUpEnabled(true);
+		tab = actionBar
+				.newTab()
+				.setText(R.string.trip_reviews_tab2)
+				.setTabListener(
+						new MyTabListener<UserFeedbackFragment>(this,
+								"user_feedback", UserFeedbackFragment.class));
+		actionBar.addTab(tab);
+
+		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -54,12 +60,21 @@ public class TripReviews extends Activity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_FEEDBACK_CODE) {
-			Toast.makeText(this, R.string.feedback_saved,
-						Toast.LENGTH_SHORT).show();
+		if (resultCode == Activity.RESULT_OK
+				&& requestCode == REQUEST_FEEDBACK_CODE) {
+			Bundle extras = data.getExtras();
+			if (extras == null) {
+				return;
+			}
+			TripFeedback feedback = (TripFeedback) extras.get("feedback");
+			if (feedback != null) {
+				// add feedback to database
+				// remove from review from database
+				Toast.makeText(this, R.string.feedback_saved, Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 }

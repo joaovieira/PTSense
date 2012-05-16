@@ -46,8 +46,7 @@
     <string name="feedback.title.noisy">Noisy</string>
     <string name="feedback.title.crowded">Crowded</string>
     <string name="feedback.title.smoothness">Smoothness of trip</string>
-    <string name="feedback.title.light">Light conditions</string>
-    <string name="feedback.title.temperature">Warm</string>
+    <string name="feedback.title.ambience">Ambience</string>
     <string name="feedback.title.fast">Fast</string>
     <string name="feedback.title.reliable">Reliable</string>
     <string name="feedback.separator.feedback">Feedback</string>
