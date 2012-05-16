@@ -1,4 +1,4 @@
-package com.cloud2bubble.ptsense;
+package com.cloud2bubble.ptsense.database;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -18,8 +18,8 @@ public class TripFeedback implements Serializable {
 		this.trip = trip;
 	}
 
-	public void addInput(String key, double d) {
-		inputs.put(key, d);
+	public void addInput(String key, Double value) {
+		inputs.put(key, value);
 	}
 
 	public void addComment(String text) {
@@ -30,4 +30,11 @@ public class TripFeedback implements Serializable {
 		return comment;
 	}
 	
+	public Map<String, Double> getInputs(){
+		return inputs;
+	}
+	
+	public ReviewItem getTrip(){
+		return trip;
+	}
 }

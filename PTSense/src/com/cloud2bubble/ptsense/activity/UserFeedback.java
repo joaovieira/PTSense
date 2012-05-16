@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.cloud2bubble.ptsense.R;
-import com.cloud2bubble.ptsense.TripFeedback;
+import com.cloud2bubble.ptsense.database.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.ActionBar;

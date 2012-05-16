@@ -1,7 +1,10 @@
 package com.cloud2bubble.ptsense.activity;
 
+import java.util.GregorianCalendar;
+
 import com.cloud2bubble.ptsense.R;
-import com.cloud2bubble.ptsense.TripFeedback;
+import com.cloud2bubble.ptsense.database.DatabaseHandler;
+import com.cloud2bubble.ptsense.database.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.tabfragment.SystemReviewsFragment;
 import com.cloud2bubble.ptsense.tabfragment.UserFeedbackFragment;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 public class TripReviews extends Activity {
 
 	public static final int REQUEST_FEEDBACK_CODE = 10;
+	private DatabaseHandler database;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,15 @@ public class TripReviews extends Activity {
 		actionBar.addTab(tab);
 
 		actionBar.setDisplayHomeAsUpEnabled(true);
+		database = new DatabaseHandler(this);
+		
+		/*ReviewItem item1 = new ReviewItem("District Line", "Transport For London - Underground", 
+				"Paddingtion", "Bayswater", new GregorianCalendar());
+		ReviewItem item2 = new ReviewItem("436 Line", "Transport For London - Buses", 
+				"Victoria", "Marble Arch (Park Lane)", new GregorianCalendar());
+		database.addReview(item1);
+		database.addReview(item2);*/
+		//database.clearTables();
 	}
 
 	@Override
@@ -71,10 +84,20 @@ public class TripReviews extends Activity {
 			}
 			TripFeedback feedback = (TripFeedback) extras.get("feedback");
 			if (feedback != null) {
-				// add feedback to database
-				// remove from review from database
-				Toast.makeText(this, R.string.feedback_saved, Toast.LENGTH_SHORT).show();
+				if (insertFeedbackIntoDatabase(feedback))
+					Toast.makeText(this, R.string.feedback_saved,
+							Toast.LENGTH_SHORT).show();
 			}
 		}
+	}
+	
+	public DatabaseHandler getDatabase(){
+		return database;
+	}
+
+	private boolean insertFeedbackIntoDatabase(TripFeedback feedback) {
+		ReviewItem oldReview = feedback.getTrip();
+		database.removeReview(oldReview);
+		return true;
 	}
 }

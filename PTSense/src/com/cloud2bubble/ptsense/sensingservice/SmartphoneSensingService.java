@@ -13,7 +13,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Sensing;
 import com.cloud2bubble.ptsense.database.SensorData;
-import com.cloud2bubble.ptsense.database.SensorDatabaseHandler;
+import com.cloud2bubble.ptsense.database.DatabaseHandler;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -57,7 +57,7 @@ public class SmartphoneSensingService extends Service implements
 			currentdZ, currentLight, currentPressure, currentTemp,
 			currentHumidity;
 
-	private SensorDatabaseHandler sensorDatabase;
+	private DatabaseHandler database;
 
 	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.displayevent";
 	private final Handler handler = new Handler();

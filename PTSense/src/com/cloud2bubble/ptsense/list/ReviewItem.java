@@ -9,13 +9,24 @@ public class ReviewItem implements Serializable {
 	static final int SYSTEM_REVIEW = 1;
 	static final int USER_FEEDBACK = 2;
 	
+	private final int databaseID;
 	public final String line;
 	public final String service;
 	public final String origin;
 	public final String destination;
 	public final Calendar date;
 	
+	public ReviewItem(int id, String line, String service, String origin, String destination, Calendar date){
+		this.databaseID = id;
+		this.line = line;
+		this.service = service;
+		this.origin = origin;
+		this.destination = destination;
+		this.date = date;
+	}
+	
 	public ReviewItem(String line, String service, String origin, String destination, Calendar date){
+		this.databaseID = -1;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;
@@ -81,4 +92,7 @@ public class ReviewItem implements Serializable {
 		}
 	}
 
+	public int getId(){
+		return this.databaseID;
+	}
 }
