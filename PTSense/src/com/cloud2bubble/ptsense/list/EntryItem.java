@@ -1,9 +1,8 @@
 package com.cloud2bubble.ptsense.list;
 
-public class EntryItem implements SensorDataItem {
+public class EntryItem extends Item {
 
 	public final String title;
-	public final String key;
 	public String value;
 	public final String unit;
 
@@ -13,16 +12,12 @@ public class EntryItem implements SensorDataItem {
 		this.unit = unit;
 		this.value = "";
 	}
-
-	public String getKey() {
-		return key;
-	}
 	
 	public String toString(){
 		return value + " " + unit;
 	}
 
 	public int getType() {
-		return SensorDataItem.ENTRY;
+		return Item.ENTRY;
 	}
 }

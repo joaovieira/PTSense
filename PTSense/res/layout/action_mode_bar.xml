@@ -12,7 +12,9 @@
         android:clickable="true"
         android:focusable="true"
         android:paddingLeft="8dip"
+        android:paddingRight="30dip"
         android:drawableLeft="?android:attr/actionModeCloseDrawable"
+        android:drawablePadding="8dip"
         android:text="@string/done"
         android:textAppearance="@android:style/TextAppearance.Holo.Widget.ActionBar.Menu" >
     </TextView>

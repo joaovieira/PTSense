@@ -31,7 +31,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@id/tvService"
                 android:layout_below="@id/tvService"
-                android:textAppearance="?android:attr/textAppearanceSmallInverse" />
+                android:textAppearance="?android:attr/textAppearanceSmallInverse"
+                android:textColor="?android:attr/textColorPrimaryInverse" />
         </RelativeLayout>
 
         <TextView
@@ -44,10 +45,94 @@
             android:textAppearance="?android:attr/textAppearanceSmallInverse" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lvInputList"
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="24dip"
+            android:paddingRight="24dip"
+            android:paddingTop="10dip"
+            android:text="@string/feedback.question"
+            android:textAllCaps="true"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:textStyle="bold" >
+        </TextView>
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                style="@style/MyListView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="10dip" >
+
+                <include
+                    android:id="@+id/sepPersonal"
+                    layout="@android:layout/preference_category" />
+
+                <include
+                    android:id="@+id/sbHappy"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sbRelaxed"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sepEnvironment"
+                    layout="@android:layout/preference_category" />
+
+                <include
+                    android:id="@+id/sbNoisy"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sbCrowded"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sbSmoothness"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sbLight"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sbTemperature"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sepService"
+                    layout="@android:layout/preference_category" />
+
+                <include
+                    android:id="@+id/sbFast"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sbReliable"
+                    layout="@layout/seekbar_user_feedback_list_item" />
+
+                <include
+                    android:id="@+id/sepFeedback"
+                    layout="@android:layout/preference_category" />
+
+                <EditText
+                    android:id="@+id/eTFeedback"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/feedback.hint" />
+                
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
 </LinearLayout>

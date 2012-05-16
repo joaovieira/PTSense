@@ -37,6 +37,21 @@
     <string name="empty_feedback_list">You don\'t have any feedback to respond.</string>
     <string name="feedback_saved">Feedback was saved successfully</string>
     <string name="done">Done</string>
+    <string name="feedback.question">How did you feel?</string>
+    <string name="feedback.title.happy">Happy</string>
+    <string name="feedback.title.relaxed">Relaxed</string>
+    <string name="feedback.separator.personal">Personal</string>
+    <string name="feedback.separator.environment">Environment</string>
+    <string name="feedback.separator.service">Service</string>
+    <string name="feedback.title.noisy">Noisy</string>
+    <string name="feedback.title.crowded">Crowded</string>
+    <string name="feedback.title.smoothness">Smoothness of trip</string>
+    <string name="feedback.title.light">Light conditions</string>
+    <string name="feedback.title.temperature">Warm</string>
+    <string name="feedback.title.fast">Fast</string>
+    <string name="feedback.title.reliable">Reliable</string>
+    <string name="feedback.separator.feedback">Feedback</string>
+    <string name="feedback.hint">How can this journey be improved? (optional)</string>
     
     
     

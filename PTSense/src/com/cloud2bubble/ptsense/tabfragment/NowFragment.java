@@ -7,7 +7,7 @@ import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.list.EmptyItem;
 import com.cloud2bubble.ptsense.list.EntryItem;
 import com.cloud2bubble.ptsense.list.HeadedListAdapter;
-import com.cloud2bubble.ptsense.list.SensorDataItem;
+import com.cloud2bubble.ptsense.list.Item;
 import com.cloud2bubble.ptsense.list.SectionItem;
 import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 
@@ -27,7 +27,7 @@ public class NowFragment extends Fragment {
 
 	private Activity sensingActivity;
 
-	ArrayList<SensorDataItem> items;
+	ArrayList<Item> items;
 	HeadedListAdapter adapter;
 
 	@Override
@@ -36,7 +36,7 @@ public class NowFragment extends Fragment {
 
 		sensingActivity = getActivity();
 
-		items = new ArrayList<SensorDataItem>();
+		items = new ArrayList<Item>();
 
 		items.add(new SectionItem("smartphone", "Smartphone Sensors"));
 		if (SmartphoneSensingService.mAcceleration != null)
@@ -106,10 +106,10 @@ public class NowFragment extends Fragment {
 
 	private void updateUI(Intent intent) {
 
-		Iterator<SensorDataItem> iterator = items.iterator();
+		Iterator<Item> iterator = items.iterator();
 		while (iterator.hasNext()) {
-			SensorDataItem element = iterator.next();
-			if (element.getType() == SensorDataItem.ENTRY)
+			Item element = iterator.next();
+			if (element.getType() == Item.ENTRY)
 				((EntryItem) element).value = intent.getStringExtra(element
 						.getKey());
 		}
