@@ -85,7 +85,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar happySB = (SeekBar) sbHappy.findViewById(R.id.sbInput);
 			happyTitle.setText(getString(R.string.feedback_title_happy));
 			happyProgress.setText(progressToString(happySB.getProgress()));
-			inputs.put("happy", happySB);
+			inputs.put(getString(R.string.feedback_key_happy), happySB);
 
 			happySB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -108,7 +108,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar relaxedSB = (SeekBar) sbRelaxed.findViewById(R.id.sbInput);
 			relaxedTitle.setText(getString(R.string.feedback_title_relaxed));
 			relaxedProgress.setText(progressToString(relaxedSB.getProgress()));
-			inputs.put("relaxed", relaxedSB);
+			inputs.put(getString(R.string.feedback_key_relaxed), relaxedSB);
 
 			relaxedSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -130,7 +130,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar noisySB = (SeekBar) sbNoisy.findViewById(R.id.sbInput);
 			noisyTitle.setText(getString(R.string.feedback_title_noisy));
 			noisyProgress.setText(progressToString(noisySB.getProgress()));
-			inputs.put("noisy", noisySB);
+			inputs.put(getString(R.string.feedback_key_noisy), noisySB);
 
 			noisySB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -153,7 +153,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar crowdedSB = (SeekBar) sbCrowded.findViewById(R.id.sbInput);
 			crowdedTitle.setText(getString(R.string.feedback_title_crowded));
 			crowdedProgress.setText(progressToString(crowdedSB.getProgress()));
-			inputs.put("crowded", crowdedSB);
+			inputs.put(getString(R.string.feedback_key_crowded), crowdedSB);
 
 			crowdedSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -179,7 +179,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 					.setText(getString(R.string.feedback_title_smoothness));
 			smoothnessProgress
 					.setText(progressToString(relaxedSB.getProgress()));
-			inputs.put("smoothness", smoothnessSB);
+			inputs.put(getString(R.string.feedback_key_smoothness), smoothnessSB);
 
 			smoothnessSB
 					.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -203,7 +203,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar ambienceSB = (SeekBar) sbAmbience.findViewById(R.id.sbInput);
 			ambienceTitle.setText(getString(R.string.feedback_title_ambience));
 			ambienceProgress.setText(progressToString(relaxedSB.getProgress()));
-			inputs.put("ambience", ambienceSB);
+			inputs.put(getString(R.string.feedback_key_ambience), ambienceSB);
 
 			ambienceSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -225,7 +225,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			SeekBar fastSB = (SeekBar) sbFast.findViewById(R.id.sbInput);
 			fastTitle.setText(getString(R.string.feedback_title_fast));
 			fastProgress.setText(progressToString(fastSB.getProgress()));
-			inputs.put("fast", fastSB);
+			inputs.put(getString(R.string.feedback_key_fast), fastSB);
 
 			fastSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 				public void onProgressChanged(SeekBar seekBar, int progress,
@@ -250,7 +250,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			reliableTitle.setText(getString(R.string.feedback_title_reliable));
 			reliableProgress
 					.setText(progressToString(reliableSB.getProgress()));
-			inputs.put("reliable", reliableSB);
+			inputs.put(getString(R.string.feedback_key_reliable), reliableSB);
 
 			reliableSB
 					.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -305,5 +305,6 @@ public class UserFeedback extends Activity implements OnClickListener {
 	        feedback.addInput(input.getKey(), seekBar.getProgress()/10.0);
 	    }
 	    feedback.addComment(etFeedback.getText().toString());
+	    feedback.getTrip().setReviewed();
 	}
 }

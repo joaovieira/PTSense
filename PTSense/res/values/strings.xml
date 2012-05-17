@@ -51,6 +51,14 @@
     <string name="feedback.title.reliable">Reliable</string>
     <string name="feedback.separator.feedback">Feedback</string>
     <string name="feedback.hint">How can this journey be improved? (optional)</string>
+    <string name="feedback.key.happy">happy</string>
+    <string name="feedback.key.relaxed">relaxed</string>
+    <string name="feedback.key.noisy">noisy</string>
+    <string name="feedback.key.crowded">crowded</string>
+    <string name="feedback.key.smoothness">smoothness</string>
+    <string name="feedback.key.ambience">ambience</string>
+    <string name="feedback.key.fast">fast</string>
+    <string name="feedback.key.reliable">reliable</string>
     
     
     

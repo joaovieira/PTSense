@@ -37,4 +37,8 @@ public class TripFeedback implements Serializable {
 	public ReviewItem getTrip(){
 		return trip;
 	}
+
+	public int getReviewId() {
+		return trip.getId();
+	}
 }

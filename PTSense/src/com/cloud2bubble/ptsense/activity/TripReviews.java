@@ -1,6 +1,7 @@
 package com.cloud2bubble.ptsense.activity;
 
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
@@ -52,12 +53,17 @@ public class TripReviews extends Activity {
 		database = new DatabaseHandler(this);
 		
 		/*ReviewItem item1 = new ReviewItem("District Line", "Transport For London - Underground", 
-				"Paddingtion", "Bayswater", new GregorianCalendar());
+				"Paddington", "Bayswater", new GregorianCalendar());
 		ReviewItem item2 = new ReviewItem("436 Line", "Transport For London - Buses", 
 				"Victoria", "Marble Arch (Park Lane)", new GregorianCalendar());
-		database.addReview(item1);
-		database.addReview(item2);*/
-		//database.clearTables();
+		ReviewItem item3 = new ReviewItem("Jubilee Line", "Transport For London - Underground", 
+				"Stratford", "Canary Wharf", new GregorianCalendar());
+		ReviewItem item4 = new ReviewItem("First Capital Connect", "National Railways", 
+				"Palmers Green", "Old Street", new GregorianCalendar());
+		database.addPendingReview(item1);
+		database.addPendingReview(item2);
+		database.addPendingReview(item3);
+		database.addPendingReview(item4);*/
 	}
 
 	@Override
@@ -84,9 +90,11 @@ public class TripReviews extends Activity {
 			}
 			TripFeedback feedback = (TripFeedback) extras.get("feedback");
 			if (feedback != null) {
-				if (insertFeedbackIntoDatabase(feedback))
+				if (insertFeedbackIntoDatabase(feedback)){
 					Toast.makeText(this, R.string.feedback_saved,
 							Toast.LENGTH_SHORT).show();
+				}
+					
 			}
 		}
 	}
@@ -97,7 +105,8 @@ public class TripReviews extends Activity {
 
 	private boolean insertFeedbackIntoDatabase(TripFeedback feedback) {
 		ReviewItem oldReview = feedback.getTrip();
-		database.removeReview(oldReview);
+		database.addPendingFeedback(feedback);
+		database.updateReviewAsReviewed(oldReview);
 		return true;
 	}
 }

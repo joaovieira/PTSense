@@ -10,23 +10,26 @@ public class ReviewItem implements Serializable {
 	static final int USER_FEEDBACK = 2;
 	
 	private final int databaseID;
+	private boolean reviewed;
 	public final String line;
 	public final String service;
 	public final String origin;
 	public final String destination;
 	public final Calendar date;
 	
-	public ReviewItem(int id, String line, String service, String origin, String destination, Calendar date){
+	public ReviewItem(int id, String line, String service, String origin, String destination, Calendar date, int reviewed){
 		this.databaseID = id;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;
 		this.destination = destination;
 		this.date = date;
+		this.reviewed = (reviewed==1)? true:false;
 	}
 	
 	public ReviewItem(String line, String service, String origin, String destination, Calendar date){
 		this.databaseID = -1;
+		this.reviewed = false;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;
@@ -94,5 +97,13 @@ public class ReviewItem implements Serializable {
 
 	public int getId(){
 		return this.databaseID;
+	}
+	
+	public boolean isReviewed(){
+		return this.reviewed;
+	}
+	
+	public void setReviewed(){
+		this.reviewed = true;
 	}
 }

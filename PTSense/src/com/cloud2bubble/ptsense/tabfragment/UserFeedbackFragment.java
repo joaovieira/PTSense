@@ -50,8 +50,7 @@ public class UserFeedbackFragment extends Fragment {
 
 	@Override
 	public void onResume() {
-		super.onResume();
-		reviews = database.getAllReviews();
+		reviews = database.getAllPendingReviews();
 		adapter = new ReviewListAdapter(tripReviewsActivity, reviews);
 		list.setAdapter(adapter);
 		
@@ -59,6 +58,7 @@ public class UserFeedbackFragment extends Fragment {
 			tvEmptyList.setText(R.string.empty_feedback_list);
 			tvEmptyList.setVisibility(View.VISIBLE);
 		}
+		super.onResume();
 	}
 
 }
