@@ -32,7 +32,6 @@
     <string name="notification.sensing.title">Sensing Running</string>
     <string name="notification.sensing.message">Touch for details</string>
     <string name="start">Start</string>
-    <string name="stop_sensing_dialog">Stop Sensing Dialog</string>
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="empty_feedback_list">You don\'t have any feedback to respond.</string>
     <string name="feedback_saved">Feedback was saved successfully</string>
@@ -59,6 +58,15 @@
     <string name="feedback.key.ambience">ambience</string>
     <string name="feedback.key.fast">fast</string>
     <string name="feedback.key.reliable">reliable</string>
+    <string name="start.dialog.title">Start Sensing</string>
+    <string name="autocomplete.service.hint">Select service</string>
+    <string name="autocomplete.line.hint">Type line name</string>
+    <string name="autocomplete.origin.hint">Type origin stop name</string>
+    <string name="autocomplete.destination.hint">Type destination stop name</string>
+    <string name="line">Line</string>
+    <string name="origin">Origin</string>
+    <string name="destination">Destination</string>
+    <string name="service">Service</string>
     
     
     

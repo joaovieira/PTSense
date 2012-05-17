@@ -79,8 +79,7 @@ public class Sensing extends Activity implements SensingManager {
 	}
 
 	public void showSenseDialog(int dialog) {
-		DialogFragment newFragment = StopSensingDialog.newInstance(this,
-                R.string.stop_sensing_dialog);
+		DialogFragment newFragment = StopSensingDialog.newInstance(this);
         newFragment.show(getFragmentManager(), "dialog");
 	}
 

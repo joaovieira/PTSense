@@ -195,24 +195,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.close(); // Close database connection
 	}
 
-	// Get single review
-	public ReviewItem getReview(int id) {
-		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor cursor = db.query(TABLE_REVIEWS, new String[] { KEY_LINE,
-				KEY_SERVICE, KEY_ORIGIN, KEY_DESTINATION, KEY_TIME }, KEY_ID
-				+ "=?", new String[] { String.valueOf(id) }, null, null, null);
-		if (cursor != null)
-			cursor.moveToFirst();
-
-		ReviewItem trip = new ReviewItem(cursor.getString(1),
-				cursor.getString(2), cursor.getString(3), cursor.getString(4),
-				stringToDate(cursor.getString(5)));
-
-		cursor.close();
-		db.close();
-		return trip;
-	}
-
 	// Get all sensor data
 	public ArrayList<ReviewItem> getAllPendingReviews() {
 		ArrayList<ReviewItem> reviewsList = new ArrayList<ReviewItem>();

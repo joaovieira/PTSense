@@ -15,7 +15,7 @@ public class StopSensingDialog extends DialogFragment {
 
 	static Activity activity;
 
-	public static StopSensingDialog newInstance(Context cxt, int title) {
+	public static StopSensingDialog newInstance(Context cxt) {
 		StopSensingDialog frag = new StopSensingDialog();
 		activity = (Activity) cxt;
 		return frag;

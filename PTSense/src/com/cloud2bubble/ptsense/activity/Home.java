@@ -140,13 +140,11 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 	public void showSenseDialog(int dialog) {
 		switch (dialog){
 		case SensingManager.DIALOG_START_SENSING:
-			DialogFragment startDialogFragment = StartSensingDialog.newInstance(this,
-	                R.string.stop_sensing_dialog);
+			DialogFragment startDialogFragment = StartSensingDialog.newInstance(this);
 			startDialogFragment.show(getFragmentManager(), "start_dialog");
 			break;
 		case SensingManager.DIALOG_STOP_SENSING:
-			DialogFragment stopDialogFragment = StopSensingDialog.newInstance(this,
-	                R.string.stop_sensing_dialog);
+			DialogFragment stopDialogFragment = StopSensingDialog.newInstance(this);
 			stopDialogFragment.show(getFragmentManager(), "stop_dialog");
 			break;
 		}
