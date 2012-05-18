@@ -215,7 +215,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<ReviewItem> reviewsList = new ArrayList<ReviewItem>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_REVIEWS + " WHERE "
-				+ KEY_REVIEWED + "=0";
+				+ KEY_REVIEWED + "=0" + " ORDER BY " + KEY_TIME + " DESC";
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
