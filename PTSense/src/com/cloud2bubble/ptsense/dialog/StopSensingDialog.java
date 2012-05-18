@@ -30,7 +30,7 @@ public class StopSensingDialog extends DialogFragment {
 				.setPositiveButton(R.string.stop,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-								((SensingManager) activity).doPositiveClick(SensingManager.DIALOG_STOP_SENSING);
+								((SensingManager) activity).doPositiveClick(SensingManager.DIALOG_STOP_SENSING, null);
 							}
 						})
 				.setNegativeButton(R.string.alert_dialog_cancel,

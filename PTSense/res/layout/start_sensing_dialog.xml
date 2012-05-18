@@ -54,7 +54,9 @@
                     android:paddingBottom="8dip"
                     android:paddingLeft="16dip"
                     android:paddingRight="16dip"
-                    android:paddingTop="8dip" />
+                    android:paddingTop="8dip"
+                    android:imeOptions="actionNext"
+                    android:singleLine="true" />
 
                 <TextView
                     android:id="@+id/tvOrigin"
@@ -71,7 +73,9 @@
                     android:paddingBottom="8dip"
                     android:paddingLeft="16dip"
                     android:paddingRight="16dip"
-                    android:paddingTop="8dip" />
+                    android:paddingTop="8dip"
+                    android:imeOptions="actionNext"
+                    android:singleLine="true" />
 
                 <TextView
                     android:id="@+id/tvDestination"
@@ -88,7 +92,9 @@
                     android:paddingBottom="8dip"
                     android:paddingLeft="16dip"
                     android:paddingRight="16dip"
-                    android:paddingTop="8dip" />
+                    android:paddingTop="8dip"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

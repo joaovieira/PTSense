@@ -4,32 +4,33 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 public class ReviewItem implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 	static final int SYSTEM_REVIEW = 1;
 	static final int USER_FEEDBACK = 2;
-	
+
 	private final int databaseID;
-	private boolean reviewed;
+	private boolean reviewed = false;
 	public final String line;
 	public final String service;
 	public final String origin;
 	public final String destination;
-	public final Calendar date;
-	
-	public ReviewItem(int id, String line, String service, String origin, String destination, Calendar date, int reviewed){
+	public Calendar date = null;
+
+	public ReviewItem(int id, String line, String service, String origin,
+			String destination, Calendar date, int reviewed) {
 		this.databaseID = id;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;
 		this.destination = destination;
 		this.date = date;
-		this.reviewed = (reviewed==1)? true:false;
+		this.reviewed = (reviewed == 1) ? true : false;
 	}
-	
-	public ReviewItem(String line, String service, String origin, String destination, Calendar date){
+
+	public ReviewItem(String line, String service, String origin,
+			String destination, Calendar date) {
 		this.databaseID = -1;
-		this.reviewed = false;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;
@@ -37,27 +38,38 @@ public class ReviewItem implements Serializable {
 		this.date = date;
 	}
 
-	public int getType(){
+	public ReviewItem(String line, String service, String origin,
+			String destination) {
+		this.databaseID = -1;
+		this.line = line;
+		this.service = service;
+		this.origin = origin;
+		this.destination = destination;
+	}
+
+	public int getType() {
 		return USER_FEEDBACK;
 	}
-	
-	public String serviceToString(){
+
+	public String serviceToString() {
 		return line + " (" + service + ")";
 	}
-	
-	public String directionToString(){
+
+	public String directionToString() {
 		return origin + " > " + destination;
 	}
-	
-	public String dateToString(){
-		String stringDate =  formatMonth(date.get(Calendar.MONTH)) + " " + date.get(Calendar.DAY_OF_MONTH) + "\n";
-		stringDate += formatTime(date.get(Calendar.HOUR), date.get(Calendar.MINUTE), date.get(Calendar.AM_PM));
+
+	public String dateToString() {
+		String stringDate = formatMonth(date.get(Calendar.MONTH)) + " "
+				+ date.get(Calendar.DAY_OF_MONTH) + "\n";
+		stringDate += formatTime(date.get(Calendar.HOUR),
+				date.get(Calendar.MINUTE), date.get(Calendar.AM_PM));
 		return stringDate;
 	}
 
 	private String formatTime(int hour, int minute, int am_pm) {
 		String time = hour + ":" + minute;
-		if(am_pm == Calendar.AM)
+		if (am_pm == Calendar.AM)
 			time += "AM";
 		else
 			time += "PM";
@@ -65,7 +77,7 @@ public class ReviewItem implements Serializable {
 	}
 
 	private String formatMonth(int month) {
-		switch (month){
+		switch (month) {
 		case 1:
 			return "Jan";
 		case 2:
@@ -89,21 +101,25 @@ public class ReviewItem implements Serializable {
 		case 11:
 			return "Nov";
 		case 12:
-			return "Dec";	
+			return "Dec";
 		default:
 			return null;
 		}
 	}
 
-	public int getId(){
+	public int getId() {
 		return this.databaseID;
 	}
-	
-	public boolean isReviewed(){
+
+	public boolean isReviewed() {
 		return this.reviewed;
 	}
-	
-	public void setReviewed(){
+
+	public void setReviewed() {
 		this.reviewed = true;
+	}
+	
+	public void setDate(Calendar date){
+		this.date = date;
 	}
 }

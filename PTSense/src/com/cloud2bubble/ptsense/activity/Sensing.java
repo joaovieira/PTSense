@@ -83,7 +83,7 @@ public class Sensing extends Activity implements SensingManager {
         newFragment.show(getFragmentManager(), "dialog");
 	}
 
-	public void doPositiveClick(int dialog) {
+	public void doPositiveClick(int dialog, Bundle bundle) {
 		stopService(new Intent(this, SmartphoneSensingService.class));
 		Intent homeIntent = new Intent(this, Home.class);
 		homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

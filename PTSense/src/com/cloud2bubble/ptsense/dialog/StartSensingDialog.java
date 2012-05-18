@@ -9,6 +9,8 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,7 +28,10 @@ public class StartSensingDialog extends DialogFragment implements
 		OnClickListener {
 
 	static Activity activity;
-	Map<String, String[]> service;
+	Map<String, String[]> serviceLines;
+	AutoCompleteTextView selectOrigin, selectDestination, selectLine;
+	Button bStart, bCancel;
+	String service;
 
 	public static StartSensingDialog newInstance(Context cxt) {
 		StartSensingDialog frag = new StartSensingDialog();
@@ -57,30 +62,35 @@ public class StartSensingDialog extends DialogFragment implements
 		originTitle.setText(R.string.origin);
 		destinationTitle.setText(R.string.destination);
 
-		final AutoCompleteTextView selectOrigin = (AutoCompleteTextView) v
-				.findViewById(R.id.acOrigin);
+		TextWatcher watcher = new LocalTextWatcher();
+
+		selectOrigin = (AutoCompleteTextView) v.findViewById(R.id.acOrigin);
 		selectOrigin.setHint(R.string.autocomplete_origin_hint);
 		selectOrigin.setEnabled(false);
+		selectOrigin.addTextChangedListener(watcher);
 
-		final AutoCompleteTextView selectDestination = (AutoCompleteTextView) v
+		selectDestination = (AutoCompleteTextView) v
 				.findViewById(R.id.acDestination);
-		selectDestination.setHint(R.string.autocomplete_origin_hint);
+		selectDestination.setHint(R.string.autocomplete_destination_hint);
 		selectDestination.setEnabled(false);
+		selectDestination.addTextChangedListener(watcher);
 
-		final AutoCompleteTextView selectLine = (AutoCompleteTextView) v
-				.findViewById(R.id.acLine);
+		selectLine = (AutoCompleteTextView) v.findViewById(R.id.acLine);
 		selectLine.setHint(R.string.autocomplete_line_hint);
 		selectLine.setEnabled(false);
-		selectLine.setOnItemClickListener(new OnItemClickListener(){
+		selectLine.addTextChangedListener(watcher);
+		selectLine.setThreshold(1);
+		selectLine.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> arg0, View view, int arg2,
 					long arg3) {
-				String[] stops = service.get(((TextView) view).getText());
-				
+				String[] stops = serviceLines.get(((TextView) view).getText());
+
 				ArrayAdapter<String> adapterStops = new ArrayAdapter<String>(
 						activity, R.layout.autocomplete_list_item, stops);
 				selectOrigin.setAdapter(adapterStops);
 				selectDestination.setAdapter(adapterStops);
+				clearStops();
 				selectOrigin.setEnabled(true);
 				selectDestination.setEnabled(true);
 			}
@@ -93,13 +103,18 @@ public class StartSensingDialog extends DialogFragment implements
 		selectService.setAdapter(adapterService);
 		selectService.setOnItemSelectedListener(new OnItemSelectedListener() {
 
-			public void onItemSelected(AdapterView<?> arg0, View view,
-					int arg2, long arg3) {
-				service = PTService.SERVICES.get(((TextView) view).getText());
+			public void onItemSelected(AdapterView<?> list, View view, int pos,
+					long arg3) {
+				service = list.getItemAtPosition(pos).toString();
+				serviceLines = PTService.SERVICES.get(service);
 				ArrayAdapter<String> adapterOrigin = new ArrayAdapter<String>(
-						activity, R.layout.autocomplete_list_item, service
+						activity, R.layout.autocomplete_list_item, serviceLines
 								.keySet().toArray(new String[0]));
 				selectLine.setAdapter(adapterOrigin);
+				clearLine();
+				clearStops();
+				selectOrigin.setEnabled(false);
+				selectDestination.setEnabled(false);
 				selectLine.setEnabled(true);
 			}
 
@@ -107,25 +122,67 @@ public class StartSensingDialog extends DialogFragment implements
 			}
 		});
 
-		Button bCancel = (Button) v.findViewById(android.R.id.button2);
-		Button bStart = (Button) v.findViewById(android.R.id.button1);
+		bCancel = (Button) v.findViewById(android.R.id.button2);
 		bCancel.setText(R.string.alert_dialog_cancel);
-		bStart.setText(R.string.start);
-
 		bCancel.setOnClickListener(this);
+
+		bStart = (Button) v.findViewById(android.R.id.button1);
+		bStart.setText(R.string.start);
+		bStart.setEnabled(false);
 		bStart.setOnClickListener(this);
 		return v;
+	}
+
+	protected void clearStops() {
+		selectOrigin.setText("");
+		selectDestination.setText("");
+	}
+
+	protected void clearLine() {
+		selectLine.setText("");
+	}
+
+	private void updateButtonState() {
+
+		boolean enabled = checkEditText(selectOrigin)
+				&& checkEditText(selectDestination)
+				&& checkEditText(selectLine);
+		bStart.setEnabled(enabled);
+	}
+
+	private boolean checkEditText(AutoCompleteTextView view) {
+		return !view.getText().toString().trim().equals("");
 	}
 
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case android.R.id.button1:
-			((SensingManager) activity)
-					.doPositiveClick(SensingManager.DIALOG_START_SENSING);
+			Bundle bundle = new Bundle();
+			bundle.putString("service", service);
+			bundle.putString("line", selectLine.getText().toString());
+			bundle.putString("origin", selectOrigin.getText().toString());
+			bundle.putString("destination", selectDestination.getText().toString());
+			((SensingManager) activity).doPositiveClick(
+					SensingManager.DIALOG_START_SENSING, bundle);
 			break;
 		case android.R.id.button2:
 			dismiss();
 			break;
+		}
+	}
+
+	private class LocalTextWatcher implements TextWatcher {
+
+		public void afterTextChanged(Editable s) {
+			updateButtonState();
+		}
+
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+		}
+
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
 		}
 	}
 }

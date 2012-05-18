@@ -34,25 +34,31 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 		setContentView(R.layout.main);
 
 		bOption1 = (RelativeLayout) findViewById(R.id.bHomeOption1);
-		tvTitle1 = (TextView) findViewById(R.id.tvHomeButtonSensing).findViewById(android.R.id.text1);
-		tvSubTitle1 = (TextView) findViewById(R.id.tvHomeButtonSensing).findViewById(android.R.id.text2);
+		tvTitle1 = (TextView) findViewById(R.id.tvHomeButtonSensing)
+				.findViewById(android.R.id.text1);
+		tvSubTitle1 = (TextView) findViewById(R.id.tvHomeButtonSensing)
+				.findViewById(android.R.id.text2);
 		tvTitle1.setText(R.string.home_title1);
 		tvSubTitle1.setText(R.string.home_subtitle1);
 		bToggleSensing = (Button) findViewById(R.id.bToggleSensing);
 		bOption1.setOnClickListener(this);
 
 		bOption2 = (RelativeLayout) findViewById(R.id.bHomeOption2);
-		tvTitle2 = (TextView) findViewById(R.id.tvHomeButtonTrips).findViewById(android.R.id.text1);
-		tvSubTitle2 = (TextView) findViewById(R.id.tvHomeButtonTrips).findViewById(android.R.id.text2);
+		tvTitle2 = (TextView) findViewById(R.id.tvHomeButtonTrips)
+				.findViewById(android.R.id.text1);
+		tvSubTitle2 = (TextView) findViewById(R.id.tvHomeButtonTrips)
+				.findViewById(android.R.id.text2);
 		tvTitle2.setText(R.string.home_title2);
 		tvSubTitle2.setText(R.string.home_subtitle2);
-		
+
 		bOption3 = (RelativeLayout) findViewById(R.id.bHomeOption3);
-		tvTitle3 = (TextView) findViewById(R.id.tvHomeButtonPlan).findViewById(android.R.id.text1);
-		tvSubTitle3 = (TextView) findViewById(R.id.tvHomeButtonPlan).findViewById(android.R.id.text2);
+		tvTitle3 = (TextView) findViewById(R.id.tvHomeButtonPlan).findViewById(
+				android.R.id.text1);
+		tvSubTitle3 = (TextView) findViewById(R.id.tvHomeButtonPlan)
+				.findViewById(android.R.id.text2);
 		tvTitle3.setText(R.string.home_title3);
 		tvSubTitle3.setText(R.string.home_subtitle3);
-		
+
 		bOption2.setOnClickListener(this);
 		bOption3.setOnClickListener(this);
 		bToggleSensing.setOnClickListener(this);
@@ -136,25 +142,29 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 			bToggleSensing.setBackgroundResource(R.color.sense_button_start);
 		}
 	}
-	
+
 	public void showSenseDialog(int dialog) {
-		switch (dialog){
+		switch (dialog) {
 		case SensingManager.DIALOG_START_SENSING:
-			DialogFragment startDialogFragment = StartSensingDialog.newInstance(this);
+			DialogFragment startDialogFragment = StartSensingDialog
+					.newInstance(this);
 			startDialogFragment.show(getFragmentManager(), "start_dialog");
 			break;
 		case SensingManager.DIALOG_STOP_SENSING:
-			DialogFragment stopDialogFragment = StopSensingDialog.newInstance(this);
+			DialogFragment stopDialogFragment = StopSensingDialog
+					.newInstance(this);
 			stopDialogFragment.show(getFragmentManager(), "stop_dialog");
 			break;
 		}
 	}
 
-	public void doPositiveClick(int dialog) {
-		switch (dialog){
+	public void doPositiveClick(int dialog, Bundle bundle) {
+		switch (dialog) {
 		case SensingManager.DIALOG_START_SENSING:
 			isSensing = true;
 			Intent i = new Intent(this, SmartphoneSensingService.class);
+			if (bundle != null)
+				i.putExtra("trip_info", bundle);
 			startService(i);
 			Intent sensingIntent = new Intent(this, Sensing.class);
 			startActivity(sensingIntent);

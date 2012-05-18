@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -14,6 +15,7 @@ import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Sensing;
 import com.cloud2bubble.ptsense.database.SensorData;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
+import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -24,6 +26,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaRecorder;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -57,19 +60,20 @@ public class SmartphoneSensingService extends Service implements
 			currentdZ, currentLight, currentPressure, currentTemp,
 			currentHumidity;
 
-	private DatabaseHandler database;
-
 	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.displayevent";
 	private final Handler handler = new Handler();
-	Intent intent;
+	Intent uiIntent;
 
 	private final String outputFile = "PTSense_output";
-
+	
+	private DatabaseHandler database;
+	ReviewItem trip;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		// sensorDatabase = new SensorDatabaseHandler(this);
+		database = new DatabaseHandler(this);
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
 			mAcceleration = sensorManager
@@ -118,21 +122,30 @@ public class SmartphoneSensingService extends Service implements
 
 		currentX = currentY = currentZ = currentLight = currentPressure = currentTemp = currentHumidity = 0.0f;
 
-		intent = new Intent(BROADCAST_ACTION);
+		uiIntent = new Intent(BROADCAST_ACTION);
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		IS_RUNNING = true;
-
+		createTrip(intent);
 		startOnGoingNotification();
 		registerSensorListeners();
 		startSoundRecording();
 		collectDataFromSensors();
 
+		IS_RUNNING = true;
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
+	}
+
+	private void createTrip(Intent intent) {
+		Bundle tripInfo = intent.getBundleExtra("trip_info");
+		String service = tripInfo.getString("service");
+		String line = tripInfo.getString("line");
+		String origin = tripInfo.getString("origin");
+		String destination = tripInfo.getString("destination");
+		trip = new ReviewItem(line, service, origin, destination);
 	}
 
 	@Override
@@ -208,9 +221,16 @@ public class SmartphoneSensingService extends Service implements
 
 		handler.removeCallbacks(sendUpdatesToUI);
 		stopForeground(true);
+		
+		saveTripToDatabase();
 
 		// Tell the user we stopped.
 		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
+	}
+
+	private void saveTripToDatabase() {
+		trip.setDate(new GregorianCalendar());
+		database.addPendingReview(trip);
 	}
 
 	private void setupSoundRecorder() {
@@ -291,29 +311,29 @@ public class SmartphoneSensingService extends Service implements
 			if (soundRecorder != null) {
 				double amp = getPowerDB();
 				soundValues.offer(Double.valueOf(amp));
-				intent.putExtra("sound", String.valueOf(amp));
+				uiIntent.putExtra("sound", String.valueOf(amp));
 			}
 
 			if (mAcceleration != null) {
 				String oscilation = "x:" + String.valueOf(currentdX) + " y:"
 						+ String.valueOf(currentdY) + " z:"
 						+ String.valueOf(currentdZ);
-				intent.putExtra("oscilation", oscilation);
+				uiIntent.putExtra("oscilation", oscilation);
 			}
 
 			if (mAmbTemperature != null)
-				intent.putExtra("temperature", String.valueOf(currentTemp));
+				uiIntent.putExtra("temperature", String.valueOf(currentTemp));
 
 			if (mLight != null)
-				intent.putExtra("light", String.valueOf(currentLight));
+				uiIntent.putExtra("light", String.valueOf(currentLight));
 
 			if (mPressure != null)
-				intent.putExtra("pressure", String.valueOf(currentPressure));
+				uiIntent.putExtra("pressure", String.valueOf(currentPressure));
 
 			if (mRelHumidity != null)
-				intent.putExtra("humidity", String.valueOf(currentHumidity));
+				uiIntent.putExtra("humidity", String.valueOf(currentHumidity));
 
-			sendBroadcast(intent);
+			sendBroadcast(uiIntent);
 		}
 
 		private double getPowerDB() {
