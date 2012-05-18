@@ -67,6 +67,8 @@
     <string name="origin">Origin</string>
     <string name="destination">Destination</string>
     <string name="service">Service</string>
+    <string name="notification.review.title">Sensing Finished</string>
+    <string name="notification.feedback.message">Need your opinion! Touch to insert</string>
     
     
     

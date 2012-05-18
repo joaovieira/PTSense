@@ -16,12 +16,10 @@ import android.app.ActionBar.Tab;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 public class TripReviews extends Activity {
 
-	public static final int REQUEST_FEEDBACK_CODE = 10;
-	private DatabaseHandler database;
+	public static final int REQUEST_FEEDBACK_CODE = 9;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +48,6 @@ public class TripReviews extends Activity {
 		actionBar.addTab(tab);
 
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		database = new DatabaseHandler(this);
 		
 		/*ReviewItem item1 = new ReviewItem("District Line", "Transport For London - Underground", 
 				"Paddington", "Bayswater", new GregorianCalendar());
@@ -84,29 +81,6 @@ public class TripReviews extends Activity {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK
 				&& requestCode == REQUEST_FEEDBACK_CODE) {
-			Bundle extras = data.getExtras();
-			if (extras == null) {
-				return;
-			}
-			TripFeedback feedback = (TripFeedback) extras.get("feedback");
-			if (feedback != null) {
-				if (insertFeedbackIntoDatabase(feedback)){
-					Toast.makeText(this, R.string.feedback_saved,
-							Toast.LENGTH_SHORT).show();
-				}
-					
-			}
 		}
-	}
-	
-	public DatabaseHandler getDatabase(){
-		return database;
-	}
-
-	private boolean insertFeedbackIntoDatabase(TripFeedback feedback) {
-		ReviewItem oldReview = feedback.getTrip();
-		database.addPendingFeedback(feedback);
-		database.updateReviewAsReviewed(oldReview);
-		return true;
 	}
 }

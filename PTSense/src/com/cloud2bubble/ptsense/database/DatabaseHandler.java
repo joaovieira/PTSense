@@ -194,6 +194,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				new String[] { String.valueOf(reviewItem.getId()) });
 		db.close(); // Close database connection
 	}
+	
+	public ReviewItem getReview(long id){
+		SQLiteDatabase db = this.getWritableDatabase();
+		String selectQuery = "SELECT * FROM " + TABLE_REVIEWS + " WHERE "
+				+ KEY_ID + "=" + id;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor != null)
+	        cursor.moveToFirst();
+		ReviewItem trip = new ReviewItem(cursor.getInt(0),
+				cursor.getString(1), cursor.getString(2),
+				cursor.getString(3), cursor.getString(4),
+				stringToDate(cursor.getString(5)), cursor.getInt(6));
+		db.close();
+		return trip;
+	}
 
 	// Get all sensor data
 	public ArrayList<ReviewItem> getAllPendingReviews() {

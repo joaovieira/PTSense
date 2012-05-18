@@ -16,6 +16,7 @@ import com.cloud2bubble.ptsense.activity.Sensing;
 import com.cloud2bubble.ptsense.database.SensorData;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
 import com.cloud2bubble.ptsense.list.ReviewItem;
+import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -36,7 +37,7 @@ import android.widget.Toast;
 public class SmartphoneSensingService extends Service implements
 		SensorEventListener {
 
-	private static final int ONGOING_NOTIFICATION = 1;
+	private static final int ONGOING_NOTIFICATION = 10;
 	public static boolean IS_RUNNING;
 
 	private Thread sensorThread = null;
@@ -222,15 +223,22 @@ public class SmartphoneSensingService extends Service implements
 		handler.removeCallbacks(sendUpdatesToUI);
 		stopForeground(true);
 		
-		saveTripToDatabase();
+		long id = saveTripToDatabase();
+		startServerCommunication(id);
 
 		// Tell the user we stopped.
 		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
 	}
 
-	private void saveTripToDatabase() {
+	private void startServerCommunication(long id) {
+		Intent i = new Intent(this, C2BClient.class);
+		i.putExtra("trip_id", id);
+		startService(i);
+	}
+
+	private long saveTripToDatabase() {
 		trip.setDate(new GregorianCalendar());
-		database.addPendingReview(trip);
+		return database.addPendingReview(trip);
 	}
 
 	private void setupSoundRecorder() {

@@ -6,11 +6,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.database.DatabaseHandler;
 import com.cloud2bubble.ptsense.database.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
+import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,6 +26,7 @@ import android.view.MotionEvent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
@@ -34,12 +38,17 @@ public class UserFeedback extends Activity implements OnClickListener {
 	Map<String, SeekBar> inputs = new HashMap<String, SeekBar>();
 	EditText etFeedback;
 	TripFeedback feedback;
+	
+	private DatabaseHandler database;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_feedback);
-
+		
+		NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(C2BClient.FEEDBACK_NOTIFICATION);
+		
 		ActionBar actionBar = getActionBar();
 
 		View actionCustomView = getLayoutInflater().inflate(
@@ -48,6 +57,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 		actionBar.setCustomView(actionCustomView);
 
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+		
+		database = new DatabaseHandler(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
@@ -287,10 +298,13 @@ public class UserFeedback extends Activity implements OnClickListener {
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.tvActionModeCloseButton:
-			Intent data = new Intent();
 			processUserInput();
-			data.putExtra("feedback", feedback);
-			setResult(RESULT_OK, data);
+			if (insertFeedbackIntoDatabase(feedback)){
+				Toast.makeText(this, R.string.feedback_saved,
+						Toast.LENGTH_SHORT).show();
+			}
+			
+			setResult(RESULT_OK);
 			finish();
 			break;
 		}
@@ -306,5 +320,12 @@ public class UserFeedback extends Activity implements OnClickListener {
 	    }
 	    feedback.addComment(etFeedback.getText().toString());
 	    feedback.getTrip().setReviewed();
+	}
+	
+	private boolean insertFeedbackIntoDatabase(TripFeedback feedback) {
+		ReviewItem oldReview = feedback.getTrip();
+		database.addPendingFeedback(feedback);
+		database.updateReviewAsReviewed(oldReview);
+		return true;
 	}
 }

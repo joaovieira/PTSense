@@ -8,6 +8,8 @@
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -35,6 +37,9 @@
             android:hardwareAccelerated="true"
             android:label="@string/settings"
             android:theme="@android:style/Theme.Holo" >
+            <intent-filter>
+                <category android:name="android.intent.category.PREFERENCE" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.Sensing"
@@ -51,12 +56,19 @@
             android:name=".activity.PlanTrip"
             android:label="@string/home.title3" >
         </activity>
-        <activity
-            android:name=".activity.UserFeedback" >
+        <activity android:name=".activity.UserFeedback" >
         </activity>
 
         <!-- Services -->
         <service android:name=".sensingservice.SmartphoneSensingService" />
+        <service android:name=".servercommunication.C2BClient" >
+        </service>
+
+        <receiver android:name=".servercommunication.NetWatcher" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -33,7 +33,7 @@ public class UserFeedbackFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		
 		tripReviewsActivity = (TripReviews) getActivity();
-		database = tripReviewsActivity.getDatabase();
+		database = new DatabaseHandler(tripReviewsActivity);
 	}
 
 	@Override
