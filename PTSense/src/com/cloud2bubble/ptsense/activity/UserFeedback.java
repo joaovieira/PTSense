@@ -13,9 +13,7 @@ import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,9 +44,6 @@ public class UserFeedback extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_feedback);
 		
-		NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		nm.cancel(C2BClient.FEEDBACK_NOTIFICATION);
-		
 		ActionBar actionBar = getActionBar();
 
 		View actionCustomView = getLayoutInflater().inflate(
@@ -64,6 +59,9 @@ public class UserFeedback extends Activity implements OnClickListener {
 		if (extras == null) {
 			return;
 		}
+		boolean clearFeedbackCount = extras.getBoolean("clear_fcount");
+		if (clearFeedbackCount)
+			C2BClient.feedbackCount = 0;
 		trip = (ReviewItem) extras.get("review_item");
 		if (trip != null) {
 			TextView tvService = (TextView) findViewById(R.id.tvService);
