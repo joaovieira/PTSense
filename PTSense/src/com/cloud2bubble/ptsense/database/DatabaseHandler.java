@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// SensorData Table Columns names
 	private static final String KEY_ID = "id";
+	private static final String REVIEW_ID = "review_id";
 	private static final String KEY_TIME = "time";
-	private static final String KEY_TYPE = "type";
-	private static final String KEY_DATA = "data";
+	private static String KEY_ACCELERATION;
+	private static String KEY_TEMPERATURE;
+	private static String KEY_LIGHT;
+	private static String KEY_PRESSURE;
+	private static String KEY_HUMIDITY;
+	private static String KEY_SOUND;
 
 	// Reviews Table Columns names
 	// private static final String KEY_ID = "id";
@@ -51,7 +57,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Feedback Table Columns names
 	// private static final String KEY_ID = "id";
-	private static final String REVIEW_ID = "review_id";
+	// private static final String REVIEW_ID = "review_id";
 	private static final String KEY_COMMENT = "comment";
 	private static String KEY_HAPPY;
 	private static String KEY_RELAXED;
@@ -62,8 +68,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static String KEY_FAST;
 	private static String KEY_RELIABLE;
 
-	public DatabaseHandler(Context context) {
+	private static DatabaseHandler instance;
+
+	private DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+		KEY_ACCELERATION = context
+				.getString(R.string.sensordata_key_acceleration);
+		KEY_TEMPERATURE = context
+				.getString(R.string.sensordata_key_temperature);
+		KEY_LIGHT = context.getString(R.string.sensordata_key_light);
+		KEY_PRESSURE = context.getString(R.string.sensordata_key_pressure);
+		KEY_HUMIDITY = context.getString(R.string.sensordata_key_humidity);
+		KEY_SOUND = context.getString(R.string.sensordata_key_sound);
+
 		KEY_HAPPY = context.getString(R.string.feedback_key_happy);
 		KEY_RELAXED = context.getString(R.string.feedback_key_relaxed);
 		KEY_NOISY = context.getString(R.string.feedback_key_noisy);
@@ -74,12 +92,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		KEY_RELIABLE = context.getString(R.string.feedback_key_reliable);
 	}
 
+	public static synchronized DatabaseHandler getInstance(Context context) {
+		if (instance == null) {
+			instance = new DatabaseHandler(context);
+		}
+		return instance;
+	}
+
 	// Creating Tables
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_SENSORDATA_TABLE = "CREATE TABLE " + TABLE_SENSORDATA
-				+ "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TIME + " TEXT,"
-				+ KEY_TYPE + " TEXT," + KEY_DATA + " REAL)";
+				+ "(" + KEY_ID + " INTEGER PRIMARY KEY," + REVIEW_ID
+				+ " INTEGER," + KEY_TIME + " TEXT," + KEY_ACCELERATION
+				+ " REAL," + KEY_TEMPERATURE + " REAL," + KEY_LIGHT + " REAL,"
+				+ KEY_PRESSURE + " REAL," + KEY_HUMIDITY + " REAL," + KEY_SOUND
+				+ " REAL)";
 		db.execSQL(CREATE_SENSORDATA_TABLE);
 
 		String CREATE_REVIEWS_TABLE = "CREATE TABLE " + TABLE_REVIEWS + "("
@@ -119,54 +147,65 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
+		values.put(REVIEW_ID, sensorData.refTripId);
 		values.put(KEY_TIME, sensorData.time);
-		values.put(KEY_TYPE, sensorData.type);
-		values.put(KEY_DATA, sensorData.data);
+
+		Map<String, Float> data = sensorData.getData();
+		Iterator<Entry<String, Float>> it = data.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<String, Float> pairs = (Map.Entry<String, Float>) it
+					.next();
+			values.put(pairs.getKey(), pairs.getValue().toString());
+		}
 
 		long rowID = db.insert(TABLE_SENSORDATA, null, values);
 		db.close(); // Close database connection
+
 		return rowID;
 	}
 
-	// Get all sensor data by type
-	public List<SensorData> getSensorDataByType(String type) {
-		List<SensorData> sensorDataList = new ArrayList<SensorData>();
-		// Select All Query
-		String selectQuery = "SELECT * FROM " + TABLE_SENSORDATA + " WHERE "
-				+ KEY_TYPE + " LIKE " + type;
-
+	// Get trip data
+	public TripData getTripData(long id){
+		ReviewItem trip = getReview(id);
+		ArrayList<Calendar> timestamps = new ArrayList<Calendar>();
+		ArrayList<Float> acceleration = new ArrayList<Float>();
+		ArrayList<Float> temperature = new ArrayList<Float>();
+		ArrayList<Float> light = new ArrayList<Float>();
+		ArrayList<Float> pressure = new ArrayList<Float>();
+		ArrayList<Float> humidity = new ArrayList<Float>();
+		ArrayList<Float> sound = new ArrayList<Float>();
+		
 		SQLiteDatabase db = this.getWritableDatabase();
+		
+		String selectQuery = "SELECT " + KEY_TIME + "," + KEY_ACCELERATION
+				+ "," + KEY_TEMPERATURE + "," + KEY_LIGHT + ","
+				+ KEY_PRESSURE + "," + KEY_HUMIDITY + "," + KEY_SOUND + " FROM " + TABLE_SENSORDATA + " WHERE "
+				+ REVIEW_ID + "=" + id + " ORDER BY " + KEY_TIME + " ASC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		if (cursor.moveToFirst()) {
+		if (cursor.moveToFirst()){
 			do {
-				SensorData contact = new SensorData(cursor.getString(1),
-						cursor.getString(2), cursor.getFloat(3));
-				sensorDataList.add(contact);
+				timestamps.add(stringToDate(cursor.getString(0)));
+				acceleration.add(cursor.getFloat(1));
+				temperature.add(cursor.getFloat(2));
+				light.add(cursor.getFloat(3));
+				pressure.add(cursor.getFloat(4));
+				humidity.add(cursor.getFloat(5));
+				sound.add(cursor.getFloat(6));
 			} while (cursor.moveToNext());
 		}
-
-		return sensorDataList;
-	}
-
-	// Get all sensor data
-	public List<SensorData> getAllSensorData() {
-		List<SensorData> sensorDataList = new ArrayList<SensorData>();
-		// Select All Query
-		String selectQuery = "SELECT * FROM " + TABLE_SENSORDATA;
-
-		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		if (cursor.moveToFirst()) {
-			do {
-				SensorData sensorData = new SensorData(cursor.getString(1),
-						cursor.getString(2), cursor.getFloat(3));
-				sensorDataList.add(sensorData);
-			} while (cursor.moveToNext());
-		}
-
-		return sensorDataList;
+		cursor.close();
+		db.close();
+		
+		Map<String, ArrayList<Float>> data = new HashMap<String, ArrayList<Float>>();
+		data.put(KEY_ACCELERATION, acceleration);
+		data.put(KEY_TEMPERATURE, temperature);
+		data.put(KEY_LIGHT, light);
+		data.put(KEY_PRESSURE, pressure);
+		data.put(KEY_HUMIDITY, humidity);
+		data.put(KEY_SOUND, sound);
+		
+		TripData tripSensorData = new TripData(trip, timestamps, data);
+		return tripSensorData;
 	}
 
 	// Add new review
@@ -205,11 +244,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor != null)
 			cursor.moveToFirst();
 
-		// TODO
 		ReviewItem trip = new ReviewItem(cursor.getInt(0), cursor.getString(1),
 				cursor.getString(2), cursor.getString(3), cursor.getString(4),
 				stringToDate(cursor.getString(5)),
 				stringToDate(cursor.getString(6)), cursor.getInt(7));
+		
+		cursor.close();
 		db.close();
 		return trip;
 	}
@@ -226,7 +266,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (cursor.moveToFirst()) {
 			do {
-				// TODO
 				ReviewItem review = new ReviewItem(cursor.getInt(0),
 						cursor.getString(1), cursor.getString(2),
 						cursor.getString(3), cursor.getString(4),
@@ -241,7 +280,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return reviewsList;
 	}
 
-	// update review as reviewd
+	// update review as reviewed
 	public int updateReviewAsReviewed(ReviewItem reviewItem) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
@@ -282,7 +321,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return ret;
 	}
 
-	// Add new contact
+	// Add new Feedback
 	public long addPendingFeedback(TripFeedback feedback) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
@@ -304,7 +343,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return rowID;
 	}
 
-	// Add new contact
+	// Remove Feedback
 	public void removePendingFeedback(int id) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_FEEDBACKS, KEY_ID + " = ?",
@@ -312,7 +351,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.close(); // Close database connection
 	}
 
-	// Get all sensor data
+	// Get all Feedbacks
 	public List<TripFeedback> getAllPendingFeedbacks() {
 		List<TripFeedback> feedbackList = new ArrayList<TripFeedback>();
 		// Select All Query

@@ -53,7 +53,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		
-		database = new DatabaseHandler(this);
+		database = DatabaseHandler.getInstance(this);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {

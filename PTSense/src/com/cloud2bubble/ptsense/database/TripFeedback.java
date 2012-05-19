@@ -10,9 +10,9 @@ public class TripFeedback implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	ReviewItem trip;
-	Map<String, Double> inputs = new HashMap<String, Double>();
-	String comment;
+	private ReviewItem trip;
+	private Map<String, Double> inputs = new HashMap<String, Double>();
+	private String comment;
 	
 	public TripFeedback(ReviewItem trip){
 		this.trip = trip;

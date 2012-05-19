@@ -69,6 +69,12 @@
     <string name="service">Service</string>
     <string name="notification.review.title">Sensing Finished</string>
     <string name="notification.feedback.message">Need your opinion! Touch to insert</string>
+    <string name="sensordata.key.acceleration">acceleration</string>
+    <string name="sensordata.key.temperature">temperature</string>
+    <string name="sensordata.key.light">light</string>
+    <string name="sensordata.key.pressure">pressure</string>
+    <string name="sensordata.key.humidity">humidity</string>
+    <string name="sensordata.key.sound">sound</string>
     
     
     

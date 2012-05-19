@@ -6,9 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.cloud2bubble.ptsense.R;
@@ -75,7 +73,7 @@ public class SmartphoneSensingService extends Service implements
 	public void onCreate() {
 		super.onCreate();
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		database = new DatabaseHandler(this);
+		database = DatabaseHandler.getInstance(this);
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
 			mAcceleration = sensorManager
@@ -147,7 +145,6 @@ public class SmartphoneSensingService extends Service implements
 		String line = tripInfo.getString("line");
 		String origin = tripInfo.getString("origin");
 		String destination = tripInfo.getString("destination");
-		// TODO
 		trip = new ReviewItem(line, service, origin, destination, new GregorianCalendar(), null);
 		tripId = saveTripToDatabase();
 		trip.setDatabaseId(tripId);
@@ -370,53 +367,29 @@ public class SmartphoneSensingService extends Service implements
 					drainBuffers();
 
 					String currentTime = getCurrentTimeStamp();
-					SensorData data = new SensorData(currentTime);
+					SensorData data = new SensorData(tripId, currentTime);
 
-					/*
-					 * data.setType("LIGHT");
-					 * data.setData(getAverageData(lightValues));
-					 * sensorDatabase.addSensorData(data);
-					 * Log.d("SmartphoneSensingService",
-					 * "Updated database with: LIGHT " +
-					 * getAverageData(lightValues));
-					 * data.setType("ACCELERATION_X");
-					 * data.setData(getAverageData(accelerationsX));
-					 * sensorDatabase.addSensorData(data);
-					 * Log.d("SmartphoneSensingService",
-					 * "Updated database with: ACCELERATION_X " +
-					 * getAverageData(accelerationsX));
-					 * data.setType("ACCELERATION_Y");
-					 * data.setData(getAverageData(accelerationsY));
-					 * sensorDatabase.addSensorData(data);
-					 * Log.d("SmartphoneSensingService",
-					 * "Updated database with: ACCELERATION_Y " +
-					 * getAverageData(accelerationsY));
-					 * data.setType("ACCELERATION_Z");
-					 * data.setData(getAverageData(accelerationsZ));
-					 * sensorDatabase.addSensorData(data);
-					 * Log.d("SmartphoneSensingService",
-					 * "Updated database with: ACCELERATION_Z " +
-					 * getAverageData(accelerationsZ));
-					 * data.setType("PRESSURE");
-					 * data.setData(getAverageData(pressureValues));
-					 * sensorDatabase.addSensorData(data);
-					 * Log.d("SmartphoneSensingService",
-					 * "Updated database with: PRESSURE " +
-					 * getAverageData(pressureValues));
-					 * data.setType("HUMIDITY");
-					 * data.setData(getAverageData(relHumidityValues));
-					 * sensorDatabase.addSensorData(data);
-					 * Log.d("SmartphoneSensingService",
-					 * "Updated database with: HUMIDITY " +
-					 * getAverageData(relHumidityValues));
-					 * data.setType("TEMPERATURE");
-					 * data.setData(getAverageData(ambTemperatureValues));
-					 * sensorDatabase.addSensorData(data);
-					 * Log.d("SmartphoneSensingService",
-					 * "Updated database with: TEMPERATURE " +
-					 * getAverageData(ambTemperatureValues));
-					 */
-					// restartRecording();
+					Float accelFinal = DataProcessor.processAccelerometerData(accelerationsX, accelerationsY, accelerationsZ);
+					data.addData(getString(R.string.sensordata_key_acceleration), accelFinal);
+					
+					Float tempFinal = DataProcessor.processTemperatureData(ambTemperatureValues);
+					data.addData(getString(R.string.sensordata_key_temperature), tempFinal);
+					
+					Float lightFinal = DataProcessor.processLightData(ambTemperatureValues);
+					data.addData(getString(R.string.sensordata_key_light), lightFinal);
+					
+					Float pressureFinal = DataProcessor.processPressureData(ambTemperatureValues);
+					data.addData(getString(R.string.sensordata_key_pressure), pressureFinal);
+					
+					Float humidityFinal = DataProcessor.processHumidityData(ambTemperatureValues);
+					data.addData(getString(R.string.sensordata_key_humidity), humidityFinal);
+					
+					Float soundFinal = DataProcessor.processSoundData(ambTemperatureValues);
+					data.addData(getString(R.string.sensordata_key_sound), soundFinal);
+					
+					database.addSensorData(data);
+					
+					clearTempBuffers();
 					// TODO define listener to reset file when reached max file
 					// size
 
@@ -426,21 +399,15 @@ public class SmartphoneSensingService extends Service implements
 			}
 		}
 
-		private void restartRecording() {
-			stopSoundRecording();
-			setupSoundRecorder();
-			startSoundRecording();
-		}
-
-		private Float getAverageData(LinkedList<Float> valuesList) {
-			ListIterator<Float> iter = valuesList.listIterator();
-			int size = valuesList.size();
-			Float average = new Float(0);
-
-			while (iter.hasNext()) {
-				average += iter.next();
-			}
-			return average / size;
+		private void clearTempBuffers() {
+			tmpLightValues.clear();
+			tmpAccelerationsX.clear();
+			tmpAccelerationsY.clear();
+			tmpAccelerationsY.clear();
+			tmpPressureValues.clear();
+			tmpPressureValues.clear();
+			tmpAmbTemperatureValues.clear();
+			tmpSoundValues.clear();
 		}
 
 		private void drainBuffers() {

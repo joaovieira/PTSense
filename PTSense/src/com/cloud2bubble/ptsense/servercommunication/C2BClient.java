@@ -5,6 +5,7 @@ import com.cloud2bubble.ptsense.activity.Home;
 import com.cloud2bubble.ptsense.activity.TripReviews;
 import com.cloud2bubble.ptsense.activity.UserFeedback;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
+import com.cloud2bubble.ptsense.database.TripData;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.Notification;
@@ -15,7 +16,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 public class C2BClient extends Service {
@@ -32,34 +37,58 @@ public class C2BClient extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		database = new DatabaseHandler(this);
+		database = DatabaseHandler.getInstance(this);
 		nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
-
-		// Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
-
-		if (intent != null) {
+		
+		if (intent.hasExtra("trip_id")) {
 			long tripId = intent.getLongExtra("trip_id", -1);
-			if (tripId != -1)
-				sendTripDataToServer(tripId);
+			if (tripId != -1) {
+				sendTripData(tripId);
+				stopSelf();
+			}
 		} else {
-			// TODO check for pending feedbacks to send to server
+			Log.d("C2BClient Start", "network connection available");
+			sendPendingData();
 			stopSelf();
 		}
 
 		return START_NOT_STICKY;
 	}
 
-	private void sendTripDataToServer(long id) {
-		// TODO communicate with server for inference
+	private void sendPendingData() {
+		// send trip data to server and wait for inference
+		if (hasDataConnection()) {
+
+			// TODO check for pending feedbacks and trip data to send to server
+		}
+	}
+
+	private void sendTripData(long id) {
+		// send trip data to server and wait for inference
+		if (hasDataConnection()) {
+			TripData tripData = database.getTripData(id);
+			sendTripDataToServer(tripData);
+		}
+
 		// now just show a notification asking for user feedback
 		ReviewItem trip = database.getReview(id);
 		notifyForFeedback(trip);
-		stopSelf();
+	}
+
+	private void sendTripDataToServer(TripData tripData) {
+		// TODO communicate with server
+	}
+
+	private boolean hasDataConnection() {
+		ConnectivityManager cm = (ConnectivityManager) this
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo info = cm.getActiveNetworkInfo();
+		return (info != null);
 	}
 
 	private void notifyForFeedback(ReviewItem trip) {
@@ -68,7 +97,8 @@ public class C2BClient extends Service {
 				+ trip.directionToString();
 
 		feedbackCount++;
-		PendingIntent contentIntent = PendingIntent.getActivities(this, FEEDBACK_NOTIFICATION,
+		PendingIntent contentIntent = PendingIntent.getActivities(this,
+				FEEDBACK_NOTIFICATION,
 				makeMessageIntentStack(this, trip, feedbackCount),
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		Resources res = this.getResources();
@@ -97,8 +127,6 @@ public class C2BClient extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
-		// Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
 	}
 
 	@Override

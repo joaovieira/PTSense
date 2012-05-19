@@ -40,7 +40,7 @@ public class UserFeedbackFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		tripReviewsActivity = (TripReviews) getActivity();
-		database = new DatabaseHandler(tripReviewsActivity);
+		database = DatabaseHandler.getInstance(tripReviewsActivity);
 	}
 
 	@Override
