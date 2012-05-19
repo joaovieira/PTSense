@@ -4,8 +4,8 @@ import java.util.Calendar;
 
 public class SystemReviewItem extends ReviewItem {
 
-	public SystemReviewItem(String line, String service, String origin, String destination, Calendar date) {
-		super(line, service, origin, destination, date);
+	public SystemReviewItem(String line, String service, String origin, String destination, Calendar startTime, Calendar endTime) {
+		super(line, service, origin, destination, startTime, endTime);
 	}
 
 	@Override

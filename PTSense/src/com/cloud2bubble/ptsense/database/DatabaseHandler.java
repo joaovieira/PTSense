@@ -45,7 +45,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_SERVICE = "service";
 	private static final String KEY_ORIGIN = "origin";
 	private static final String KEY_DESTINATION = "destination";
-	// private static final String KEY_TIME = "time";
+	private static final String KEY_START_TIME = "start_time";
+	private static final String KEY_END_TIME = "end_time";
 	private static final String KEY_REVIEWED = "reviewed";
 
 	// Feedback Table Columns names
@@ -84,8 +85,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_REVIEWS_TABLE = "CREATE TABLE " + TABLE_REVIEWS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_LINE + " TEXT,"
 				+ KEY_SERVICE + " TEXT," + KEY_ORIGIN + " TEXT,"
-				+ KEY_DESTINATION + " TEXT," + KEY_TIME + " TEXT,"
-				+ KEY_REVIEWED + " INTEGER)";
+				+ KEY_DESTINATION + " TEXT," + KEY_START_TIME + " TEXT,"
+				+ KEY_END_TIME + " TEXT," + KEY_REVIEWED + " INTEGER)";
 		db.execSQL(CREATE_REVIEWS_TABLE);
 
 		String CREATE_FEEDBACKS_TABLE = "CREATE TABLE " + TABLE_FEEDBACKS + "("
@@ -177,7 +178,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_SERVICE, reviewItem.service);
 		values.put(KEY_ORIGIN, reviewItem.origin);
 		values.put(KEY_DESTINATION, reviewItem.destination);
-		values.put(KEY_TIME, dateToString(reviewItem.date));
+		values.put(KEY_START_TIME, dateToString(reviewItem.startTime));
+		values.put(KEY_END_TIME, dateToString(reviewItem.endTime));
 		int intReviewed = (reviewItem.isReviewed()) ? 1 : 0;
 		values.put(KEY_REVIEWED, intReviewed);
 
@@ -194,18 +196,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				new String[] { String.valueOf(reviewItem.getId()) });
 		db.close(); // Close database connection
 	}
-	
-	public ReviewItem getReview(long id){
+
+	public ReviewItem getReview(long id) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		String selectQuery = "SELECT * FROM " + TABLE_REVIEWS + " WHERE "
 				+ KEY_ID + "=" + id;
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor != null)
-	        cursor.moveToFirst();
-		ReviewItem trip = new ReviewItem(cursor.getInt(0),
-				cursor.getString(1), cursor.getString(2),
-				cursor.getString(3), cursor.getString(4),
-				stringToDate(cursor.getString(5)), cursor.getInt(6));
+			cursor.moveToFirst();
+
+		// TODO
+		ReviewItem trip = new ReviewItem(cursor.getInt(0), cursor.getString(1),
+				cursor.getString(2), cursor.getString(3), cursor.getString(4),
+				stringToDate(cursor.getString(5)),
+				stringToDate(cursor.getString(6)), cursor.getInt(7));
 		db.close();
 		return trip;
 	}
@@ -215,17 +219,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<ReviewItem> reviewsList = new ArrayList<ReviewItem>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_REVIEWS + " WHERE "
-				+ KEY_REVIEWED + "=0" + " ORDER BY " + KEY_TIME + " DESC";
+				+ KEY_REVIEWED + "=0" + " ORDER BY " + KEY_END_TIME + " DESC";
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		if (cursor.moveToFirst()) {
 			do {
+				// TODO
 				ReviewItem review = new ReviewItem(cursor.getInt(0),
 						cursor.getString(1), cursor.getString(2),
 						cursor.getString(3), cursor.getString(4),
-						stringToDate(cursor.getString(5)), cursor.getInt(6));
+						stringToDate(cursor.getString(5)),
+						stringToDate(cursor.getString(6)), cursor.getInt(7));
 				reviewsList.add(review);
 			} while (cursor.moveToNext());
 		}
@@ -244,8 +250,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_SERVICE, reviewItem.service);
 		values.put(KEY_ORIGIN, reviewItem.origin);
 		values.put(KEY_DESTINATION, reviewItem.destination);
-		values.put(KEY_TIME, dateToString(reviewItem.date));
+		values.put(KEY_START_TIME, dateToString(reviewItem.startTime));
+		values.put(KEY_START_TIME, dateToString(reviewItem.endTime));
 		values.put(KEY_REVIEWED, 1);
+
+		// updating row
+		int ret = db.update(TABLE_REVIEWS, values, KEY_ID + " = ?",
+				new String[] { String.valueOf(reviewItem.getId()) });
+		db.close();
+		return ret;
+	}
+
+	// update finish time to review
+	public int updatePendingReview(ReviewItem reviewItem) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		int reviewed = reviewItem.isReviewed() ? 1 : 0;
+		ContentValues values = new ContentValues();
+		values.put(KEY_LINE, reviewItem.line);
+		values.put(KEY_SERVICE, reviewItem.service);
+		values.put(KEY_ORIGIN, reviewItem.origin);
+		values.put(KEY_DESTINATION, reviewItem.destination);
+		values.put(KEY_START_TIME, dateToString(reviewItem.startTime));
+		values.put(KEY_END_TIME, dateToString(reviewItem.endTime));
+		values.put(KEY_REVIEWED, reviewed);
 
 		// updating row
 		int ret = db.update(TABLE_REVIEWS, values, KEY_ID + " = ?",
@@ -268,7 +296,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					.next();
 			values.put(pairs.getKey(), pairs.getValue().toString());
 		}
-		values.put(KEY_COMMENT, feedback.getcomment());
+		values.put(KEY_COMMENT, feedback.getComment());
 
 		long rowID = db.insert(TABLE_FEEDBACKS, null, values);
 		db.close(); // Close database connection
@@ -290,10 +318,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		// Select All Query
 		String selectQuery = "SELECT " + TABLE_FEEDBACKS + "." + KEY_ID + ","
 				+ KEY_LINE + "," + KEY_SERVICE + "," + KEY_ORIGIN + ","
-				+ KEY_DESTINATION + "," + KEY_TIME + "," + KEY_HAPPY + ","
-				+ KEY_RELAXED + "," + KEY_NOISY + "," + KEY_CROWDED + ","
-				+ KEY_SMOOTHNESS + "," + KEY_AMBIENCE + "," + KEY_FAST + ","
-				+ KEY_RELIABLE + "," + KEY_COMMENT
+				+ KEY_DESTINATION + "," + KEY_START_TIME + "," + KEY_END_TIME
+				+ "," + KEY_HAPPY + "," + KEY_RELAXED + "," + KEY_NOISY + ","
+				+ KEY_CROWDED + "," + KEY_SMOOTHNESS + "," + KEY_AMBIENCE + ","
+				+ KEY_FAST + "," + KEY_RELIABLE + "," + KEY_COMMENT
 
 				+ " FROM " + TABLE_FEEDBACKS + "," + TABLE_REVIEWS + " WHERE "
 				+ TABLE_FEEDBACKS + "." + REVIEW_ID + "=" + TABLE_REVIEWS + "."
@@ -306,17 +334,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			do {
 				ReviewItem trip = new ReviewItem(cursor.getString(1),
 						cursor.getString(2), cursor.getString(3),
-						cursor.getString(4), stringToDate(cursor.getString(5)));
+						cursor.getString(4), stringToDate(cursor.getString(5)),
+						stringToDate(cursor.getString(6)));
 				TripFeedback feedback = new TripFeedback(trip);
-				feedback.addInput(KEY_HAPPY, Double.parseDouble(cursor.getString(6)));
-				feedback.addInput(KEY_RELAXED, Double.parseDouble(cursor.getString(7)));
-				feedback.addInput(KEY_NOISY, Double.parseDouble(cursor.getString(8)));
-				feedback.addInput(KEY_CROWDED, Double.parseDouble(cursor.getString(9)));
-				feedback.addInput(KEY_SMOOTHNESS, Double.parseDouble(cursor.getString(10)));
-				feedback.addInput(KEY_AMBIENCE, Double.parseDouble(cursor.getString(11)));
-				feedback.addInput(KEY_FAST, Double.parseDouble(cursor.getString(12)));
-				feedback.addInput(KEY_RELIABLE, Double.parseDouble(cursor.getString(12)));
-				feedback.addComment(cursor.getString(14));
+				feedback.addInput(KEY_HAPPY,
+						Double.parseDouble(cursor.getString(7)));
+				feedback.addInput(KEY_RELAXED,
+						Double.parseDouble(cursor.getString(8)));
+				feedback.addInput(KEY_NOISY,
+						Double.parseDouble(cursor.getString(9)));
+				feedback.addInput(KEY_CROWDED,
+						Double.parseDouble(cursor.getString(10)));
+				feedback.addInput(KEY_SMOOTHNESS,
+						Double.parseDouble(cursor.getString(11)));
+				feedback.addInput(KEY_AMBIENCE,
+						Double.parseDouble(cursor.getString(12)));
+				feedback.addInput(KEY_FAST,
+						Double.parseDouble(cursor.getString(13)));
+				feedback.addInput(KEY_RELIABLE,
+						Double.parseDouble(cursor.getString(14)));
+				feedback.addComment(cursor.getString(15));
 				feedbackList.add(feedback);
 			} while (cursor.moveToNext());
 		}
@@ -331,29 +368,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Date date = null;
 		try {
 			date = sdfDate.parse(stringDate);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			return cal;
 		} catch (ParseException e) {
-			e.printStackTrace();
+			return null;
 		}
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		return cal;
 	}
 
 	private String dateToString(Calendar date) {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return sdfDate.format(date.getTime());
+		if (date == null)
+			return "";
+		else {
+			SimpleDateFormat sdfDate = new SimpleDateFormat(
+					"yyyy-MM-dd HH:mm:ss");
+			return sdfDate.format(date.getTime());
+		}
 	}
-
-	// --- remove
-
-	public void clearTables() {
-		SQLiteDatabase db = this.getWritableDatabase();
-
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_SENSORDATA);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEWS);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_FEEDBACKS);
-
-		onCreate(db);
-	}
-
 }

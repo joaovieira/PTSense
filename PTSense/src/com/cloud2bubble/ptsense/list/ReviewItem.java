@@ -9,42 +9,36 @@ public class ReviewItem implements Serializable {
 	static final int SYSTEM_REVIEW = 1;
 	static final int USER_FEEDBACK = 2;
 
-	private final int databaseID;
+	private long databaseID;
 	private boolean reviewed = false;
 	public final String line;
 	public final String service;
 	public final String origin;
 	public final String destination;
-	public Calendar date = null;
+	public Calendar startTime = null;
+	public Calendar endTime = null;
 
 	public ReviewItem(int id, String line, String service, String origin,
-			String destination, Calendar date, int reviewed) {
+			String destination, Calendar startTime, Calendar endTime, int reviewed) {
 		this.databaseID = id;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;
 		this.destination = destination;
-		this.date = date;
+		this.startTime = startTime;
+		this.endTime = endTime;
 		this.reviewed = (reviewed == 1) ? true : false;
 	}
 
 	public ReviewItem(String line, String service, String origin,
-			String destination, Calendar date) {
+			String destination, Calendar startTime, Calendar endTime) {
 		this.databaseID = -1;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;
 		this.destination = destination;
-		this.date = date;
-	}
-
-	public ReviewItem(String line, String service, String origin,
-			String destination) {
-		this.databaseID = -1;
-		this.line = line;
-		this.service = service;
-		this.origin = origin;
-		this.destination = destination;
+		this.startTime = startTime;
+		this.endTime = endTime;
 	}
 
 	public int getType() {
@@ -59,12 +53,12 @@ public class ReviewItem implements Serializable {
 		return origin + " > " + destination;
 	}
 
-	public String dateToString() {
-		String stringDate = formatMonth(date.get(Calendar.MONTH)) + " "
-				+ date.get(Calendar.DAY_OF_MONTH) + "\n";
-		stringDate += formatTime(date.get(Calendar.HOUR),
-				date.get(Calendar.MINUTE), date.get(Calendar.AM_PM));
-		return stringDate;
+	public String endTimeToString() {
+		String stringTime = formatMonth(endTime.get(Calendar.MONTH)) + " "
+				+ endTime.get(Calendar.DAY_OF_MONTH) + "\n";
+		stringTime += formatTime(endTime.get(Calendar.HOUR),
+				endTime.get(Calendar.MINUTE), endTime.get(Calendar.AM_PM));
+		return stringTime;
 	}
 
 	private String formatTime(int hour, int minute, int am_pm) {
@@ -107,7 +101,11 @@ public class ReviewItem implements Serializable {
 		}
 	}
 
-	public int getId() {
+	public void setDatabaseId(long tripId) {
+		databaseID = tripId;
+	}
+	
+	public long getId() {
 		return this.databaseID;
 	}
 
@@ -119,7 +117,7 @@ public class ReviewItem implements Serializable {
 		this.reviewed = true;
 	}
 	
-	public void setDate(Calendar date){
-		this.date = date;
+	public void setEndTime(Calendar endTime){
+		this.endTime = endTime;
 	}
 }

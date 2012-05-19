@@ -26,7 +26,7 @@ public class TripFeedback implements Serializable {
 		this.comment = text;
 	}
 	
-	public String getcomment(){
+	public String getComment(){
 		return comment;
 	}
 	
@@ -38,7 +38,7 @@ public class TripFeedback implements Serializable {
 		return trip;
 	}
 
-	public int getReviewId() {
+	public long getReviewId() {
 		return trip.getId();
 	}
 }

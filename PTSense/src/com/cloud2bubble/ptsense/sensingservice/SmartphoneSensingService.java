@@ -69,6 +69,7 @@ public class SmartphoneSensingService extends Service implements
 	
 	private DatabaseHandler database;
 	ReviewItem trip;
+	long tripId;
 	
 	@Override
 	public void onCreate() {
@@ -146,7 +147,10 @@ public class SmartphoneSensingService extends Service implements
 		String line = tripInfo.getString("line");
 		String origin = tripInfo.getString("origin");
 		String destination = tripInfo.getString("destination");
-		trip = new ReviewItem(line, service, origin, destination);
+		// TODO
+		trip = new ReviewItem(line, service, origin, destination, new GregorianCalendar(), null);
+		tripId = saveTripToDatabase();
+		trip.setDatabaseId(tripId);
 	}
 
 	@Override
@@ -209,7 +213,7 @@ public class SmartphoneSensingService extends Service implements
 	private void collectDataFromSensors() {
 		// print values on Sensing Now activity UI every 2 seconds
 		handler.removeCallbacks(sendUpdatesToUI);
-		handler.postDelayed(sendUpdatesToUI, 500); // 1 second
+		handler.postDelayed(sendUpdatesToUI, 200); // 1 second
 
 		// calculate average and insert store into database every 20 seconds
 		sensorThread = new PreProcessThread();
@@ -223,11 +227,16 @@ public class SmartphoneSensingService extends Service implements
 		handler.removeCallbacks(sendUpdatesToUI);
 		stopForeground(true);
 		
-		long id = saveTripToDatabase();
-		startServerCommunication(id);
+		updateTripDate();
+		startServerCommunication(tripId);
 
 		// Tell the user we stopped.
 		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
+	}
+
+	private void updateTripDate() {
+		trip.setEndTime(new GregorianCalendar());
+		database.updatePendingReview(trip);
 	}
 
 	private void startServerCommunication(long id) {
@@ -237,7 +246,6 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private long saveTripToDatabase() {
-		trip.setDate(new GregorianCalendar());
 		return database.addPendingReview(trip);
 	}
 
@@ -356,7 +364,7 @@ public class SmartphoneSensingService extends Service implements
 		public void run() {
 			while (IS_RUNNING) {
 				try {
-					sleep(20000);
+					sleep(2000);
 					Log.d("SmartphoneSensingService", "Updating SensorDatabase");
 
 					drainBuffers();

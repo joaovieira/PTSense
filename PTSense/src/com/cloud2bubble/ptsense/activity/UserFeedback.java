@@ -70,7 +70,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 			TextView tvCloseButton = (TextView) findViewById(R.id.tvActionModeCloseButton);
 			tvService.setText(trip.serviceToString());
 			tvDirection.setText(trip.directionToString());
-			tvDate.setText(trip.dateToString());
+			tvDate.setText(trip.endTimeToString());
 			tvCloseButton.setOnClickListener(this);
 
 			TextView sepPersonal = (TextView) findViewById(R.id.sepPersonal);
@@ -298,7 +298,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 		case R.id.tvActionModeCloseButton:
 			processUserInput();
 			if (insertFeedbackIntoDatabase(feedback)){
-				Toast.makeText(this, R.string.feedback_saved,
+				TripFeedback tf = database.getAllPendingFeedbacks().get(0);
+				Toast.makeText(this, tf.getReviewId() + tf.getComment(),
 						Toast.LENGTH_SHORT).show();
 			}
 			

@@ -41,7 +41,7 @@ public class ReviewListAdapter extends ArrayAdapter<ReviewItem> {
 				if (direction != null)
 					direction.setText(ri.directionToString());
 				if (date != null)
-					date.setText(ri.dateToString());
+					date.setText(ri.endTimeToString());
 				break;
 			case ReviewItem.SYSTEM_REVIEW:
 				break;
