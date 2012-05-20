@@ -79,7 +79,7 @@ public class C2BClient extends Service {
 		    	}
 		    }
 		    
-		    List<TripData> pendingTripData = database.getAllTripData();
+		    List<TripData> pendingTripData = database.getAllTripsData();
 		    Iterator<TripData> itr2 = pendingTripData.iterator();
 		    while (itr2.hasNext()) {
 		    	TripData tripData = itr2.next();

@@ -18,9 +18,9 @@ public class ReviewItem implements Serializable {
 	public Calendar startTime = null;
 	public Calendar endTime = null;
 
-	public ReviewItem(int id, String line, String service, String origin,
+	public ReviewItem(long l, String line, String service, String origin,
 			String destination, Calendar startTime, Calendar endTime, int reviewed) {
-		this.databaseID = id;
+		this.databaseID = l;
 		this.line = line;
 		this.service = service;
 		this.origin = origin;

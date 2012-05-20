@@ -2,6 +2,7 @@ package com.cloud2bubble.ptsense.sensingservice;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -134,8 +135,6 @@ public class SmartphoneSensingService extends Service implements
 		collectDataFromSensors();
 
 		IS_RUNNING = true;
-		// We want this service to continue running until it is explicitly
-		// stopped, so return sticky.
 		return START_STICKY;
 	}
 
@@ -215,18 +214,20 @@ public class SmartphoneSensingService extends Service implements
 	private void collectDataFromSensors() {
 		// print values on Sensing Now activity UI every 2 seconds
 		handler.removeCallbacks(sendUpdatesToUI);
-		handler.postDelayed(sendUpdatesToUI, 200); // 1 second
 
-		// calculate average and insert store into database every 20 seconds
+		soundRecorder.getMaxAmplitude();
+		handler.postDelayed(sendUpdatesToUI, 200);
+
+		// calculate average and insert store into database every 2 seconds
 		sensorThread = new PreProcessThread();
-		sensorThread.start();
+		handler.postDelayed(sensorThread, 1000);
+		//sensorThread.start();
 	}
 
 	private void stop() {
 		unregisterSensorListeners();
 		stopSoundRecording();
 
-		handler.removeCallbacks(sendUpdatesToUI);
 		stopForeground(true);
 
 		updateTripDate();
@@ -259,6 +260,7 @@ public class SmartphoneSensingService extends Service implements
 		try {
 			soundRecorder.prepare();
 			soundRecorder.start();
+			soundRecorder.getMaxAmplitude();
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -282,15 +284,15 @@ public class SmartphoneSensingService extends Service implements
 				float dX = event.values[0] - currentX;
 				currentX = event.values[0];
 				currentdX = dX;
-				accelerationsX.offer(dX);
+				accelerationsX.offer(currentX);
 				float dY = event.values[1] - currentY;
 				currentY = event.values[1];
 				currentdY = dY;
-				accelerationsY.offer(dY);
+				accelerationsY.offer(currentY);
 				float dZ = event.values[2] - currentZ;
 				currentZ = event.values[2];
 				currentdZ = dZ;
-				accelerationsZ.offer(dZ);
+				accelerationsZ.offer(currentZ);
 				break;
 			case Sensor.TYPE_AMBIENT_TEMPERATURE:
 				currentTemp = event.values[0];
@@ -317,10 +319,11 @@ public class SmartphoneSensingService extends Service implements
 	};
 
 	private Runnable sendUpdatesToUI = new Runnable() {
+		DecimalFormat df = new DecimalFormat("0.0000");
 		public void run() {
 			if (IS_RUNNING) {
 				sendIntentWithSensorData();
-				handler.postDelayed(this, 1000); // 1 second
+				handler.postDelayed(this, 500); // 0.5 second
 			}
 		}
 
@@ -328,27 +331,27 @@ public class SmartphoneSensingService extends Service implements
 			if (soundRecorder != null) {
 				double amp = getPowerDB();
 				soundValues.offer(Double.valueOf(amp));
-				uiIntent.putExtra("sound", String.valueOf(amp));
+				uiIntent.putExtra("sound", df.format(amp));
 			}
 
 			if (mAcceleration != null) {
-				String oscilation = "x:" + String.valueOf(currentdX) + " y:"
-						+ String.valueOf(currentdY) + " z:"
-						+ String.valueOf(currentdZ);
+				String oscilation = "x:" + df.format(currentdX) + " y:"
+						+ df.format(currentdY) + " z:"
+						+ df.format(currentdZ);
 				uiIntent.putExtra("oscilation", oscilation);
 			}
 
 			if (mAmbTemperature != null)
-				uiIntent.putExtra("temperature", String.valueOf(currentTemp));
+				uiIntent.putExtra("temperature", df.format(currentTemp));
 
 			if (mLight != null)
-				uiIntent.putExtra("light", String.valueOf(currentLight));
+				uiIntent.putExtra("light", df.format(currentLight));
 
 			if (mPressure != null)
-				uiIntent.putExtra("pressure", String.valueOf(currentPressure));
+				uiIntent.putExtra("pressure", df.format(currentPressure));
 
 			if (mRelHumidity != null)
-				uiIntent.putExtra("humidity", String.valueOf(currentHumidity));
+				uiIntent.putExtra("humidity", df.format(currentHumidity));
 
 			sendBroadcast(uiIntent);
 		}
@@ -365,7 +368,7 @@ public class SmartphoneSensingService extends Service implements
 		public void run() {
 			if (IS_RUNNING) {
 				updateSensorDatabase();
-				handler.postDelayed(this, 2000); // 1 second
+				handler.postDelayed(this, 2000);
 			}
 		}
 
@@ -378,31 +381,31 @@ public class SmartphoneSensingService extends Service implements
 			SensorData data = new SensorData(tripId, currentTime);
 
 			Float accelFinal = DataProcessor.processAccelerometerData(
-					accelerationsX, accelerationsY, accelerationsZ);
+					tmpAccelerationsX, tmpAccelerationsY, tmpAccelerationsZ);
 			data.addData(getString(R.string.sensordata_key_acceleration),
 					accelFinal);
 
 			Float tempFinal = DataProcessor
-					.processTemperatureData(ambTemperatureValues);
+					.processTemperatureData(tmpAmbTemperatureValues);
 			data.addData(getString(R.string.sensordata_key_temperature),
 					tempFinal);
 
 			Float lightFinal = DataProcessor
-					.processLightData(ambTemperatureValues);
+					.processLightData(tmpLightValues);
 			data.addData(getString(R.string.sensordata_key_light), lightFinal);
 
 			Float pressureFinal = DataProcessor
-					.processPressureData(ambTemperatureValues);
+					.processPressureData(tmpPressureValues);
 			data.addData(getString(R.string.sensordata_key_pressure),
 					pressureFinal);
 
 			Float humidityFinal = DataProcessor
-					.processHumidityData(ambTemperatureValues);
+					.processHumidityData(tmpRelHumidityValues);
 			data.addData(getString(R.string.sensordata_key_humidity),
 					humidityFinal);
 
 			Float soundFinal = DataProcessor
-					.processSoundData(ambTemperatureValues);
+					.processSoundData(tmpSoundValues);
 			data.addData(getString(R.string.sensordata_key_sound), soundFinal);
 
 			database.addSensorData(data);
@@ -415,9 +418,9 @@ public class SmartphoneSensingService extends Service implements
 			tmpLightValues.clear();
 			tmpAccelerationsX.clear();
 			tmpAccelerationsY.clear();
-			tmpAccelerationsY.clear();
+			tmpAccelerationsZ.clear();
 			tmpPressureValues.clear();
-			tmpPressureValues.clear();
+			tmpRelHumidityValues.clear();
 			tmpAmbTemperatureValues.clear();
 			tmpSoundValues.clear();
 		}

@@ -164,6 +164,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return rowID;
 	}
 
+	// Add new contact
+	public void removeTripData(TripData tripData) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_REVIEWS, REVIEW_ID + "=?",
+				new String[] { String.valueOf(tripData.getTrip().getId()) });
+		db.close(); // Close database connection
+	}
+
 	// Get trip data
 	public TripData getTripData(long id) {
 		ReviewItem trip = getReview(id);
@@ -210,8 +218,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	// get all pending trip data
-	public List<TripData> getAllTripData() {
-		ArrayList<Integer> tripIds = new ArrayList<Integer>();
+	public List<TripData> getAllTripsData() {
+		ArrayList<Long> tripIds = new ArrayList<Long>();
 		List<TripData> tripData = new ArrayList<TripData>();
 
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -221,17 +229,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (cursor.moveToFirst()) {
 			do {
-				tripIds.add(cursor.getInt(0));
+				tripIds.add(cursor.getLong(0));
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
 		db.close();
 
-		Iterator<Integer> itr = tripIds.iterator();
-	    while (itr.hasNext()) {
-	    	tripData.add(getTripData(itr.next()));
-	    }
-	    
+		Iterator<Long> itr = tripIds.iterator();
+		while (itr.hasNext()) {
+			tripData.add(getTripData(itr.next()));
+		}
+
 		return tripData;
 	}
 
@@ -255,7 +263,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return rowID;
 	}
 
-	// Add new contact
+	// Remove review
 	public void removePendingReview(ReviewItem reviewItem) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_REVIEWS, KEY_ID + "=?",
@@ -271,9 +279,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor != null)
 			cursor.moveToFirst();
 
-		ReviewItem trip = new ReviewItem(cursor.getInt(0), cursor.getString(1),
-				cursor.getString(2), cursor.getString(3), cursor.getString(4),
-				stringToDate(cursor.getString(5)),
+		ReviewItem trip = new ReviewItem(cursor.getLong(0),
+				cursor.getString(1), cursor.getString(2), cursor.getString(3),
+				cursor.getString(4), stringToDate(cursor.getString(5)),
 				stringToDate(cursor.getString(6)), cursor.getInt(7));
 
 		cursor.close();
@@ -293,7 +301,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (cursor.moveToFirst()) {
 			do {
-				ReviewItem review = new ReviewItem(cursor.getInt(0),
+				ReviewItem review = new ReviewItem(cursor.getLong(0),
 						cursor.getString(1), cursor.getString(2),
 						cursor.getString(3), cursor.getString(4),
 						stringToDate(cursor.getString(5)),
@@ -371,7 +379,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	// Remove Feedback
-	public void removePendingFeedback(int id) {
+	public void removePendingFeedback(long id) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_FEEDBACKS, KEY_ID + " = ?",
 				new String[] { String.valueOf(id) });
