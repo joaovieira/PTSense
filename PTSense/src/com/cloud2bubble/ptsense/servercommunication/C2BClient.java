@@ -1,11 +1,15 @@
 package com.cloud2bubble.ptsense.servercommunication;
 
+import java.util.Iterator;
+import java.util.List;
+
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Home;
 import com.cloud2bubble.ptsense.activity.TripReviews;
 import com.cloud2bubble.ptsense.activity.UserFeedback;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
 import com.cloud2bubble.ptsense.database.TripData;
+import com.cloud2bubble.ptsense.database.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.Notification;
@@ -15,13 +19,12 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 public class C2BClient extends Service {
 
@@ -33,18 +36,20 @@ public class C2BClient extends Service {
 	public static int feedbackCount = 0;
 
 	private DatabaseHandler database;
+	ComponentName netWatcher;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		database = DatabaseHandler.getInstance(this);
 		nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		netWatcher = new ComponentName(this, NetWatcher.class);
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
-		
+
 		if (intent.hasExtra("trip_id")) {
 			long tripId = intent.getLongExtra("trip_id", -1);
 			if (tripId != -1) {
@@ -52,7 +57,6 @@ public class C2BClient extends Service {
 				stopSelf();
 			}
 		} else {
-			Log.d("C2BClient Start", "network connection available");
 			sendPendingData();
 			stopSelf();
 		}
@@ -63,8 +67,38 @@ public class C2BClient extends Service {
 	private void sendPendingData() {
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
-
-			// TODO check for pending feedbacks and trip data to send to server
+			List<TripFeedback> pendingsFeedbacks = database.getAllPendingFeedbacks();
+			
+			boolean done = true;
+			Iterator<TripFeedback> itr = pendingsFeedbacks.iterator();
+		    while (itr.hasNext()) {
+		    	TripFeedback feedback = itr.next();
+		    	if(!sendFeedbackToServer(feedback)){
+		    		done = false;
+		    		break;
+		    	}
+		    }
+		    
+		    List<TripData> pendingTripData = database.getAllTripData();
+		    Iterator<TripData> itr2 = pendingTripData.iterator();
+		    while (itr2.hasNext()) {
+		    	TripData tripData = itr2.next();
+		    	if(!sendTripDataToServer(tripData)){
+		    		done = false;
+		    		break;
+		    	}
+		    }
+		    
+		    if(done){
+		    	ignoreInternetConnections();
+		    }else{
+				Log.d("C2BClient", "error while transmitting data to server");
+		    	listenInternetConnections();
+		    }
+		    
+		}else{
+			Log.d("C2BClient", "no network connections available");
+			listenInternetConnections();
 		}
 	}
 
@@ -72,7 +106,17 @@ public class C2BClient extends Service {
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
 			TripData tripData = database.getTripData(id);
-			sendTripDataToServer(tripData);
+			if (sendTripDataToServer(tripData)) {
+				ignoreInternetConnections();
+			}else{
+				// if could not transmit information start listening for
+				// internet connections to transmite later
+				Log.d("C2BClient", "error while transmitting data to server");
+				listenInternetConnections();
+			}
+		}else{
+			Log.d("C2BClient", "no network connections available");
+			listenInternetConnections();
 		}
 
 		// now just show a notification asking for user feedback
@@ -80,15 +124,42 @@ public class C2BClient extends Service {
 		notifyForFeedback(trip);
 	}
 
-	private void sendTripDataToServer(TripData tripData) {
-		// TODO communicate with server
+	private boolean sendTripDataToServer(TripData tripData) {
+		// TODO communicate with server - thread
+		boolean success = true;
+		Log.d("C2BClient", "sent tripdata to server = " + success);
+		return success;
+	}
+	
+	private boolean sendFeedbackToServer(TripFeedback feedback) {
+		// TODO Auto-generated method stub - thread
+		boolean success = true;
+		Log.d("C2BClient", "sent feedback to server = " + success);
+		return success;
+	}
+
+	private void listenInternetConnections() {
+		Log.d("C2BClient", "LISTENING internet connections");
+		this.getPackageManager().setComponentEnabledSetting(netWatcher,
+				PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+				PackageManager.DONT_KILL_APP);
+	}
+
+	private void ignoreInternetConnections() {
+		Log.d("C2BClient", "IGNORING internet connections");
+		this.getPackageManager().setComponentEnabledSetting(netWatcher,
+				PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+				PackageManager.DONT_KILL_APP);
 	}
 
 	private boolean hasDataConnection() {
 		ConnectivityManager cm = (ConnectivityManager) this
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo info = cm.getActiveNetworkInfo();
-		return (info != null);
+		if (info != null && info.isConnected()) {
+			return true;
+		} else
+			return false;
 	}
 
 	private void notifyForFeedback(ReviewItem trip) {

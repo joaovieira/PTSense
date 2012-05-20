@@ -59,16 +59,16 @@ public class SmartphoneSensingService extends Service implements
 			currentdZ, currentLight, currentPressure, currentTemp,
 			currentHumidity;
 
-	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.displayevent";
+	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
 	private final Handler handler = new Handler();
 	Intent uiIntent;
 
 	private final String outputFile = "PTSense_output";
-	
+
 	private DatabaseHandler database;
 	ReviewItem trip;
 	long tripId;
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -145,15 +145,20 @@ public class SmartphoneSensingService extends Service implements
 		String line = tripInfo.getString("line");
 		String origin = tripInfo.getString("origin");
 		String destination = tripInfo.getString("destination");
-		trip = new ReviewItem(line, service, origin, destination, new GregorianCalendar(), null);
+		trip = new ReviewItem(line, service, origin, destination,
+				new GregorianCalendar(), null);
 		tripId = saveTripToDatabase();
 		trip.setDatabaseId(tripId);
 	}
 
 	@Override
 	public void onDestroy() {
-		stop();
 		IS_RUNNING = false;
+
+		// Tell the user we stopped.
+		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
+		
+		stop();
 	}
 
 	@Override
@@ -223,12 +228,9 @@ public class SmartphoneSensingService extends Service implements
 
 		handler.removeCallbacks(sendUpdatesToUI);
 		stopForeground(true);
-		
+
 		updateTripDate();
 		startServerCommunication(tripId);
-
-		// Tell the user we stopped.
-		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
 	}
 
 	private void updateTripDate() {
@@ -316,8 +318,10 @@ public class SmartphoneSensingService extends Service implements
 
 	private Runnable sendUpdatesToUI = new Runnable() {
 		public void run() {
-			sendIntentWithSensorData();
-			handler.postDelayed(this, 1000); // 1 second
+			if (IS_RUNNING) {
+				sendIntentWithSensorData();
+				handler.postDelayed(this, 1000); // 1 second
+			}
 		}
 
 		private void sendIntentWithSensorData() {
@@ -359,44 +363,52 @@ public class SmartphoneSensingService extends Service implements
 	private class PreProcessThread extends Thread {
 		@Override
 		public void run() {
-			while (IS_RUNNING) {
-				try {
-					sleep(2000);
-					Log.d("SmartphoneSensingService", "Updating SensorDatabase");
-
-					drainBuffers();
-
-					String currentTime = getCurrentTimeStamp();
-					SensorData data = new SensorData(tripId, currentTime);
-
-					Float accelFinal = DataProcessor.processAccelerometerData(accelerationsX, accelerationsY, accelerationsZ);
-					data.addData(getString(R.string.sensordata_key_acceleration), accelFinal);
-					
-					Float tempFinal = DataProcessor.processTemperatureData(ambTemperatureValues);
-					data.addData(getString(R.string.sensordata_key_temperature), tempFinal);
-					
-					Float lightFinal = DataProcessor.processLightData(ambTemperatureValues);
-					data.addData(getString(R.string.sensordata_key_light), lightFinal);
-					
-					Float pressureFinal = DataProcessor.processPressureData(ambTemperatureValues);
-					data.addData(getString(R.string.sensordata_key_pressure), pressureFinal);
-					
-					Float humidityFinal = DataProcessor.processHumidityData(ambTemperatureValues);
-					data.addData(getString(R.string.sensordata_key_humidity), humidityFinal);
-					
-					Float soundFinal = DataProcessor.processSoundData(ambTemperatureValues);
-					data.addData(getString(R.string.sensordata_key_sound), soundFinal);
-					
-					database.addSensorData(data);
-					
-					clearTempBuffers();
-					// TODO define listener to reset file when reached max file
-					// size
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			if (IS_RUNNING) {
+				updateSensorDatabase();
+				handler.postDelayed(this, 2000); // 1 second
 			}
+		}
+
+		private void updateSensorDatabase() {
+			Log.d("SmartphoneSensingService", "Updating SensorDatabase");
+
+			drainBuffers();
+
+			String currentTime = getCurrentTimeStamp();
+			SensorData data = new SensorData(tripId, currentTime);
+
+			Float accelFinal = DataProcessor.processAccelerometerData(
+					accelerationsX, accelerationsY, accelerationsZ);
+			data.addData(getString(R.string.sensordata_key_acceleration),
+					accelFinal);
+
+			Float tempFinal = DataProcessor
+					.processTemperatureData(ambTemperatureValues);
+			data.addData(getString(R.string.sensordata_key_temperature),
+					tempFinal);
+
+			Float lightFinal = DataProcessor
+					.processLightData(ambTemperatureValues);
+			data.addData(getString(R.string.sensordata_key_light), lightFinal);
+
+			Float pressureFinal = DataProcessor
+					.processPressureData(ambTemperatureValues);
+			data.addData(getString(R.string.sensordata_key_pressure),
+					pressureFinal);
+
+			Float humidityFinal = DataProcessor
+					.processHumidityData(ambTemperatureValues);
+			data.addData(getString(R.string.sensordata_key_humidity),
+					humidityFinal);
+
+			Float soundFinal = DataProcessor
+					.processSoundData(ambTemperatureValues);
+			data.addData(getString(R.string.sensordata_key_sound), soundFinal);
+
+			database.addSensorData(data);
+
+			clearTempBuffers();
+			// TODO define listener to reset file when reached max file size
 		}
 
 		private void clearTempBuffers() {

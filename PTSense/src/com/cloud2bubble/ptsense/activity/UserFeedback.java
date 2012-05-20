@@ -36,14 +36,14 @@ public class UserFeedback extends Activity implements OnClickListener {
 	Map<String, SeekBar> inputs = new HashMap<String, SeekBar>();
 	EditText etFeedback;
 	TripFeedback feedback;
-	
+
 	private DatabaseHandler database;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_feedback);
-		
+
 		ActionBar actionBar = getActionBar();
 
 		View actionCustomView = getLayoutInflater().inflate(
@@ -52,7 +52,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 		actionBar.setCustomView(actionCustomView);
 
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-		
+
 		database = DatabaseHandler.getInstance(this);
 
 		Bundle extras = getIntent().getExtras();
@@ -188,7 +188,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 					.setText(getString(R.string.feedback_title_smoothness));
 			smoothnessProgress
 					.setText(progressToString(relaxedSB.getProgress()));
-			inputs.put(getString(R.string.feedback_key_smoothness), smoothnessSB);
+			inputs.put(getString(R.string.feedback_key_smoothness),
+					smoothnessSB);
 
 			smoothnessSB
 					.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -206,26 +207,30 @@ public class UserFeedback extends Activity implements OnClickListener {
 					});
 
 			sbAmbience = (LinearLayout) findViewById(R.id.sbAmbience);
-			TextView ambienceTitle = (TextView) sbAmbience.findViewById(R.id.tvTitle);
+			TextView ambienceTitle = (TextView) sbAmbience
+					.findViewById(R.id.tvTitle);
 			final TextView ambienceProgress = (TextView) sbAmbience
 					.findViewById(R.id.tvProgress);
-			SeekBar ambienceSB = (SeekBar) sbAmbience.findViewById(R.id.sbInput);
+			SeekBar ambienceSB = (SeekBar) sbAmbience
+					.findViewById(R.id.sbInput);
 			ambienceTitle.setText(getString(R.string.feedback_title_ambience));
 			ambienceProgress.setText(progressToString(relaxedSB.getProgress()));
 			inputs.put(getString(R.string.feedback_key_ambience), ambienceSB);
 
-			ambienceSB.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-				public void onProgressChanged(SeekBar seekBar, int progress,
-						boolean fromUser) {
-					ambienceProgress.setText(progressToString(progress));
-				}
+			ambienceSB
+					.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+						public void onProgressChanged(SeekBar seekBar,
+								int progress, boolean fromUser) {
+							ambienceProgress
+									.setText(progressToString(progress));
+						}
 
-				public void onStartTrackingTouch(SeekBar seekBar) {
-				}
+						public void onStartTrackingTouch(SeekBar seekBar) {
+						}
 
-				public void onStopTrackingTouch(SeekBar seekBar) {
-				}
-			});
+						public void onStopTrackingTouch(SeekBar seekBar) {
+						}
+					});
 
 			sbFast = (LinearLayout) findViewById(R.id.sbFast);
 			TextView fastTitle = (TextView) sbFast.findViewById(R.id.tvTitle);
@@ -297,12 +302,11 @@ public class UserFeedback extends Activity implements OnClickListener {
 		switch (view.getId()) {
 		case R.id.tvActionModeCloseButton:
 			processUserInput();
-			if (insertFeedbackIntoDatabase(feedback)){
-				TripFeedback tf = database.getAllPendingFeedbacks().get(0);
-				Toast.makeText(this, tf.getReviewId() + tf.getComment(),
+			if (insertFeedbackIntoDatabase(feedback)) {
+				Toast.makeText(this, R.string.feedback_saved,
 						Toast.LENGTH_SHORT).show();
 			}
-			
+
 			setResult(RESULT_OK);
 			finish();
 			break;
@@ -312,15 +316,16 @@ public class UserFeedback extends Activity implements OnClickListener {
 	private void processUserInput() {
 		feedback = new TripFeedback(trip);
 		Iterator<Entry<String, SeekBar>> it = inputs.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry<String, SeekBar> input = (Map.Entry<String, SeekBar>)it.next();
-	        SeekBar seekBar = input.getValue();
-	        feedback.addInput(input.getKey(), seekBar.getProgress()/10.0);
-	    }
-	    feedback.addComment(etFeedback.getText().toString());
-	    feedback.getTrip().setReviewed();
+		while (it.hasNext()) {
+			Map.Entry<String, SeekBar> input = (Map.Entry<String, SeekBar>) it
+					.next();
+			SeekBar seekBar = input.getValue();
+			feedback.addInput(input.getKey(), seekBar.getProgress() / 10.0);
+		}
+		feedback.addComment(etFeedback.getText().toString());
+		feedback.getTrip().setReviewed();
 	}
-	
+
 	private boolean insertFeedbackIntoDatabase(TripFeedback feedback) {
 		ReviewItem oldReview = feedback.getTrip();
 		database.addPendingFeedback(feedback);

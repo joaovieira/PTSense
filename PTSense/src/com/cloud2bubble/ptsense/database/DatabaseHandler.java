@@ -165,7 +165,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	// Get trip data
-	public TripData getTripData(long id){
+	public TripData getTripData(long id) {
 		ReviewItem trip = getReview(id);
 		ArrayList<Calendar> timestamps = new ArrayList<Calendar>();
 		ArrayList<Float> acceleration = new ArrayList<Float>();
@@ -174,15 +174,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<Float> pressure = new ArrayList<Float>();
 		ArrayList<Float> humidity = new ArrayList<Float>();
 		ArrayList<Float> sound = new ArrayList<Float>();
-		
+
 		SQLiteDatabase db = this.getWritableDatabase();
-		
+
 		String selectQuery = "SELECT " + KEY_TIME + "," + KEY_ACCELERATION
-				+ "," + KEY_TEMPERATURE + "," + KEY_LIGHT + ","
-				+ KEY_PRESSURE + "," + KEY_HUMIDITY + "," + KEY_SOUND + " FROM " + TABLE_SENSORDATA + " WHERE "
-				+ REVIEW_ID + "=" + id + " ORDER BY " + KEY_TIME + " ASC";
+				+ "," + KEY_TEMPERATURE + "," + KEY_LIGHT + "," + KEY_PRESSURE
+				+ "," + KEY_HUMIDITY + "," + KEY_SOUND + " FROM "
+				+ TABLE_SENSORDATA + " WHERE " + REVIEW_ID + "=" + id
+				+ " ORDER BY " + KEY_TIME + " ASC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
+		if (cursor.moveToFirst()) {
 			do {
 				timestamps.add(stringToDate(cursor.getString(0)));
 				acceleration.add(cursor.getFloat(1));
@@ -195,7 +196,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 		db.close();
-		
+
 		Map<String, ArrayList<Float>> data = new HashMap<String, ArrayList<Float>>();
 		data.put(KEY_ACCELERATION, acceleration);
 		data.put(KEY_TEMPERATURE, temperature);
@@ -203,9 +204,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		data.put(KEY_PRESSURE, pressure);
 		data.put(KEY_HUMIDITY, humidity);
 		data.put(KEY_SOUND, sound);
-		
+
 		TripData tripSensorData = new TripData(trip, timestamps, data);
 		return tripSensorData;
+	}
+
+	// get all pending trip data
+	public List<TripData> getAllTripData() {
+		ArrayList<Integer> tripIds = new ArrayList<Integer>();
+		List<TripData> tripData = new ArrayList<TripData>();
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		String selectQuery = "SELECT DISTINCT " + REVIEW_ID + " FROM "
+				+ TABLE_SENSORDATA + ";";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (cursor.moveToFirst()) {
+			do {
+				tripIds.add(cursor.getInt(0));
+			} while (cursor.moveToNext());
+		}
+		cursor.close();
+		db.close();
+
+		Iterator<Integer> itr = tripIds.iterator();
+	    while (itr.hasNext()) {
+	    	tripData.add(getTripData(itr.next()));
+	    }
+	    
+		return tripData;
 	}
 
 	// Add new review
@@ -248,7 +275,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				cursor.getString(2), cursor.getString(3), cursor.getString(4),
 				stringToDate(cursor.getString(5)),
 				stringToDate(cursor.getString(6)), cursor.getInt(7));
-		
+
 		cursor.close();
 		db.close();
 		return trip;
@@ -424,4 +451,5 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			return sdfDate.format(date.getTime());
 		}
 	}
+
 }
