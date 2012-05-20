@@ -154,10 +154,18 @@ public class SmartphoneSensingService extends Service implements
 	public void onDestroy() {
 		IS_RUNNING = false;
 
-		// Tell the user we stopped.
-		Toast.makeText(this, "Sensing stopped", Toast.LENGTH_SHORT).show();
-		
-		stop();
+		new Thread(new Runnable() {
+			public void run() {
+				stop();
+				// Tell the user we stopped.
+				handler.post(new Runnable() {
+					public void run() {
+						Toast.makeText(SmartphoneSensingService.this,
+								"Sensing stopped", Toast.LENGTH_SHORT).show();
+					}
+				});
+			}
+		}).start();
 	}
 
 	@Override
@@ -221,7 +229,7 @@ public class SmartphoneSensingService extends Service implements
 		// calculate average and insert store into database every 2 seconds
 		sensorThread = new PreProcessThread();
 		handler.postDelayed(sensorThread, 1000);
-		//sensorThread.start();
+		// sensorThread.start();
 	}
 
 	private void stop() {
@@ -320,6 +328,7 @@ public class SmartphoneSensingService extends Service implements
 
 	private Runnable sendUpdatesToUI = new Runnable() {
 		DecimalFormat df = new DecimalFormat("0.0000");
+
 		public void run() {
 			if (IS_RUNNING) {
 				sendIntentWithSensorData();
@@ -336,8 +345,7 @@ public class SmartphoneSensingService extends Service implements
 
 			if (mAcceleration != null) {
 				String oscilation = "x:" + df.format(currentdX) + " y:"
-						+ df.format(currentdY) + " z:"
-						+ df.format(currentdZ);
+						+ df.format(currentdY) + " z:" + df.format(currentdZ);
 				uiIntent.putExtra("oscilation", oscilation);
 			}
 
@@ -390,8 +398,7 @@ public class SmartphoneSensingService extends Service implements
 			data.addData(getString(R.string.sensordata_key_temperature),
 					tempFinal);
 
-			Float lightFinal = DataProcessor
-					.processLightData(tmpLightValues);
+			Float lightFinal = DataProcessor.processLightData(tmpLightValues);
 			data.addData(getString(R.string.sensordata_key_light), lightFinal);
 
 			Float pressureFinal = DataProcessor
@@ -404,8 +411,7 @@ public class SmartphoneSensingService extends Service implements
 			data.addData(getString(R.string.sensordata_key_humidity),
 					humidityFinal);
 
-			Float soundFinal = DataProcessor
-					.processSoundData(tmpSoundValues);
+			Float soundFinal = DataProcessor.processSoundData(tmpSoundValues);
 			data.addData(getString(R.string.sensordata_key_sound), soundFinal);
 
 			database.addSensorData(data);

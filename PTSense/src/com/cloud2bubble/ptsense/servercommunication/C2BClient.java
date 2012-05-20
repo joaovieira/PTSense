@@ -3,11 +3,19 @@ package com.cloud2bubble.ptsense.servercommunication;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Home;
 import com.cloud2bubble.ptsense.activity.TripReviews;
 import com.cloud2bubble.ptsense.activity.UserFeedback;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
+import com.cloud2bubble.ptsense.database.ServerObject;
 import com.cloud2bubble.ptsense.database.TripData;
 import com.cloud2bubble.ptsense.database.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
@@ -37,6 +45,8 @@ public class C2BClient extends Service {
 
 	private DatabaseHandler database;
 	ComponentName netWatcher;
+	
+	private static final String C2B_REQUEST_URL = "http://example.com";
 
 	@Override
 	public void onCreate() {
@@ -73,7 +83,7 @@ public class C2BClient extends Service {
 			Iterator<TripFeedback> itr = pendingsFeedbacks.iterator();
 		    while (itr.hasNext()) {
 		    	TripFeedback feedback = itr.next();
-		    	if(!sendFeedbackToServer(feedback)){
+		    	if(!sendDataToServer(feedback)){
 		    		done = false;
 		    		break;
 		    	}
@@ -83,7 +93,7 @@ public class C2BClient extends Service {
 		    Iterator<TripData> itr2 = pendingTripData.iterator();
 		    while (itr2.hasNext()) {
 		    	TripData tripData = itr2.next();
-		    	if(!sendTripDataToServer(tripData)){
+		    	if(!sendDataToServer(tripData)){
 		    		done = false;
 		    		break;
 		    	}
@@ -106,7 +116,7 @@ public class C2BClient extends Service {
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
 			TripData tripData = database.getTripData(id);
-			if (sendTripDataToServer(tripData)) {
+			if (sendDataToServer(tripData)) {
 				ignoreInternetConnections();
 			}else{
 				// if could not transmit information start listening for
@@ -122,20 +132,6 @@ public class C2BClient extends Service {
 		// now just show a notification asking for user feedback
 		ReviewItem trip = database.getReview(id);
 		notifyForFeedback(trip);
-	}
-
-	private boolean sendTripDataToServer(TripData tripData) {
-		// TODO communicate with server - thread
-		boolean success = true;
-		Log.d("C2BClient", "sent tripdata to server = " + success);
-		return success;
-	}
-	
-	private boolean sendFeedbackToServer(TripFeedback feedback) {
-		// TODO Auto-generated method stub - thread
-		boolean success = true;
-		Log.d("C2BClient", "sent feedback to server = " + success);
-		return success;
 	}
 
 	private void listenInternetConnections() {
@@ -239,4 +235,42 @@ public class C2BClient extends Service {
 		}
 		return intents;
 	}
+	
+	
+	/**
+	 * ******* Communication with server *******
+	 */
+	
+	private boolean sendDataToServer(ServerObject object) {
+		String json;
+		try {
+			json = object.toJSON().toString(1);
+
+			Log.d("C2BClient", "sent data to server: JSON=" + json);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		/*HttpClient httpClient = new DefaultHttpClient();
+		
+		HttpPost httpPost = new HttpPost(C2B_REQUEST_URL);
+		httpPost.setHeader("Content-type", "application/json");
+	    
+		try {
+			StringEntity se = new StringEntity(json, "UTF-8");
+			se.setContentType("application/json");
+		    httpPost.setEntity(se); 
+		    
+		    HttpResponse response = httpClient.execute(httpPost);
+		    
+		    // TODO process response
+			Log.d("C2BClient", "sent data to server: JSON=" + json + " RESULT=" + response);
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
+		
+		return true;
+	}
+	
 }

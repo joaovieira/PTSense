@@ -14,6 +14,7 @@ import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -301,11 +302,20 @@ public class UserFeedback extends Activity implements OnClickListener {
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.tvActionModeCloseButton:
-			processUserInput();
-			if (insertFeedbackIntoDatabase(feedback)) {
-				Toast.makeText(this, R.string.feedback_saved,
-						Toast.LENGTH_SHORT).show();
-			}
+			new Thread(new Runnable() {
+				public void run() {
+					processUserInput();
+					if (insertFeedbackIntoDatabase(feedback)) {
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(UserFeedback.this,
+										R.string.feedback_saved,
+										Toast.LENGTH_SHORT).show();
+							}
+						});
+					}
+				}
+			}).start();
 
 			setResult(RESULT_OK);
 			finish();
@@ -330,6 +340,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 		ReviewItem oldReview = feedback.getTrip();
 		database.addPendingFeedback(feedback);
 		database.updateReviewAsReviewed(oldReview);
+		Intent serviceIntent = new Intent(this, C2BClient.class);
+		this.startService(serviceIntent);
 		return true;
 	}
 }
