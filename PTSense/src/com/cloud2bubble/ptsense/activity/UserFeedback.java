@@ -302,20 +302,11 @@ public class UserFeedback extends Activity implements OnClickListener {
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.tvActionModeCloseButton:
-			new Thread(new Runnable() {
-				public void run() {
-					processUserInput();
-					if (insertFeedbackIntoDatabase(feedback)) {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								Toast.makeText(UserFeedback.this,
-										R.string.feedback_saved,
-										Toast.LENGTH_SHORT).show();
-							}
-						});
-					}
-				}
-			}).start();
+			processUserInput();
+			if (insertFeedbackIntoDatabase()) {
+				Toast.makeText(UserFeedback.this, R.string.feedback_saved,
+						Toast.LENGTH_SHORT).show();
+			}
 
 			setResult(RESULT_OK);
 			finish();
@@ -336,7 +327,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 		feedback.getTrip().setReviewed();
 	}
 
-	private boolean insertFeedbackIntoDatabase(TripFeedback feedback) {
+	private boolean insertFeedbackIntoDatabase() {
 		ReviewItem oldReview = feedback.getTrip();
 		database.addPendingFeedback(feedback);
 		database.updateReviewAsReviewed(oldReview);

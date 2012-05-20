@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Home;
@@ -32,6 +33,7 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class C2BClient extends Service {
@@ -242,9 +244,13 @@ public class C2BClient extends Service {
 	 */
 	
 	private boolean sendDataToServer(ServerObject object) {
+		final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+		
 		String json;
 		try {
-			json = object.toJSON().toString(1);
+			JSONObject sendJSON = object.toJSON();
+			sendJSON.put("device_id", tm.getDeviceId());
+			json = sendJSON.toString(1);
 
 			Log.d("C2BClient", "sent data to server: JSON=" + json);
 		} catch (JSONException e) {
