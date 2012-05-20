@@ -406,10 +406,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (cursor.moveToFirst()) {
 			do {
-				ReviewItem trip = new ReviewItem(cursor.getString(1),
+				ReviewItem trip = new ReviewItem(cursor.getLong(0), cursor.getString(1),
 						cursor.getString(2), cursor.getString(3),
 						cursor.getString(4), stringToDate(cursor.getString(5)),
-						stringToDate(cursor.getString(6)));
+						stringToDate(cursor.getString(6)), cursor.getInt(7));
 				TripFeedback feedback = new TripFeedback(trip);
 				feedback.addInput(KEY_HAPPY,
 						Double.parseDouble(cursor.getString(7)));

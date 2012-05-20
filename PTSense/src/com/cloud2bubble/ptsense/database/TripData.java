@@ -63,15 +63,16 @@ public class TripData implements ServerObject {
 			jsonTrip.put("end_time", sdfDate.format(trip.endTime.getTime()));
 			jsonTripData.put("trip_info", jsonTrip);
 
+			// sensor data
+			JSONObject jsonSensorData = new JSONObject();
+
 			// timestamps
 			JSONArray jsonTimestamps = new JSONArray();
 			for (Calendar t : timestamps) {
 				jsonTimestamps.put(sdfDate.format(t.getTime()));
 			}
-			jsonTripData.put("timestamps", jsonTimestamps);
+			jsonSensorData.put("timestamps", jsonTimestamps);
 
-			// sensor data
-			JSONObject jsonSensorData = new JSONObject();
 			Iterator<Entry<String, ArrayList<Float>>> it = data.entrySet()
 					.iterator();
 			while (it.hasNext()) {
