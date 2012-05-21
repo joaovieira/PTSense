@@ -89,15 +89,6 @@ public class C2BClient extends Service {
 					.getAllPendingFeedbacks();
 
 			boolean done = true;
-			Iterator<TripFeedback> itr = pendingsFeedbacks.iterator();
-			while (itr.hasNext()) {
-				TripFeedback feedback = itr.next();
-				if (!sendDataToServer(feedback)) {
-					done = false;
-					break;
-				}
-			}
-
 			List<TripData> pendingTripData = database.getAllTripsData();
 			Iterator<TripData> itr2 = pendingTripData.iterator();
 			while (itr2.hasNext()) {
@@ -105,6 +96,20 @@ public class C2BClient extends Service {
 				if (!sendDataToServer(tripData)) {
 					done = false;
 					break;
+				}else{
+					database.removeTripData(tripData);
+				}
+			}
+			
+			Iterator<TripFeedback> itr = pendingsFeedbacks.iterator();
+			while (itr.hasNext()) {
+				TripFeedback feedback = itr.next();
+				if (!sendDataToServer(feedback)) {
+					done = false;
+					break;
+				}else{
+					database.removePendingFeedback(feedback);
+					database.removePendingReview(feedback.getTrip());
 				}
 			}
 
@@ -126,6 +131,7 @@ public class C2BClient extends Service {
 		if (hasDataConnection()) {
 			TripData tripData = database.getTripData(id);
 			if (sendDataToServer(tripData)) {
+				database.removeTripData(tripData);
 				ignoreInternetConnections();
 			} else {
 				// if could not transmit information start listening for

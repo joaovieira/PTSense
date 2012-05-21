@@ -167,7 +167,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	// Add new contact
 	public void removeTripData(TripData tripData) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_REVIEWS, REVIEW_ID + "=?",
+		db.delete(TABLE_SENSORDATA, REVIEW_ID + "=?",
 				new String[] { String.valueOf(tripData.getTrip().getId()) });
 		db.close(); // Close database connection
 	}
@@ -379,10 +379,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	// Remove Feedback
-	public void removePendingFeedback(long id) {
+	public void removePendingFeedback(TripFeedback feedback) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_FEEDBACKS, KEY_ID + " = ?",
-				new String[] { String.valueOf(id) });
+		db.delete(TABLE_FEEDBACKS, REVIEW_ID + " = ?",
+				new String[] { String.valueOf(feedback.getTrip().getId()) });
 		db.close(); // Close database connection
 	}
 
