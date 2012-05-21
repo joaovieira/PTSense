@@ -3,11 +3,13 @@ package com.cloud2bubble.ptsense.servercommunication;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,8 +49,12 @@ public class C2BClient extends Service {
 
 	private DatabaseHandler database;
 	ComponentName netWatcher;
-	
-	private static final String C2B_REQUEST_URL = "http://example.com";
+
+	private static final String C2B_DATA_URL = "http://cloud2bubble.appspot.com/api/trip/data";
+	private static final String C2B_FEEDBACK_URL = "http://cloud2bubble.appspot.com/api/trip/feedback";
+
+	private boolean COMMUNICATION_RUNNING;
+	JSONObject responseJSON;
 
 	@Override
 	public void onCreate() {
@@ -79,36 +85,37 @@ public class C2BClient extends Service {
 	private void sendPendingData() {
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
-			List<TripFeedback> pendingsFeedbacks = database.getAllPendingFeedbacks();
-			
+			List<TripFeedback> pendingsFeedbacks = database
+					.getAllPendingFeedbacks();
+
 			boolean done = true;
 			Iterator<TripFeedback> itr = pendingsFeedbacks.iterator();
-		    while (itr.hasNext()) {
-		    	TripFeedback feedback = itr.next();
-		    	if(!sendDataToServer(feedback)){
-		    		done = false;
-		    		break;
-		    	}
-		    }
-		    
-		    List<TripData> pendingTripData = database.getAllTripsData();
-		    Iterator<TripData> itr2 = pendingTripData.iterator();
-		    while (itr2.hasNext()) {
-		    	TripData tripData = itr2.next();
-		    	if(!sendDataToServer(tripData)){
-		    		done = false;
-		    		break;
-		    	}
-		    }
-		    
-		    if(done){
-		    	ignoreInternetConnections();
-		    }else{
+			while (itr.hasNext()) {
+				TripFeedback feedback = itr.next();
+				if (!sendDataToServer(feedback)) {
+					done = false;
+					break;
+				}
+			}
+
+			List<TripData> pendingTripData = database.getAllTripsData();
+			Iterator<TripData> itr2 = pendingTripData.iterator();
+			while (itr2.hasNext()) {
+				TripData tripData = itr2.next();
+				if (!sendDataToServer(tripData)) {
+					done = false;
+					break;
+				}
+			}
+
+			if (done) {
+				ignoreInternetConnections();
+			} else {
 				Log.d("C2BClient", "error while transmitting data to server");
-		    	listenInternetConnections();
-		    }
-		    
-		}else{
+				listenInternetConnections();
+			}
+
+		} else {
 			Log.d("C2BClient", "no network connections available");
 			listenInternetConnections();
 		}
@@ -120,13 +127,13 @@ public class C2BClient extends Service {
 			TripData tripData = database.getTripData(id);
 			if (sendDataToServer(tripData)) {
 				ignoreInternetConnections();
-			}else{
+			} else {
 				// if could not transmit information start listening for
 				// internet connections to transmite later
 				Log.d("C2BClient", "error while transmitting data to server");
 				listenInternetConnections();
 			}
-		}else{
+		} else {
 			Log.d("C2BClient", "no network connections available");
 			listenInternetConnections();
 		}
@@ -237,46 +244,86 @@ public class C2BClient extends Service {
 		}
 		return intents;
 	}
-	
-	
+
 	/**
 	 * ******* Communication with server *******
 	 */
-	
-	private boolean sendDataToServer(ServerObject object) {
-		final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-		
-		String json;
-		try {
-			JSONObject sendJSON = object.toJSON();
-			sendJSON.put("device_id", tm.getDeviceId());
-			json = sendJSON.toString(1);
 
-			Log.d("C2BClient", "sent data to server: JSON=" + json);
+	private boolean sendDataToServer(ServerObject object) {
+		final TelephonyManager tm = (TelephonyManager) getBaseContext()
+				.getSystemService(Context.TELEPHONY_SERVICE);
+
+		/*
+		 * String json; try { JSONObject sendJSON = object.toJSON();
+		 * sendJSON.put("device_id", tm.getDeviceId()); json =
+		 * sendJSON.toString(1);
+		 * 
+		 * Log.d("C2BClient", "sent data to server: JSON=" + json); } catch
+		 * (JSONException e) { e.printStackTrace(); }
+		 */
+
+		JSONObject sendJSON = object.toJSON();
+		try {
+			sendJSON.put("device_id", tm.getDeviceId());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+
+		String json = sendJSON.toString();
+		String postURL;
+		if (object.getType() == ServerObject.TRIP_DATA) {
+			postURL = C2B_DATA_URL;
+		} else {
+			postURL = C2B_FEEDBACK_URL;
+		}
+
+		COMMUNICATION_RUNNING = true;
+		Thread communication = new CommunicationThread(postURL, json);
+		communication.start();
+
+		while (COMMUNICATION_RUNNING) {
+		}
 		
-		/*HttpClient httpClient = new DefaultHttpClient();
-		
-		HttpPost httpPost = new HttpPost(C2B_REQUEST_URL);
-		httpPost.setHeader("Content-type", "application/json");
-	    
-		try {
-			StringEntity se = new StringEntity(json, "UTF-8");
-			se.setContentType("application/json");
-		    httpPost.setEntity(se); 
-		    
-		    HttpResponse response = httpClient.execute(httpPost);
-		    
-		    // TODO process response
-			Log.d("C2BClient", "sent data to server: JSON=" + json + " RESULT=" + response);
-		    
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
-		
-		return true;
+		if (responseJSON != null) {
+			return responseJSON.opt("result").equals("ok");
+		} else {
+			return false;
+		}
 	}
-	
+
+	private class CommunicationThread extends Thread {
+
+		String url, json;
+
+		public CommunicationThread(String url, String json) {
+			this.url = url;
+			this.json = json;
+		}
+
+		@Override
+		public void run() {
+			HttpClient httpClient = new DefaultHttpClient();
+
+			HttpPost httpPost = new HttpPost(url);
+			httpPost.setHeader("Content-type", "application/json");
+
+			try {
+				StringEntity se = new StringEntity(json, "UTF-8");
+				se.setContentType("application/json");
+				httpPost.setEntity(se);
+
+				HttpResponse response = httpClient.execute(httpPost);
+				HttpEntity entity = response.getEntity();
+				responseJSON = new JSONObject(EntityUtils.toString(entity));
+
+				// TODO process response
+				Log.d("C2BClient", "sent data to server: JSON=" + json
+						+ " RESULT=" + responseJSON.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			COMMUNICATION_RUNNING = false;
+		}
+	}
+
 }

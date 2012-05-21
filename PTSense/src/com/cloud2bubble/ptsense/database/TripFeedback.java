@@ -15,7 +15,6 @@ import com.cloud2bubble.ptsense.list.ReviewItem;
 public class TripFeedback implements Serializable, ServerObject {
 
 	private static final long serialVersionUID = 1L;
-	private static final String TYPE = "trip_feedback";
 
 	private ReviewItem trip;
 	private Map<String, Double> inputs = new HashMap<String, Double>();
@@ -52,8 +51,6 @@ public class TripFeedback implements Serializable, ServerObject {
 	public JSONObject toJSON() {
 		JSONObject jsonFeedback = new JSONObject();
 		try {
-			jsonFeedback.put("type", TYPE);
-			
 			// trip info
 			JSONObject jsonTrip = new JSONObject();
 			jsonTrip.put("database_id", trip.getId());
@@ -88,5 +85,9 @@ public class TripFeedback implements Serializable, ServerObject {
 		}
 		
 		return jsonFeedback;
+	}
+
+	public int getType() {
+		return ServerObject.TRIP_FEEDBACK;
 	}
 }

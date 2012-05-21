@@ -17,8 +17,6 @@ import com.cloud2bubble.ptsense.list.ReviewItem;
 
 public class TripData implements ServerObject {
 
-	private static final String TYPE = "trip_data";
-
 	private ReviewItem trip;
 	private List<Calendar> timestamps = new ArrayList<Calendar>();
 	private Map<String, ArrayList<Float>> data = new HashMap<String, ArrayList<Float>>();
@@ -45,8 +43,6 @@ public class TripData implements ServerObject {
 	public JSONObject toJSON() {
 		JSONObject jsonTripData = new JSONObject();
 		try {
-			jsonTripData.put("type", TYPE);
-
 			// trip info
 			JSONObject jsonTrip = new JSONObject();
 			jsonTrip.put("database_id", trip.getId());
@@ -95,6 +91,10 @@ public class TripData implements ServerObject {
 		}
 
 		return jsonTripData;
+	}
+
+	public int getType() {
+		return ServerObject.TRIP_DATA;
 	}
 
 }
