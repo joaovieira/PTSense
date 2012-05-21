@@ -7,19 +7,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.TextView;
 
-public class PlanTrip extends Activity{
+public class PlanTrip extends Activity {
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.plan_trip);
-		
+		setContentView(R.layout.feature_not_supported);
+
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
+
+		TextView text = (TextView) findViewById(android.R.id.text1);
+		text.setText("Here you will be able to easily plan your trip using system inferences to determine the best routes for you.");
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

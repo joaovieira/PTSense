@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/light_grey" >
+
+    <TextView
+        android:layout_width="230dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawableLeft="@drawable/ic_sad_droid"
+        android:drawablePadding="10dip"
+        android:gravity="center"
+        android:text="@string/feature_not_supported"
+        android:textColor="@color/droid_green"
+        android:textSize="20dip"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dip" />
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="230dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center" />
+
+</LinearLayout>

@@ -75,6 +75,7 @@
     <string name="sensordata.key.pressure">pressure</string>
     <string name="sensordata.key.humidity">humidity</string>
     <string name="sensordata.key.sound">sound</string>
+    <string name="feature_not_supported">Sorry! Feature not supported yet.</string>
     
     
     

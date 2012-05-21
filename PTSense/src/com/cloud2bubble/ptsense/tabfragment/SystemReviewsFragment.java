@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class SystemReviewsFragment extends Fragment {
 
@@ -14,6 +15,12 @@ public class SystemReviewsFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-        return inflater.inflate(R.layout.systemreviews_fragment, container, false);
+		View v = inflater.inflate(R.layout.feature_not_supported, container,
+				false);
+
+		TextView text = (TextView) v.findViewById(android.R.id.text1);
+		text.setText("Here you will find the last trips you made and the corresponding review the system made for you.");
+
+		return v;
 	}
 }

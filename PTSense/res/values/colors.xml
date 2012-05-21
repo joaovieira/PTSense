@@ -5,5 +5,7 @@
     <color name="dark_grey">#555</color>
     <color name="light_green_home">#8899CC00</color>
     <color name="dark_red_home">#88CC0000</color>
+    <color name="droid_green">#a4ca39</color>
+    <color name="light_grey">#eee</color>
     
 </resources>
