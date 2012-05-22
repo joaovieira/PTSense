@@ -2,7 +2,6 @@ package com.cloud2bubble.ptsense.servercommunication;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -24,10 +23,10 @@ import com.cloud2bubble.ptsense.database.TripData;
 import com.cloud2bubble.ptsense.database.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -41,7 +40,7 @@ import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-public class C2BClient extends Service {
+public class C2BClient extends IntentService {
 
 	public static final int FEEDBACK_NOTIFICATION = 11;
 	public static final int INFERENCE_NOTIFICATION = 12;
@@ -59,6 +58,14 @@ public class C2BClient extends Service {
 	private boolean COMMUNICATION_RUNNING;
 	JSONObject responseJSON;
 
+	public C2BClient() {
+		super("C2BClient");
+	}
+	
+	public C2BClient(String name) {
+		super(name);
+	}
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -66,11 +73,9 @@ public class C2BClient extends Service {
 		nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		netWatcher = new ComponentName(this, NetWatcher.class);
 	}
-
+	
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		super.onStartCommand(intent, flags, startId);
-
+	protected void onHandleIntent(Intent intent) {
 		if (intent.hasExtra("trip_id")) {
 			long tripId = intent.getLongExtra("trip_id", -1);
 			if (tripId != -1) {
@@ -81,8 +86,6 @@ public class C2BClient extends Service {
 			sendPendingData();
 			stopSelf();
 		}
-
-		return START_NOT_STICKY;
 	}
 
 	private void sendPendingData() {
@@ -206,7 +209,7 @@ public class C2BClient extends Service {
 						Notification.DEFAULT_LIGHTS
 								| Notification.DEFAULT_SOUND)
 				.setTicker(tickerText).setWhen(System.currentTimeMillis());
-
+		
 		if (feedbackCount > 1) {
 			feedbackBuilder.setNumber(feedbackCount);
 		}
@@ -248,14 +251,12 @@ public class C2BClient extends Service {
 		// "Trip Reviews"
 		intents[1] = new Intent(context, TripReviews.class);
 		intents[1].putExtra("tab", 1);
-		intents[1].putExtra("clear_fcount", true);
 
 		if (notificationsCount == 1) {
 			// Now the activity to display to the user. Also fill in the data it
 			// should display.
 			intents[2] = new Intent(context, UserFeedback.class);
 			intents[2].putExtra("review_item", trip);
-			intents[2].putExtra("clear_fcount", true);
 		}
 		return intents;
 	}
@@ -340,5 +341,15 @@ public class C2BClient extends Service {
 			COMMUNICATION_RUNNING = false;
 		}
 	}
+	
+	public static void clearCount(int notification) {
+		switch (notification){
+		case FEEDBACK_NOTIFICATION:
+			feedbackCount = 0;
+			break;
+		case INFERENCE_NOTIFICATION:
+			break;
+		}
+    }
 
 }

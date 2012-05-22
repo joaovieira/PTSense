@@ -16,87 +16,80 @@
         android:layout_weight="1"
         android:orientation="vertical" >
 
-        <ScrollView
-            android:id="@+id/scrollView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false" >
+            android:orientation="vertical" >
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvService"
+                style="?android:attr/textAppearance"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+
+            <Spinner
+                android:id="@+id/sService"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:prompt="@string/autocomplete.service.hint" />
 
-                <TextView
-                    android:id="@+id/tvService"
-                    style="?android:attr/textAppearance"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvLine"
+                style="?android:attr/textAppearance"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dip" />
 
-                <Spinner
-                    android:id="@+id/sService"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:prompt="@string/autocomplete.service.hint" />
+            <AutoCompleteTextView
+                android:id="@+id/acLine"
+                style="?android:attr/autoCompleteTextViewStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:paddingBottom="8dip"
+                android:paddingLeft="16dip"
+                android:paddingRight="16dip"
+                android:paddingTop="8dip"
+                android:singleLine="true" />
 
-                <TextView
-                    android:id="@+id/tvLine"
-                    style="?android:attr/textAppearance"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dip" />
+            <TextView
+                android:id="@+id/tvOrigin"
+                style="?android:attr/textAppearance"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dip" />
 
-                <AutoCompleteTextView
-                    android:id="@+id/acLine"
-                    style="?android:attr/autoCompleteTextViewStyle"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="8dip"
-                    android:paddingLeft="16dip"
-                    android:paddingRight="16dip"
-                    android:paddingTop="8dip"
-                    android:imeOptions="actionNext"
-                    android:singleLine="true" />
+            <AutoCompleteTextView
+                android:id="@+id/acOrigin"
+                style="?android:attr/autoCompleteTextViewStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:paddingBottom="8dip"
+                android:paddingLeft="16dip"
+                android:paddingRight="16dip"
+                android:paddingTop="8dip"
+                android:singleLine="true" />
 
-                <TextView
-                    android:id="@+id/tvOrigin"
-                    style="?android:attr/textAppearance"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dip" />
+            <TextView
+                android:id="@+id/tvDestination"
+                style="?android:attr/textAppearance"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dip" />
 
-                <AutoCompleteTextView
-                    android:id="@+id/acOrigin"
-                    style="?android:attr/autoCompleteTextViewStyle"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="8dip"
-                    android:paddingLeft="16dip"
-                    android:paddingRight="16dip"
-                    android:paddingTop="8dip"
-                    android:imeOptions="actionNext"
-                    android:singleLine="true" />
-
-                <TextView
-                    android:id="@+id/tvDestination"
-                    style="?android:attr/textAppearance"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="8dip" />
-
-                <AutoCompleteTextView
-                    android:id="@+id/acDestination"
-                    style="?android:attr/autoCompleteTextViewStyle"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="8dip"
-                    android:paddingLeft="16dip"
-                    android:paddingRight="16dip"
-                    android:paddingTop="8dip"
-                    android:imeOptions="actionDone"
-                    android:singleLine="true" />
-            </LinearLayout>
-        </ScrollView>
+            <AutoCompleteTextView
+                android:id="@+id/acDestination"
+                style="?android:attr/autoCompleteTextViewStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:paddingBottom="8dip"
+                android:paddingLeft="16dip"
+                android:paddingRight="16dip"
+                android:paddingTop="8dip"
+                android:singleLine="true" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

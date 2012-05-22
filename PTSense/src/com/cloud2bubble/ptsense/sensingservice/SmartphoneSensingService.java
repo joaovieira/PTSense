@@ -85,41 +85,48 @@ public class SmartphoneSensingService extends Service implements
 				null);
 		Boolean a = prefs.getBoolean("automatic_routines", false);
 		String b = prefs.getString("notifications", "fail");
-		Log.d("SmartphoneSensingService", "preferences: sensors=" + sensorsAllowed.toString() + " routines=" + a + " notifications=" + b);
+		Log.d("SmartphoneSensingService", "preferences: sensors="
+				+ sensorsAllowed.toString() + " routines=" + a
+				+ " notifications=" + b);
 
-		if (sensorsAllowed == null)
-			return;
+		if (sensorsAllowed != null) {
 
-		if (sensorsAllowed
-				.contains(getString(R.string.sensordata_key_acceleration)))
-			mAcceleration = sensorManager
-					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_acceleration)))
+				mAcceleration = sensorManager
+						.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-		if (sensorsAllowed
-				.contains(getString(R.string.sensordata_key_temperature)))
-			mAmbTemperature = sensorManager
-					.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_temperature)))
+				mAmbTemperature = sensorManager
+						.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 
-		if (sensorsAllowed.contains(getString(R.string.sensordata_key_light)))
-			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_light)))
+				mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-		if (sensorsAllowed
-				.contains(getString(R.string.sensordata_key_pressure)))
-			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_pressure)))
+				mPressure = sensorManager
+						.getDefaultSensor(Sensor.TYPE_PRESSURE);
 
-		if (sensorsAllowed
-				.contains(getString(R.string.sensordata_key_humidity)))
-			mRelHumidity = sensorManager
-					.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_humidity)))
+				mRelHumidity = sensorManager
+						.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
-			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+			if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
+				mProximity = sensorManager
+						.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
-		if (sensorsAllowed.contains(getString(R.string.sensordata_key_sound))) {
-			soundRecorder = new MediaRecorder();
-			File sampleDir = Environment.getExternalStorageDirectory();
-			soundOutputPath = sampleDir + File.separator + outputFile + ".3gp";
-			setupSoundRecorder();
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_sound))) {
+				soundRecorder = new MediaRecorder();
+				File sampleDir = Environment.getExternalStorageDirectory();
+				soundOutputPath = sampleDir + File.separator + outputFile
+						+ ".3gp";
+				setupSoundRecorder();
+			}
 		}
 
 		lightValues = new ArrayBlockingQueue<Float>(60); // 200ms * 10sec = 50
@@ -173,19 +180,7 @@ public class SmartphoneSensingService extends Service implements
 	@Override
 	public void onDestroy() {
 		IS_RUNNING = false;
-
-		new Thread(new Runnable() {
-			public void run() {
-				stop();
-				// Tell the user we stopped.
-				handler.post(new Runnable() {
-					public void run() {
-						Toast.makeText(SmartphoneSensingService.this,
-								"Sensing stopped", Toast.LENGTH_SHORT).show();
-					}
-				});
-			}
-		}).start();
+		stop();
 	}
 
 	@Override
@@ -256,6 +251,9 @@ public class SmartphoneSensingService extends Service implements
 		stopSoundRecording();
 
 		stopForeground(true);
+
+		Toast.makeText(SmartphoneSensingService.this, "Sensing stopped",
+				Toast.LENGTH_SHORT).show();
 
 		updateTripDate();
 		startServerCommunication(tripId);

@@ -63,6 +63,8 @@ public class UserFeedbackFragment extends Fragment {
 	        	tripReviewsActivity.startActivityForResult(i, TripReviews.REQUEST_FEEDBACK_CODE);
 			}
 		});
+		
+		C2BClient.clearCount(C2BClient.FEEDBACK_NOTIFICATION);
 
 		return v;
 	}

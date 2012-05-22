@@ -8,11 +8,6 @@
         android:icon="@drawable/ic_action_stop" >
     </item>
     <item
-        android:id="@+id/miSettingsSensing"
-        android:showAsAction="never"
-        android:title="@string/settings" >
-    </item>
-    <item
         android:id="@+id/miSetupDevices"
         android:showAsAction="never"
         android:title="@string/settings.header1.devices.title">

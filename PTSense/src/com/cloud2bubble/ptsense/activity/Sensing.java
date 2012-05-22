@@ -64,10 +64,6 @@ public class Sensing extends Activity implements SensingManager {
 			homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(homeIntent);
 			return true;
-		case R.id.miSettingsSensing:
-			Intent settingsIntent = new Intent(this, Settings.class);
-			startActivity(settingsIntent);
-			return true;
 		case R.id.miSetupDevices:
 			//TODO open Setup Devices preference pane
 			Intent devicesIntent = new Intent(this, Settings.class);

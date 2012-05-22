@@ -63,8 +63,7 @@
         <!-- Services -->
         <service android:name=".sensingservice.SmartphoneSensingService" />
         <service
-            android:name=".servercommunication.C2BClient"
-            android:process=":C2B_process" >
+            android:name=".servercommunication.C2BClient" >
         </service>
 
         <receiver

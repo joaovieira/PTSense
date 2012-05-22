@@ -1,7 +1,6 @@
 package com.cloud2bubble.ptsense.activity;
 
 import com.cloud2bubble.ptsense.R;
-import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 import com.cloud2bubble.ptsense.tabfragment.SystemReviewsFragment;
 import com.cloud2bubble.ptsense.tabfragment.UserFeedbackFragment;
 
@@ -45,10 +44,7 @@ public class TripReviews extends Activity {
 		Intent i = getIntent();
 		if (i != null){
 			int tabSelector = i.getIntExtra("tab", 0);
-			boolean clearFeedbackCount = i.getBooleanExtra("clear_fcount", false);
 			actionBar.setSelectedNavigationItem(tabSelector);
-			if (clearFeedbackCount)
-				C2BClient.feedbackCount = 0;
 		}
 
 		actionBar.setDisplayHomeAsUpEnabled(true);

@@ -56,13 +56,11 @@ public class UserFeedback extends Activity implements OnClickListener {
 
 		database = DatabaseHandler.getInstance(this);
 
+		C2BClient.clearCount(C2BClient.FEEDBACK_NOTIFICATION);
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			return;
 		}
-		boolean clearFeedbackCount = extras.getBoolean("clear_fcount");
-		if (clearFeedbackCount)
-			C2BClient.feedbackCount = 0;
 		trip = (ReviewItem) extras.get("review_item");
 		if (trip != null) {
 			TextView tvService = (TextView) findViewById(R.id.tvService);
