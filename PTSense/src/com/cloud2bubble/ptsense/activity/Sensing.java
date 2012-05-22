@@ -71,6 +71,7 @@ public class Sensing extends Activity implements SensingManager {
 		case R.id.miSetupDevices:
 			//TODO open Setup Devices preference pane
 			Intent devicesIntent = new Intent(this, Settings.class);
+			devicesIntent.putExtra("open_devices", true);
 			startActivity(devicesIntent);
 			return true;
 		default:

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
 import android.view.MenuItem;
 
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
@@ -27,6 +28,13 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		addPreferencesFromResource(R.xml.settings);
+		
+		if (getIntent().getBooleanExtra("open_devices", false) == true){
+			int pos = findPreference("devices").getOrder();
+
+			// simulate a click / call it!!
+			getPreferenceScreen().onItemClick( null, null, pos+1, 0 ); 
+		}
 	}
 
 	@Override
