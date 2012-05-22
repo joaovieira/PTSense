@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/settings.category.sensing" >
+        <com.cloud2bubble.ptsense.component.MyMultiSelectListPreference
+            android:key="smartphone_sensors"
+            android:summary="@string/settings.header1.smartphone.summary"
+            android:title="@string/settings.header1.smartphone.title" />
+
+            <!-- android:icon="@drawable/ic_pref_sensor" -->
+        <PreferenceScreen
+            android:key="devices"
+            android:summary="@string/settings.header1.devices.summary"
+            android:title="@string/settings.header1.devices.title" >
+            <Preference
+                android:key="scan_devices"
+                android:title="@string/settings.header1.devices.scan.title" >
+            </Preference>
+
+            <PreferenceCategory android:title="@string/settings.header1.devices.connected" >
+
+                <!-- TODO populate with connected devices -->
+            </PreferenceCategory>
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings.category.inferencing" >
+        <SwitchPreference
+            android:key="automatic_routines"
+            android:defaultValue="true"
+            android:summary="@string/settings.header2.automatic_routines.summary"
+            android:title="@string/settings.header2.automatic_routines.title" >
+        </SwitchPreference>
+
+        <ListPreference
+            android:entries="@array/notifications"
+            android:entryValues="@array/notifications_values"
+            android:defaultValue="1"
+            android:key="notifications"
+            android:title="@string/settings.header2.notifications.title" >
+        </ListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings.category.webservices" >
+        
+        <!-- android:icon="@drawable/ic_pref_world"-->
+        <PreferenceScreen
+            android:key="web_systems"
+            android:summary="@string/settings.summary.ts"
+            android:title="@string/settings.title.ts" >
+            <Preference android:title="@string/add_more" >
+            </Preference>
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+</PreferenceScreen>

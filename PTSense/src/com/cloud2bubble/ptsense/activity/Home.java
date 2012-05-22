@@ -5,13 +5,10 @@ import com.cloud2bubble.ptsense.dialog.SensingManager;
 import com.cloud2bubble.ptsense.dialog.StartSensingDialog;
 import com.cloud2bubble.ptsense.dialog.StopSensingDialog;
 import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
-import com.cloud2bubble.ptsense.servercommunication.NetWatcher;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;

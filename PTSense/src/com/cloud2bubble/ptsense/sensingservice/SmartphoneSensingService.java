@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.cloud2bubble.ptsense.R;
@@ -21,6 +22,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -30,6 +32,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -76,31 +79,48 @@ public class SmartphoneSensingService extends Service implements
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		database = DatabaseHandler.getInstance(this);
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		Set<String> sensorsAllowed = prefs.getStringSet("smartphone_sensors",
+				null);
+		Boolean a = prefs.getBoolean("automatic_routines", false);
+		String b = prefs.getString("notifications", "fail");
+		Log.d("SmartphoneSensingService", "preferences: sensors=" + sensorsAllowed.toString() + " routines=" + a + " notifications=" + b);
+
+		if (sensorsAllowed == null)
+			return;
+
+		if (sensorsAllowed
+				.contains(getString(R.string.sensordata_key_acceleration)))
 			mAcceleration = sensorManager
 					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null)
+		if (sensorsAllowed
+				.contains(getString(R.string.sensordata_key_temperature)))
 			mAmbTemperature = sensorManager
 					.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null)
+		if (sensorsAllowed.contains(getString(R.string.sensordata_key_light)))
 			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null)
+		if (sensorsAllowed
+				.contains(getString(R.string.sensordata_key_pressure)))
 			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+
+		if (sensorsAllowed
+				.contains(getString(R.string.sensordata_key_humidity)))
+			mRelHumidity = sensorManager
+					.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
 
 		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
 			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null)
-			mRelHumidity = sensorManager
-					.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
-
-		soundRecorder = new MediaRecorder();
-		File sampleDir = Environment.getExternalStorageDirectory();
-		soundOutputPath = sampleDir + File.separator + outputFile + ".3gp";
-		setupSoundRecorder();
+		if (sensorsAllowed.contains(getString(R.string.sensordata_key_sound))) {
+			soundRecorder = new MediaRecorder();
+			File sampleDir = Environment.getExternalStorageDirectory();
+			soundOutputPath = sampleDir + File.separator + outputFile + ".3gp";
+			setupSoundRecorder();
+		}
 
 		lightValues = new ArrayBlockingQueue<Float>(60); // 200ms * 10sec = 50
 															// values
@@ -223,13 +243,12 @@ public class SmartphoneSensingService extends Service implements
 		// print values on Sensing Now activity UI every 2 seconds
 		handler.removeCallbacks(sendUpdatesToUI);
 
-		soundRecorder.getMaxAmplitude();
+		// soundRecorder.getMaxAmplitude();
 		handler.postDelayed(sendUpdatesToUI, 200);
 
 		// calculate average and insert store into database every 2 seconds
 		sensorThread = new PreProcessThread();
 		handler.postDelayed(sensorThread, 1000);
-		// sensorThread.start();
 	}
 
 	private void stop() {
@@ -265,20 +284,24 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void startSoundRecording() {
-		try {
-			soundRecorder.prepare();
-			soundRecorder.start();
-			soundRecorder.getMaxAmplitude();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (soundRecorder != null) {
+			try {
+				soundRecorder.prepare();
+				soundRecorder.start();
+				soundRecorder.getMaxAmplitude();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	private void stopSoundRecording() {
-		soundRecorder.stop();
-		soundRecorder.release();
+		if (soundRecorder != null) {
+			soundRecorder.stop();
+			soundRecorder.release();
+		}
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {

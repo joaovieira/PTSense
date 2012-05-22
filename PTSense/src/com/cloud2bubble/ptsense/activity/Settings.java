@@ -1,47 +1,34 @@
 package com.cloud2bubble.ptsense.activity;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.cloud2bubble.ptsense.R;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.view.MenuItem;
 
-public class Settings extends PreferenceActivity {
+public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
+
+	static Map<String,String> sensors = new HashMap<String,String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
+
+		addPreferencesFromResource(R.xml.settings);
 	}
 
-	/**
-	 * Populate the activity with the top-level headers.
-	 */
-	@Override
-	public void onBuildHeaders(List<Header> target) {
-		loadHeadersFromResource(R.xml.preference_headers, target);
-	}
-
-	public static class StockPreferenceFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-
-			int res = getActivity().getResources().getIdentifier(
-					getArguments().getString("resource"), "xml",
-					getActivity().getPackageName());
-
-			addPreferencesFromResource(res);
-		}
-	}
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -54,5 +41,31 @@ public class Settings extends PreferenceActivity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override 
+    protected void onResume(){
+        super.onResume();
+		ListPreference listPref = (ListPreference) findPreference("notifications"); 
+		listPref.setSummary(listPref.getEntry());
+		
+        // Set up a listener whenever a key changes             
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override 
+    protected void onPause() { 
+        super.onPause();
+        // Unregister the listener whenever a key changes             
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);     
+    } 
+	
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+	    Preference pref = findPreference(key);
+
+	    if (pref instanceof ListPreference) {
+	        ListPreference listPref = (ListPreference) pref;
+	        pref.setSummary(listPref.getEntry());
+	    }
 	}
 }

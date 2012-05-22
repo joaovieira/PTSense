@@ -2,6 +2,7 @@ package com.cloud2bubble.ptsense.servercommunication;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -30,11 +31,13 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -96,18 +99,18 @@ public class C2BClient extends Service {
 				if (!sendDataToServer(tripData)) {
 					done = false;
 					break;
-				}else{
+				} else {
 					database.removeTripData(tripData);
 				}
 			}
-			
+
 			Iterator<TripFeedback> itr = pendingsFeedbacks.iterator();
 			while (itr.hasNext()) {
 				TripFeedback feedback = itr.next();
 				if (!sendDataToServer(feedback)) {
 					done = false;
 					break;
-				}else{
+				} else {
 					database.removePendingFeedback(feedback);
 					database.removePendingReview(feedback.getTrip());
 				}
@@ -146,7 +149,13 @@ public class C2BClient extends Service {
 
 		// now just show a notification asking for user feedback
 		ReviewItem trip = database.getReview(id);
-		notifyForFeedback(trip);
+
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		String shouldNotifiy = prefs.getString("notifications", "fail");
+
+		if (!shouldNotifiy.equals("2"))
+			notifyForFeedback(trip);
 	}
 
 	private void listenInternetConnections() {
@@ -289,7 +298,7 @@ public class C2BClient extends Service {
 
 		while (COMMUNICATION_RUNNING) {
 		}
-		
+
 		if (responseJSON != null) {
 			return responseJSON.opt("result").equals("ok");
 		} else {

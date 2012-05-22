@@ -76,6 +76,11 @@
     <string name="sensordata.key.humidity">humidity</string>
     <string name="sensordata.key.sound">sound</string>
     <string name="feature_not_supported">Sorry! Feature not supported yet.</string>
+    <string name="settings.category.sensing">Sensing</string>
+    <string name="settings.category.inferencing">Inferencing</string>
+    <string name="settings.category.webservices">Web Services</string>
+    <string name="settings.summary.ts">Select TS for collecting stops and routes info</string>
+    <string name="settings.title.ts">Transportation Systems</string>
     
     
     
