@@ -53,18 +53,22 @@ public class NowFragment extends Fragment {
 
 		if (SmartphoneSensingService.mRelHumidity != null)
 			items.add(new EntryItem("humidity", "Relative Humidity", "%"));
-		
+
 		if (SmartphoneSensingService.soundRecorder != null)
 			items.add(new EntryItem("sound", "Sound Level", "dB"));
 
+		if (SmartphoneSensingService.locationSystem != null)
+			items.add(new EntryItem("position", "Position", ""));
+
 		items.add(new SectionItem("environment", "Environment Sensors"));
-		
+
 		// TODO change with external environment sensors connected
 		if (true)
-			items.add(new EmptyItem("env_sensors", "No environment sensors connected"));
-		
+			items.add(new EmptyItem("env_sensors",
+					"No environment sensors connected"));
+
 		items.add(new SectionItem("body", "Body Sensors"));
-		
+
 		if (true)
 			items.add(new EmptyItem("body_sensors", "No body sensors connected"));
 
@@ -76,11 +80,11 @@ public class NowFragment extends Fragment {
 			Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		View v = inflater.inflate(R.layout.now_fragment, container, false);
-		
+
 		ListView list = (ListView) v.findViewById(R.id.lvSensingNow);
 
 		list.setAdapter(adapter);
-		
+
 		return v;
 	}
 

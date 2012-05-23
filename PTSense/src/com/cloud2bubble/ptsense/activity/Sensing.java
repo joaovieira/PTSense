@@ -44,6 +44,9 @@ public class Sensing extends Activity implements SensingManager {
 								NowFragment.class));
 		actionBar.addTab(tab);
 
+		// open in second tab
+		actionBar.setSelectedNavigationItem(1);
+
 		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 

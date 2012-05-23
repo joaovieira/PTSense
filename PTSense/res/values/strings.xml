@@ -86,6 +86,8 @@
     <string name="yes">Yes</string>
     <string name="sensordata.key.latitude">latitude</string>
     <string name="sensordata.key.longitude">longitude</string>
+    <string name="gps">gps</string>
+    <string name="no_position">Current position unavailable</string>
     
     
     

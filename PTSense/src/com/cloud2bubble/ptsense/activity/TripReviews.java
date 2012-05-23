@@ -46,21 +46,11 @@ public class TripReviews extends Activity {
 			int tabSelector = i.getIntExtra("tab", 0);
 			actionBar.setSelectedNavigationItem(tabSelector);
 		}
+		
+		// open in second tab
+		actionBar.setSelectedNavigationItem(1);
 
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		
-		/*ReviewItem item1 = new ReviewItem("District Line", "Transport For London - Underground", 
-				"Paddington", "Bayswater", new GregorianCalendar());
-		ReviewItem item2 = new ReviewItem("436 Line", "Transport For London - Buses", 
-				"Victoria", "Marble Arch (Park Lane)", new GregorianCalendar());
-		ReviewItem item3 = new ReviewItem("Jubilee Line", "Transport For London - Underground", 
-				"Stratford", "Canary Wharf", new GregorianCalendar());
-		ReviewItem item4 = new ReviewItem("First Capital Connect", "National Railways", 
-				"Palmers Green", "Old Street", new GregorianCalendar());
-		database.addPendingReview(item1);
-		database.addPendingReview(item2);
-		database.addPendingReview(item3);
-		database.addPendingReview(item4);*/
 	}
 
 	@Override

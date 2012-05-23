@@ -27,6 +27,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
@@ -44,7 +45,7 @@ public class SmartphoneSensingService extends Service implements
 	public static Sensor mAcceleration, mAmbTemperature, mLight, mPressure,
 			mProximity, mRelHumidity = null;
 	public static MediaRecorder soundRecorder = null;
-	LocationSystem locationSystem;
+	public static LocationSystem locationSystem;
 
 	private ArrayBlockingQueue<Float> lightValues, accelerationsX,
 			accelerationsY, accelerationsZ, pressureValues, relHumidityValues,
@@ -131,7 +132,8 @@ public class SmartphoneSensingService extends Service implements
 				setupSoundRecorder();
 			}
 
-			locationSystem = new LocationSystem(this);
+			if (sensorsAllowed.contains(getString(R.string.gps)))
+				locationSystem = new LocationSystem(this);
 		}
 
 		lightValues = new ArrayBlockingQueue<Float>(15); // 200ms * 2sec = 10
@@ -331,6 +333,7 @@ public class SmartphoneSensingService extends Service implements
 
 	private Runnable sendUpdatesToUI = new Runnable() {
 		DecimalFormat df = new DecimalFormat("0.0000");
+		DecimalFormat dfc = new DecimalFormat("0.00000000");
 
 		public void run() {
 			if (app.isSensing()) {
@@ -364,7 +367,22 @@ public class SmartphoneSensingService extends Service implements
 			if (mRelHumidity != null)
 				uiIntent.putExtra("humidity", df.format(currentHumidity));
 
+			if (locationSystem != null) {
+				String position = formatCoordinates(locationSystem
+						.getLocation());
+				uiIntent.putExtra("position", position);
+			}
+
 			sendBroadcast(uiIntent);
+		}
+
+		private String formatCoordinates(Location location) {
+			if (location == null) {
+				return getString(R.string.no_position);
+			} else {
+				return "Lat:" + dfc.format(location.getLatitude()) + " Lon:"
+						+ dfc.format(location.getLongitude());
+			}
 		}
 
 		private double getPowerDB() {
@@ -384,7 +402,7 @@ public class SmartphoneSensingService extends Service implements
 		}
 
 		private void updateSensorDatabase() {
-			Log.d("SmartphoneSensingService", "Updating SensorDatabase");
+			//Log.d("SmartphoneSensingService", "Updating SensorDatabase");
 
 			drainBuffers();
 
@@ -417,12 +435,14 @@ public class SmartphoneSensingService extends Service implements
 			Float soundFinal = DataProcessor.processSoundData(tmpSoundValues);
 			data.addData(getString(R.string.sensordata_key_sound), soundFinal);
 
-			Pair<Float,Float> coordinates = DataProcessor
-					.processCoordinate(locationSystem.getLocation());
-			data.addData(getString(R.string.sensordata_key_latitude),
-					coordinates.first);
-			data.addData(getString(R.string.sensordata_key_longitude),
-					coordinates.second);
+			if (locationSystem != null) {
+				Pair<Float, Float> coordinates = DataProcessor
+						.processCoordinate(locationSystem.getLocation());
+				data.addData(getString(R.string.sensordata_key_latitude),
+						coordinates.first);
+				data.addData(getString(R.string.sensordata_key_longitude),
+						coordinates.second);
+			}
 
 			database.addSensorData(data);
 

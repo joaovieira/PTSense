@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -25,23 +26,21 @@ public class LocationSystem implements LocationListener {
 	public void start() {
 		// Register the listener with the Location Manager to receive location
 		// updates
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, FREQUENCY,
-				MIN_DISTANCE, this);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				FREQUENCY, MIN_DISTANCE, this);
 	}
 
 	public void stop() {
 		// Remove the listener you previously added
 		locationManager.removeUpdates(this);
 	}
-	
-	public Location getLocation(){
+
+	public Location getLocation() {
 		return currentBestLocation;
 	}
 
 	// Define a listener that responds to location updates
 	public void onLocationChanged(Location location) {
-		Log.d("LocationSystem",
-				"Received update: location=" + location.toString());
 		getBestLocation(location);
 	}
 
@@ -52,6 +51,16 @@ public class LocationSystem implements LocationListener {
 	}
 
 	public void onStatusChanged(String provider, int status, Bundle extras) {
+		String statusS = "";
+		switch (status){
+		case LocationProvider.AVAILABLE:
+			statusS = "AVAILABLE";
+		case LocationProvider.OUT_OF_SERVICE:
+			statusS = "OUT_OF_SERVICE";
+		case LocationProvider.TEMPORARILY_UNAVAILABLE:
+			statusS = "TEMPORARILY_UNAVAILABLE";
+		}
+		Log.d("LocationSystem", "GPS status:" + statusS);
 	}
 
 	private void getBestLocation(Location location) {
