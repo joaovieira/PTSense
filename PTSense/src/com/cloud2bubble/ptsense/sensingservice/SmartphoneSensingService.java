@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Sensing;
 import com.cloud2bubble.ptsense.database.SensorData;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
-import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
 import android.app.Notification;
@@ -28,7 +28,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaRecorder;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,9 +37,6 @@ import android.widget.Toast;
 
 public class SmartphoneSensingService extends Service implements
 		SensorEventListener {
-
-	private static final int ONGOING_NOTIFICATION = 10;
-	public static boolean IS_RUNNING;
 
 	private Thread sensorThread = null;
 	private SensorManager sensorManager;
@@ -69,25 +65,30 @@ public class SmartphoneSensingService extends Service implements
 
 	private final String outputFile = "PTSense_output";
 
+	PTSense app;
 	private DatabaseHandler database;
-	ReviewItem trip;
 	long tripId;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-		database = DatabaseHandler.getInstance(this);
+
+		app = (PTSense) getApplication();
+		database = app.getDatabase();
 
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		Set<String> sensorsAllowed = prefs.getStringSet("smartphone_sensors",
 				null);
-		Boolean a = prefs.getBoolean("automatic_routines", false);
-		String b = prefs.getString("notifications", "fail");
-		Log.d("SmartphoneSensingService", "preferences: sensors="
-				+ sensorsAllowed.toString() + " routines=" + a
-				+ " notifications=" + b);
+
+		/*
+		 * Boolean a = prefs.getBoolean("automatic_routines", false); String b =
+		 * prefs.getString("notifications", "fail");
+		 * Log.d("SmartphoneSensingService", "preferences: sensors=" +
+		 * sensorsAllowed.toString() + " routines=" + a + " notifications=" +
+		 * b);
+		 */
 
 		if (sensorsAllowed != null) {
 
@@ -129,24 +130,24 @@ public class SmartphoneSensingService extends Service implements
 			}
 		}
 
-		lightValues = new ArrayBlockingQueue<Float>(60); // 200ms * 10sec = 50
+		lightValues = new ArrayBlockingQueue<Float>(15); // 200ms * 2sec = 10
 															// values
-		pressureValues = new ArrayBlockingQueue<Float>(60);
-		relHumidityValues = new ArrayBlockingQueue<Float>(60);
-		ambTemperatureValues = new ArrayBlockingQueue<Float>(60);
-		accelerationsX = new ArrayBlockingQueue<Float>(60);
-		accelerationsY = new ArrayBlockingQueue<Float>(60);
-		accelerationsZ = new ArrayBlockingQueue<Float>(60);
-		soundValues = new ArrayBlockingQueue<Double>(60);
+		pressureValues = new ArrayBlockingQueue<Float>(15);
+		relHumidityValues = new ArrayBlockingQueue<Float>(15);
+		ambTemperatureValues = new ArrayBlockingQueue<Float>(15);
+		accelerationsX = new ArrayBlockingQueue<Float>(15);
+		accelerationsY = new ArrayBlockingQueue<Float>(15);
+		accelerationsZ = new ArrayBlockingQueue<Float>(15);
+		soundValues = new ArrayBlockingQueue<Double>(15);
 
-		tmpLightValues = new ArrayList<Float>(60);
-		tmpPressureValues = new ArrayList<Float>(60);
-		tmpRelHumidityValues = new ArrayList<Float>(60);
-		tmpAmbTemperatureValues = new ArrayList<Float>(60);
-		tmpAccelerationsX = new ArrayList<Float>(60);
-		tmpAccelerationsY = new ArrayList<Float>(60);
-		tmpAccelerationsZ = new ArrayList<Float>(60);
-		tmpSoundValues = new ArrayList<Double>(60);
+		tmpLightValues = new ArrayList<Float>(15);
+		tmpPressureValues = new ArrayList<Float>(15);
+		tmpRelHumidityValues = new ArrayList<Float>(15);
+		tmpAmbTemperatureValues = new ArrayList<Float>(15);
+		tmpAccelerationsX = new ArrayList<Float>(15);
+		tmpAccelerationsY = new ArrayList<Float>(15);
+		tmpAccelerationsZ = new ArrayList<Float>(15);
+		tmpSoundValues = new ArrayList<Double>(15);
 
 		currentX = currentY = currentZ = currentLight = currentPressure = currentTemp = currentHumidity = 0.0f;
 
@@ -155,32 +156,30 @@ public class SmartphoneSensingService extends Service implements
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		createTrip(intent);
 		startOnGoingNotification();
 		registerSensorListeners();
 		startSoundRecording();
 		collectDataFromSensors();
 
-		IS_RUNNING = true;
+		tripId = app.getCurrentTripId();
 		return START_STICKY;
-	}
-
-	private void createTrip(Intent intent) {
-		Bundle tripInfo = intent.getBundleExtra("trip_info");
-		String service = tripInfo.getString("service");
-		String line = tripInfo.getString("line");
-		String origin = tripInfo.getString("origin");
-		String destination = tripInfo.getString("destination");
-		trip = new ReviewItem(line, service, origin, destination,
-				new GregorianCalendar(), null);
-		tripId = saveTripToDatabase();
-		trip.setDatabaseId(tripId);
 	}
 
 	@Override
 	public void onDestroy() {
-		IS_RUNNING = false;
-		stop();
+		Log.d("SmartphoneSensingService", "Started to stop sensing");
+		unregisterSensorListeners();
+		stopSoundRecording();
+		stopForeground(true);
+
+		Toast.makeText(SmartphoneSensingService.this, "Sensing stopped",
+				Toast.LENGTH_SHORT).show();
+
+		app.updateTripEndTime(new GregorianCalendar());
+		
+
+		Log.d("SmartphoneSensingService", "Sending trip data to server");
+		sendTripToServer();
 	}
 
 	@Override
@@ -201,7 +200,7 @@ public class SmartphoneSensingService extends Service implements
 		notification.setLatestEventInfo(this,
 				getText(R.string.notification_sensing_title),
 				getText(R.string.notification_sensing_message), pendingIntent);
-		startForeground(ONGOING_NOTIFICATION, notification);
+		startForeground(PTSense.ONGOING_NOTIFICATION, notification);
 	}
 
 	private void registerSensorListeners() {
@@ -235,10 +234,7 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void collectDataFromSensors() {
-		// print values on Sensing Now activity UI every 2 seconds
 		handler.removeCallbacks(sendUpdatesToUI);
-
-		// soundRecorder.getMaxAmplitude();
 		handler.postDelayed(sendUpdatesToUI, 200);
 
 		// calculate average and insert store into database every 2 seconds
@@ -246,39 +242,13 @@ public class SmartphoneSensingService extends Service implements
 		handler.postDelayed(sensorThread, 1000);
 	}
 
-	private void stop() {
-		unregisterSensorListeners();
-		stopSoundRecording();
-
-		stopForeground(true);
-
-		Toast.makeText(SmartphoneSensingService.this, "Sensing stopped",
-				Toast.LENGTH_SHORT).show();
-
-		updateTripDate();
-		startServerCommunication(tripId);
-	}
-
-	private void updateTripDate() {
-		trip.setEndTime(new GregorianCalendar());
-		database.updatePendingReview(trip);
-	}
-
-	private void startServerCommunication(long id) {
-		Intent i = new Intent(this, C2BClient.class);
-		i.putExtra("trip_id", id);
-		startService(i);
-	}
-
-	private long saveTripToDatabase() {
-		return database.addPendingReview(trip);
-	}
-
 	private void setupSoundRecorder() {
-		soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-		soundRecorder.setOutputFile(soundOutputPath);
+		if (soundRecorder != null) {
+			soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+			soundRecorder.setOutputFile(soundOutputPath);
+		}
 	}
 
 	private void startSoundRecording() {
@@ -302,8 +272,14 @@ public class SmartphoneSensingService extends Service implements
 		}
 	}
 
+	private void sendTripToServer() {
+		Intent i = new Intent(this, C2BClient.class);
+		i.putExtra("trip_id", tripId);
+		startService(i);
+		Log.d("SmartphoneSensingService", "Continuing previous thread");
+	}
+
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// Do something here if sensor accuracy changes.
 	}
 
 	public void onSensorChanged(SensorEvent event) {
@@ -351,13 +327,14 @@ public class SmartphoneSensingService extends Service implements
 		DecimalFormat df = new DecimalFormat("0.0000");
 
 		public void run() {
-			if (IS_RUNNING) {
+			if (app.isSensing()) {
 				sendIntentWithSensorData();
 				handler.postDelayed(this, 500); // 0.5 second
 			}
 		}
 
 		private void sendIntentWithSensorData() {
+			Log.d("SmartphoneSensingService", "Sending intent");
 			if (soundRecorder != null) {
 				double amp = getPowerDB();
 				soundValues.offer(Double.valueOf(amp));
@@ -395,7 +372,7 @@ public class SmartphoneSensingService extends Service implements
 	private class PreProcessThread extends Thread {
 		@Override
 		public void run() {
-			if (IS_RUNNING) {
+			if (app.isSensing()) {
 				updateSensorDatabase();
 				handler.postDelayed(this, 2000);
 			}

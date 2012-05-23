@@ -2,14 +2,15 @@ package com.cloud2bubble.ptsense.tabfragment;
 
 import java.util.ArrayList;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.TripReviews;
 import com.cloud2bubble.ptsense.activity.UserFeedback;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.list.ReviewListAdapter;
-import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -25,28 +26,26 @@ import android.widget.TextView;
 
 public class UserFeedbackFragment extends Fragment {
 
-	private TripReviews tripReviewsActivity;
+	private Activity activity;
 
 	ArrayList<ReviewItem> reviews;
 	ReviewListAdapter adapter;
 
 	ListView list;
 	TextView tvEmptyList;
-
-	private DatabaseHandler database;
+	
+	PTSense app;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		tripReviewsActivity = (TripReviews) getActivity();
-		database = DatabaseHandler.getInstance(tripReviewsActivity);
+		activity = getActivity();
+		app = (PTSense) activity.getApplication();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.review_list_fragment, container,
 				false);
 
@@ -58,25 +57,26 @@ public class UserFeedbackFragment extends Fragment {
 			public void onItemClick(AdapterView<?> adapter, View v, int pos,
 					long id) {
 				final ReviewItem ri = (ReviewItem)adapter.getItemAtPosition(pos);
-				Intent i = new Intent(tripReviewsActivity, UserFeedback.class);
+				Intent i = new Intent(activity, UserFeedback.class);
 	        	i.putExtra("review_item", ri);
-	        	tripReviewsActivity.startActivityForResult(i, TripReviews.REQUEST_FEEDBACK_CODE);
+	        	activity.startActivityForResult(i, TripReviews.REQUEST_FEEDBACK_CODE);
 			}
 		});
-		
-		C2BClient.clearCount(C2BClient.FEEDBACK_NOTIFICATION);
 
+		app.resetNotificationCount(PTSense.FEEDBACK_NOTIFICATION);
 		return v;
 	}
 
 	@Override
 	public void onResume() {
-		NotificationManager nManager = (NotificationManager) tripReviewsActivity
+		DatabaseHandler database = app.getDatabase();
+		
+		NotificationManager nManager = (NotificationManager) activity
 				.getSystemService(Context.NOTIFICATION_SERVICE);
-		nManager.cancel(C2BClient.FEEDBACK_NOTIFICATION);
+		nManager.cancel(PTSense.FEEDBACK_NOTIFICATION);
 
 		reviews = database.getAllPendingReviews();
-		adapter = new ReviewListAdapter(tripReviewsActivity, reviews);
+		adapter = new ReviewListAdapter(activity, reviews);
 		list.setAdapter(adapter);
 
 		if (reviews.isEmpty()) {

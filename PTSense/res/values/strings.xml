@@ -58,7 +58,7 @@
     <string name="feedback.key.ambience">ambience</string>
     <string name="feedback.key.fast">fast</string>
     <string name="feedback.key.reliable">reliable</string>
-    <string name="start.dialog.title">Start Sensing</string>
+    <string name="start.dialog.title">Jorney Info</string>
     <string name="autocomplete.service.hint">Select service</string>
     <string name="autocomplete.line.hint">Type line name</string>
     <string name="autocomplete.origin.hint">Type origin stop name</string>
@@ -81,6 +81,9 @@
     <string name="settings.category.webservices">Web Services</string>
     <string name="settings.summary.ts">Select TS for collecting stops and routes info</string>
     <string name="settings.title.ts">Transportation Systems</string>
+    <string name="journey_info">Edit Journey Info</string>
+    <string name="spinner.prompt">Select PT service</string>
+    <string name="yes">Yes</string>
     
     
     

@@ -13,6 +13,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Home;
 import com.cloud2bubble.ptsense.activity.TripReviews;
@@ -35,50 +36,32 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class C2BClient extends IntentService {
 
-	public static final int FEEDBACK_NOTIFICATION = 11;
-	public static final int INFERENCE_NOTIFICATION = 12;
-
-	NotificationManager nManager;
-
-	public static int feedbackCount = 0;
-
-	private DatabaseHandler database;
-	ComponentName netWatcher;
-
 	private static final String C2B_DATA_URL = "http://cloud2bubble.appspot.com/api/trip/data";
 	private static final String C2B_FEEDBACK_URL = "http://cloud2bubble.appspot.com/api/trip/feedback";
 
 	private boolean COMMUNICATION_RUNNING;
 	JSONObject responseJSON;
+	
+	PTSense app;
 
 	public C2BClient() {
 		super("C2BClient");
 	}
 	
-	public C2BClient(String name) {
-		super(name);
-	}
-	
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		database = DatabaseHandler.getInstance(this);
-		nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		netWatcher = new ComponentName(this, NetWatcher.class);
-	}
-	
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		app = (PTSense) getApplication();
 		if (intent.hasExtra("trip_id")) {
 			long tripId = intent.getLongExtra("trip_id", -1);
 			if (tripId != -1) {
+
+				Log.d("C2BClient", "Sending trip data to server with id=" + tripId);
 				sendTripData(tripId);
 				stopSelf();
 			}
@@ -89,6 +72,8 @@ public class C2BClient extends IntentService {
 	}
 
 	private void sendPendingData() {
+		DatabaseHandler database = app.getDatabase();
+		
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
 			List<TripFeedback> pendingsFeedbacks = database
@@ -133,8 +118,13 @@ public class C2BClient extends IntentService {
 	}
 
 	private void sendTripData(long id) {
+		DatabaseHandler database = app.getDatabase();
+		
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
+
+			Log.d("C2BClient", "Getting trip data from database");
+			
 			TripData tripData = database.getTripData(id);
 			if (sendDataToServer(tripData)) {
 				database.removeTripData(tripData);
@@ -163,6 +153,7 @@ public class C2BClient extends IntentService {
 
 	private void listenInternetConnections() {
 		Log.d("C2BClient", "LISTENING internet connections");
+		ComponentName netWatcher = new ComponentName(this, NetWatcher.class);
 		this.getPackageManager().setComponentEnabledSetting(netWatcher,
 				PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
 				PackageManager.DONT_KILL_APP);
@@ -170,6 +161,7 @@ public class C2BClient extends IntentService {
 
 	private void ignoreInternetConnections() {
 		Log.d("C2BClient", "IGNORING internet connections");
+		ComponentName netWatcher = new ComponentName(this, NetWatcher.class);
 		this.getPackageManager().setComponentEnabledSetting(netWatcher,
 				PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 				PackageManager.DONT_KILL_APP);
@@ -190,9 +182,9 @@ public class C2BClient extends IntentService {
 				+ " for " + trip.serviceToString() + " "
 				+ trip.directionToString();
 
-		feedbackCount++;
+		int feedbackCount = app.incrementNotificationCount(PTSense.FEEDBACK_NOTIFICATION);
 		PendingIntent contentIntent = PendingIntent.getActivities(this,
-				FEEDBACK_NOTIFICATION,
+				PTSense.FEEDBACK_NOTIFICATION,
 				makeMessageIntentStack(this, trip, feedbackCount),
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		Resources res = this.getResources();
@@ -215,17 +207,9 @@ public class C2BClient extends IntentService {
 		}
 
 		Notification feedbackNotification = feedbackBuilder.getNotification();
-		nManager.notify(FEEDBACK_NOTIFICATION, feedbackNotification);
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
+		
+		NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		nManager.notify(PTSense.FEEDBACK_NOTIFICATION, feedbackNotification);
 	}
 
 	/**
@@ -341,15 +325,5 @@ public class C2BClient extends IntentService {
 			COMMUNICATION_RUNNING = false;
 		}
 	}
-	
-	public static void clearCount(int notification) {
-		switch (notification){
-		case FEEDBACK_NOTIFICATION:
-			feedbackCount = 0;
-			break;
-		case INFERENCE_NOTIFICATION:
-			break;
-		}
-    }
 
 }

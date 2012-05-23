@@ -1,5 +1,6 @@
 package com.cloud2bubble.ptsense.activity;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.dialog.SensingManager;
 import com.cloud2bubble.ptsense.dialog.StartSensingDialog;
@@ -25,13 +26,14 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 	TextView tvTitle1, tvTitle2, tvTitle3;
 	TextView tvSubTitle1, tvSubTitle2, tvSubTitle3;
 	Button bToggleSensing;
-	boolean isSensing;
+
+	PTSense app;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		app = (PTSense) getApplication();
 		setContentView(R.layout.main);
 
 		bOption1 = (RelativeLayout) findViewById(R.id.bHomeOption1);
@@ -63,7 +65,6 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 		bOption2.setOnClickListener(this);
 		bOption3.setOnClickListener(this);
 		bToggleSensing.setOnClickListener(this);
-		isSensing = SmartphoneSensingService.IS_RUNNING;
 	}
 
 	@Override
@@ -111,29 +112,17 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 			startActivity(option3Intent);
 			break;
 		case R.id.bToggleSensing:
-			if (!isSensing) {
-				showSenseDialog(SensingManager.DIALOG_START_SENSING);
+			if (!app.isSensing()) {
+				showSenseDialog(PTSense.DIALOG_START_SENSING);
 			} else {
-				showSenseDialog(SensingManager.DIALOG_STOP_SENSING);
+				showSenseDialog(PTSense.DIALOG_STOP_SENSING);
 			}
 			break;
 		}
 	}
 
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		isSensing = savedInstanceState.getBoolean("isSensing");
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putBoolean("isSensing", isSensing);
-	}
-
 	private void toggleSensingButtons() {
-		if (isSensing) {
+		if (app.isSensing()) {
 			bOption1.setEnabled(true);
 			bToggleSensing.setText(getText(R.string.stop));
 			bToggleSensing.setBackgroundResource(R.color.sense_button_stop);
@@ -146,12 +135,11 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 
 	public void showSenseDialog(int dialog) {
 		switch (dialog) {
-		case SensingManager.DIALOG_START_SENSING:
-			DialogFragment startDialogFragment = StartSensingDialog
-					.newInstance(this);
+		case PTSense.DIALOG_START_SENSING:
+			DialogFragment startDialogFragment = new StartSensingDialog(this);
 			startDialogFragment.show(getFragmentManager(), "start_dialog");
 			break;
-		case SensingManager.DIALOG_STOP_SENSING:
+		case PTSense.DIALOG_STOP_SENSING:
 			DialogFragment stopDialogFragment = StopSensingDialog
 					.newInstance(this);
 			stopDialogFragment.show(getFragmentManager(), "stop_dialog");
@@ -159,22 +147,36 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 		}
 	}
 
-	public void doPositiveClick(int dialog, Bundle bundle) {
+	public void doPositiveClick(int dialog, int state) {
 		switch (dialog) {
-		case SensingManager.DIALOG_START_SENSING:
-			isSensing = true;
-			Intent i = new Intent(this, SmartphoneSensingService.class);
-			if (bundle != null)
-				i.putExtra("trip_info", bundle);
-			startService(i);
-			Intent sensingIntent = new Intent(this, Sensing.class);
-			startActivity(sensingIntent);
+		case PTSense.DIALOG_START_SENSING:
+			if (state == PTSense.STATE_STOPPED) {
+				app.setState(PTSense.STATE_SENSING);
+				Intent i = new Intent(this, SmartphoneSensingService.class);
+				startService(i);
+				Intent sensingIntent = new Intent(this, Sensing.class);
+				startActivity(sensingIntent);
+			} else {
+				app.setState(PTSense.STATE_STOPPED);
+				stopSensing();
+			}
 			break;
-		case SensingManager.DIALOG_STOP_SENSING:
-			stopService(new Intent(Home.this, SmartphoneSensingService.class));
-			isSensing = false;
-			toggleSensingButtons();
+		case PTSense.DIALOG_STOP_SENSING:
+			if (app.isTripInfoCompleted()) {
+				app.setState(PTSense.STATE_STOPPED);
+				stopSensing();
+			} else {
+				DialogFragment startDialogFragment = new StartSensingDialog(
+						this, "stop");
+				startDialogFragment.show(getFragmentManager(), "start_dialog");
+			}
 			break;
 		}
 	}
+
+	public void stopSensing() {
+		stopService(new Intent(Home.this, SmartphoneSensingService.class));
+		toggleSensingButtons();
+	}
+
 }

@@ -1,7 +1,9 @@
 package com.cloud2bubble.ptsense.activity;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.dialog.SensingManager;
+import com.cloud2bubble.ptsense.dialog.StartSensingDialog;
 import com.cloud2bubble.ptsense.dialog.StopSensingDialog;
 import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 import com.cloud2bubble.ptsense.tabfragment.NowFragment;
@@ -22,26 +24,27 @@ public class Sensing extends Activity implements SensingManager {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// Notice that setContentView() is not used, because we use the root
-	    // android.R.id.content as the container for each fragment
-		
-		// setup action bar for tabs
-	    ActionBar actionBar = getActionBar();
-	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-	    Tab tab = actionBar.newTab()
-	            .setText(R.string.sensing_tab1)
-	            .setTabListener(new MyTabListener<ThisLineFragment>(
-	                    this, "this_line", ThisLineFragment.class));
-	    actionBar.addTab(tab);
+		ActionBar actionBar = getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-	    tab = actionBar.newTab()
-	        .setText(R.string.sensing_tab2)
-	        .setTabListener(new MyTabListener<NowFragment>(
-	                this, "now", NowFragment.class));
-	    actionBar.addTab(tab);
-	    
-	    actionBar.setDisplayHomeAsUpEnabled(true);
+		Tab tab = actionBar
+				.newTab()
+				.setText(R.string.sensing_tab1)
+				.setTabListener(
+						new MyTabListener<ThisLineFragment>(this, "this_line",
+								ThisLineFragment.class));
+		actionBar.addTab(tab);
+
+		tab = actionBar
+				.newTab()
+				.setText(R.string.sensing_tab2)
+				.setTabListener(
+						new MyTabListener<NowFragment>(this, "now",
+								NowFragment.class));
+		actionBar.addTab(tab);
+
+		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -56,16 +59,17 @@ public class Sensing extends Activity implements SensingManager {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.miStopSensing:
-			showSenseDialog(SensingManager.DIALOG_STOP_SENSING);
+			showSenseDialog(PTSense.DIALOG_STOP_SENSING);
 			return true;
 		case android.R.id.home:
-			// app icon in action bar clicked; go home
 			Intent homeIntent = new Intent(this, Home.class);
 			homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(homeIntent);
 			return true;
+		case R.id.miEditJourneyInfo:
+			showSenseDialog(PTSense.DIALOG_START_SENSING);
+			return true;
 		case R.id.miSetupDevices:
-			//TODO open Setup Devices preference pane
 			Intent devicesIntent = new Intent(this, Settings.class);
 			devicesIntent.putExtra("open_devices", true);
 			startActivity(devicesIntent);
@@ -76,14 +80,45 @@ public class Sensing extends Activity implements SensingManager {
 	}
 
 	public void showSenseDialog(int dialog) {
-		DialogFragment newFragment = StopSensingDialog.newInstance(this);
-        newFragment.show(getFragmentManager(), "dialog");
+		switch (dialog) {
+		case PTSense.DIALOG_START_SENSING:
+			DialogFragment startDialogFragment = new StartSensingDialog(this);
+			startDialogFragment.show(getFragmentManager(), "start_dialog");
+			break;
+		case PTSense.DIALOG_STOP_SENSING:
+			DialogFragment stopDialogFragment = StopSensingDialog
+					.newInstance(this);
+			stopDialogFragment.show(getFragmentManager(), "stop_dialog");
+			break;
+		}
 	}
 
-	public void doPositiveClick(int dialog, Bundle bundle) {
+	public void doPositiveClick(int dialog, int state) {
+		PTSense app = (PTSense) getApplicationContext();
+
+		switch (dialog) {
+		case PTSense.DIALOG_START_SENSING:
+			app.setState(PTSense.STATE_STOPPED);
+			stopSensing();
+			break;
+		case PTSense.DIALOG_STOP_SENSING:
+			if (app.isTripInfoCompleted()) {
+				app.setState(PTSense.STATE_STOPPED);
+				stopSensing();
+			} else {
+				DialogFragment startDialogFragment = new StartSensingDialog(
+						this, "stop");
+				startDialogFragment.show(getFragmentManager(), "start_dialog");
+			}
+			break;
+		}
+	}
+
+	public void stopSensing() {
 		stopService(new Intent(this, SmartphoneSensingService.class));
 		Intent homeIntent = new Intent(this, Home.class);
 		homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(homeIntent);
 	}
+
 }

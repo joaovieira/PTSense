@@ -1,5 +1,6 @@
 package com.cloud2bubble.ptsense.dialog;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 
 import android.app.Activity;
@@ -27,10 +28,10 @@ public class StopSensingDialog extends DialogFragment {
 				android.R.style.Theme_Holo_Dialog))
 				.setMessage("This will stop sensing conditions. Do you want to continue?")
 				.setCancelable(true)
-				.setPositiveButton(R.string.stop,
+				.setPositiveButton(R.string.yes,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-								((SensingManager) activity).doPositiveClick(SensingManager.DIALOG_STOP_SENSING, null);
+								((SensingManager) activity).doPositiveClick(PTSense.DIALOG_STOP_SENSING, 0);
 							}
 						})
 				.setNegativeButton(R.string.alert_dialog_cancel,

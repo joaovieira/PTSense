@@ -2,8 +2,10 @@ package com.cloud2bubble.ptsense.dialog;
 
 import java.util.Map;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.PTService;
 import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -27,22 +29,33 @@ import android.widget.TextView;
 public class StartSensingDialog extends DialogFragment implements
 		OnClickListener {
 
-	static Activity activity;
+	Activity activity;
 	Map<String, String[]> serviceLines;
 	AutoCompleteTextView selectOrigin, selectDestination, selectLine;
 	Button bStart, bCancel;
-	String service;
+	String selectedService;
 
-	public static StartSensingDialog newInstance(Context cxt) {
-		StartSensingDialog frag = new StartSensingDialog();
-		activity = (Activity) cxt;
-		return frag;
+	int stateApp;
+	ReviewItem currentTrip;
+	PTSense app;
+
+	public StartSensingDialog(Context cxt) {
+		this.activity = (Activity) cxt;
+		app = (PTSense) activity.getApplication();
+		this.stateApp = app.getState();
+	}
+	
+	public StartSensingDialog(Context cxt, String stop) {
+		this.activity = (Activity) cxt;
+		app = (PTSense) activity.getApplication();
+		this.stateApp = -1;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Holo_Dialog);
+		currentTrip = app.getCurrentTrip();
 	}
 
 	@Override
@@ -51,6 +64,7 @@ public class StartSensingDialog extends DialogFragment implements
 		View v = inflater.inflate(R.layout.start_sensing_dialog, container,
 				false);
 		getDialog().setTitle(R.string.start_dialog_title);
+		setCancelable(true);
 
 		TextView serviceTitle = (TextView) v.findViewById(R.id.tvService);
 		TextView lineTitle = (TextView) v.findViewById(R.id.tvLine);
@@ -62,23 +76,75 @@ public class StartSensingDialog extends DialogFragment implements
 		originTitle.setText(R.string.origin);
 		destinationTitle.setText(R.string.destination);
 
-		TextWatcher watcher = new LocalTextWatcher();
+		bCancel = (Button) v.findViewById(android.R.id.button2);
+		bStart = (Button) v.findViewById(android.R.id.button1);
+		bCancel.setText(R.string.alert_dialog_cancel);
+		if (stateApp == PTSense.STATE_STOPPED) {
+			bStart.setText(R.string.start);
+		} else if (stateApp == PTSense.STATE_SENSING) {
+			bStart.setText(R.string.done);
+		} else {
+			bStart.setText(R.string.stop);
+			bStart.setEnabled(false);
+		}
 
 		selectOrigin = (AutoCompleteTextView) v.findViewById(R.id.acOrigin);
-		selectOrigin.setHint(R.string.autocomplete_origin_hint);
-		selectOrigin.setEnabled(false);
-		selectOrigin.addTextChangedListener(watcher);
-
 		selectDestination = (AutoCompleteTextView) v
 				.findViewById(R.id.acDestination);
-		selectDestination.setHint(R.string.autocomplete_destination_hint);
-		selectDestination.setEnabled(false);
-		selectDestination.addTextChangedListener(watcher);
-
 		selectLine = (AutoCompleteTextView) v.findViewById(R.id.acLine);
+		Spinner selectService = (Spinner) v.findViewById(R.id.sService);
+		ArrayAdapter<String> adapterService = new ArrayAdapter<String>(
+				activity, R.layout.autocomplete_list_item, PTService.SERVICES
+						.keySet().toArray(new String[0]));
+		selectService.setAdapter(adapterService);
+
+		selectOrigin.setHint(R.string.autocomplete_origin_hint);
+		selectDestination.setHint(R.string.autocomplete_destination_hint);
 		selectLine.setHint(R.string.autocomplete_line_hint);
+
+		selectOrigin.setEnabled(false);
+		selectDestination.setEnabled(false);
 		selectLine.setEnabled(false);
-		selectLine.addTextChangedListener(watcher);
+
+		if (stateApp != PTSense.STATE_STOPPED) {
+			if (!currentTrip.service.isEmpty()) {
+				selectedService = currentTrip.service;
+				int pos = adapterService.getPosition(selectedService);
+				selectService.setSelection(pos, true);
+
+				serviceLines = PTService.SERVICES.get(selectedService);
+				ArrayAdapter<String> adapterOrigin = new ArrayAdapter<String>(
+						activity, R.layout.autocomplete_list_item, serviceLines
+								.keySet().toArray(new String[0]));
+				selectLine.setAdapter(adapterOrigin);
+				selectLine.setEnabled(true);
+			}
+
+			if (!currentTrip.line.isEmpty()) {
+				selectLine.setText(currentTrip.line);
+				selectOrigin.setEnabled(true);
+				selectDestination.setEnabled(true);
+
+				String[] stops = serviceLines.get(currentTrip.line);
+				ArrayAdapter<String> adapterStops = new ArrayAdapter<String>(
+						activity, R.layout.autocomplete_list_item, stops);
+				selectOrigin.setAdapter(adapterStops);
+				selectDestination.setAdapter(adapterStops);
+			}
+
+			if (!currentTrip.origin.isEmpty())
+				selectOrigin.setText(currentTrip.origin);
+
+			if (!currentTrip.destination.isEmpty())
+				selectDestination.setText(currentTrip.destination);
+
+			if (stateApp == -1) {
+				TextWatcher watcher = new LocalTextWatcher();
+				selectOrigin.addTextChangedListener(watcher);
+				selectDestination.addTextChangedListener(watcher);
+				selectLine.addTextChangedListener(watcher);
+			}
+		}
 		selectLine.setThreshold(1);
 		selectLine.setOnItemClickListener(new OnItemClickListener() {
 
@@ -96,17 +162,12 @@ public class StartSensingDialog extends DialogFragment implements
 			}
 		});
 
-		Spinner selectService = (Spinner) v.findViewById(R.id.sService);
-		ArrayAdapter<String> adapterService = new ArrayAdapter<String>(
-				activity, R.layout.autocomplete_list_item, PTService.SERVICES
-						.keySet().toArray(new String[0]));
-		selectService.setAdapter(adapterService);
 		selectService.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			public void onItemSelected(AdapterView<?> list, View view, int pos,
 					long arg3) {
-				service = list.getItemAtPosition(pos).toString();
-				serviceLines = PTService.SERVICES.get(service);
+				selectedService = list.getItemAtPosition(pos).toString();
+				serviceLines = PTService.SERVICES.get(selectedService);
 				ArrayAdapter<String> adapterOrigin = new ArrayAdapter<String>(
 						activity, R.layout.autocomplete_list_item, serviceLines
 								.keySet().toArray(new String[0]));
@@ -122,13 +183,7 @@ public class StartSensingDialog extends DialogFragment implements
 			}
 		});
 
-		bCancel = (Button) v.findViewById(android.R.id.button2);
-		bCancel.setText(R.string.alert_dialog_cancel);
 		bCancel.setOnClickListener(this);
-
-		bStart = (Button) v.findViewById(android.R.id.button1);
-		bStart.setText(R.string.start);
-		bStart.setEnabled(false);
 		bStart.setOnClickListener(this);
 		return v;
 	}
@@ -143,7 +198,6 @@ public class StartSensingDialog extends DialogFragment implements
 	}
 
 	private void updateButtonState() {
-
 		boolean enabled = checkEditText(selectOrigin)
 				&& checkEditText(selectDestination)
 				&& checkEditText(selectLine);
@@ -157,13 +211,29 @@ public class StartSensingDialog extends DialogFragment implements
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case android.R.id.button1:
-			Bundle bundle = new Bundle();
-			bundle.putString("service", service);
-			bundle.putString("line", selectLine.getText().toString());
-			bundle.putString("origin", selectOrigin.getText().toString());
-			bundle.putString("destination", selectDestination.getText().toString());
-			((SensingManager) activity).doPositiveClick(
-					SensingManager.DIALOG_START_SENSING, bundle);
+			if (stateApp == PTSense.STATE_STOPPED) {
+				String service = selectedService;
+				String line = selectLine.getText().toString();
+				String origin = selectOrigin.getText().toString();
+				String destination = selectDestination.getText().toString();
+
+				app.createTrip(service, line, origin, destination);
+
+				((SensingManager) activity).doPositiveClick(
+						PTSense.DIALOG_START_SENSING, stateApp);
+			} else {
+				String service = selectedService;
+				String line = selectLine.getText().toString();
+				String origin = selectOrigin.getText().toString();
+				String destination = selectDestination.getText().toString();
+
+				app.updateTrip(service, line, origin, destination);
+
+				if (stateApp == -1)
+					((SensingManager) activity).doPositiveClick(
+							PTSense.DIALOG_START_SENSING, stateApp);
+			}
+			dismiss();
 			break;
 		case android.R.id.button2:
 			dismiss();

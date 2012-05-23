@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
 import com.cloud2bubble.ptsense.database.TripFeedback;
@@ -37,8 +38,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 	Map<String, SeekBar> inputs = new HashMap<String, SeekBar>();
 	EditText etFeedback;
 	TripFeedback feedback;
-
-	private DatabaseHandler database;
+	
+	PTSense app;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +47,14 @@ public class UserFeedback extends Activity implements OnClickListener {
 		setContentView(R.layout.user_feedback);
 
 		ActionBar actionBar = getActionBar();
-
 		View actionCustomView = getLayoutInflater().inflate(
 				R.layout.action_mode_bar, null);
-
 		actionBar.setCustomView(actionCustomView);
-
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
-		database = DatabaseHandler.getInstance(this);
-
-		C2BClient.clearCount(C2BClient.FEEDBACK_NOTIFICATION);
+		app = (PTSense) getApplication();
+		app.resetNotificationCount(PTSense.FEEDBACK_NOTIFICATION);
+		
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			return;
@@ -326,6 +324,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 	}
 
 	private boolean insertFeedbackIntoDatabase() {
+		DatabaseHandler database = app.getDatabase();
+		
 		ReviewItem oldReview = feedback.getTrip();
 		database.addPendingFeedback(feedback);
 		database.updateReviewAsReviewed(oldReview);
