@@ -3,8 +3,11 @@ package com.cloud2bubble.ptsense.sensingservice;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.location.Location;
+import android.util.Pair;
+
 public class DataProcessor {
-	
+
 	private static final double AREF_CONSTANT = Math.pow(1, -5);
 
 	public static Float processAccelerometerData(List<Float> tmpAccelerationsX,
@@ -24,8 +27,8 @@ public class DataProcessor {
 	}
 
 	private static Double normalize(Double accelT) {
-		Double log = Math.log(accelT/AREF_CONSTANT);
-		return 20*log;
+		Double log = Math.log(accelT / AREF_CONSTANT);
+		return 20 * log;
 	}
 
 	// formula as ISO standard 2631
@@ -72,12 +75,20 @@ public class DataProcessor {
 			count += list.get(i);
 		return count / list.size();
 	}
-	
-	private static Double getAverageDouble(List<Double> list){
+
+	private static Double getAverageDouble(List<Double> list) {
 		Double count = 0.0;
 		for (int i = 0; i < list.size(); i++)
 			count += list.get(i);
 		return count / list.size();
+	}
+
+	public static Pair<Float, Float> processCoordinate(Location location) {
+		if (location == null)
+			return new Pair<Float, Float>(Float.NaN, Float.NaN);
+		else
+			return new Pair<Float, Float>((float) location.getLatitude(),
+					(float) location.getLongitude());
 	}
 
 }

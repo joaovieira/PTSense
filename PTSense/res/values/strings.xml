@@ -84,6 +84,8 @@
     <string name="journey_info">Edit Journey Info</string>
     <string name="spinner.prompt">Select PT service</string>
     <string name="yes">Yes</string>
+    <string name="sensordata.key.latitude">latitude</string>
+    <string name="sensordata.key.longitude">longitude</string>
     
     
     

@@ -33,6 +33,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 public class SmartphoneSensingService extends Service implements
@@ -43,7 +44,7 @@ public class SmartphoneSensingService extends Service implements
 	public static Sensor mAcceleration, mAmbTemperature, mLight, mPressure,
 			mProximity, mRelHumidity = null;
 	public static MediaRecorder soundRecorder = null;
-	String soundOutputPath;
+	LocationSystem locationSystem;
 
 	private ArrayBlockingQueue<Float> lightValues, accelerationsX,
 			accelerationsY, accelerationsZ, pressureValues, relHumidityValues,
@@ -63,6 +64,7 @@ public class SmartphoneSensingService extends Service implements
 	private final Handler handler = new Handler();
 	Intent uiIntent;
 
+	String soundOutputPath;
 	private final String outputFile = "PTSense_output";
 
 	PTSense app;
@@ -128,6 +130,8 @@ public class SmartphoneSensingService extends Service implements
 						+ ".3gp";
 				setupSoundRecorder();
 			}
+
+			locationSystem = new LocationSystem(this);
 		}
 
 		lightValues = new ArrayBlockingQueue<Float>(15); // 200ms * 2sec = 10
@@ -167,7 +171,6 @@ public class SmartphoneSensingService extends Service implements
 
 	@Override
 	public void onDestroy() {
-		Log.d("SmartphoneSensingService", "Started to stop sensing");
 		unregisterSensorListeners();
 		stopSoundRecording();
 		stopForeground(true);
@@ -176,9 +179,6 @@ public class SmartphoneSensingService extends Service implements
 				Toast.LENGTH_SHORT).show();
 
 		app.updateTripEndTime(new GregorianCalendar());
-		
-
-		Log.d("SmartphoneSensingService", "Sending trip data to server");
 		sendTripToServer();
 	}
 
@@ -227,10 +227,16 @@ public class SmartphoneSensingService extends Service implements
 		if (mRelHumidity != null)
 			sensorManager.registerListener(this, mRelHumidity,
 					SensorManager.SENSOR_DELAY_NORMAL);
+
+		if (locationSystem != null)
+			locationSystem.start();
 	}
 
 	private void unregisterSensorListeners() {
 		sensorManager.unregisterListener(this);
+
+		if (locationSystem != null)
+			locationSystem.stop();
 	}
 
 	private void collectDataFromSensors() {
@@ -334,7 +340,6 @@ public class SmartphoneSensingService extends Service implements
 		}
 
 		private void sendIntentWithSensorData() {
-			Log.d("SmartphoneSensingService", "Sending intent");
 			if (soundRecorder != null) {
 				double amp = getPowerDB();
 				soundValues.offer(Double.valueOf(amp));
@@ -411,6 +416,13 @@ public class SmartphoneSensingService extends Service implements
 
 			Float soundFinal = DataProcessor.processSoundData(tmpSoundValues);
 			data.addData(getString(R.string.sensordata_key_sound), soundFinal);
+
+			Pair<Float,Float> coordinates = DataProcessor
+					.processCoordinate(locationSystem.getLocation());
+			data.addData(getString(R.string.sensordata_key_latitude),
+					coordinates.first);
+			data.addData(getString(R.string.sensordata_key_longitude),
+					coordinates.second);
 
 			database.addSensorData(data);
 

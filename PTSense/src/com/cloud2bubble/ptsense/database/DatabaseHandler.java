@@ -44,6 +44,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static String KEY_PRESSURE;
 	private static String KEY_HUMIDITY;
 	private static String KEY_SOUND;
+	private static String KEY_LATITUDE;
+	private static String KEY_LONGITUDE;
 
 	// Reviews Table Columns names
 	// private static final String KEY_ID = "id";
@@ -90,6 +92,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		KEY_AMBIENCE = context.getString(R.string.feedback_key_ambience);
 		KEY_FAST = context.getString(R.string.feedback_key_fast);
 		KEY_RELIABLE = context.getString(R.string.feedback_key_reliable);
+		KEY_LATITUDE = context.getString(R.string.sensordata_key_latitude);
+		KEY_LONGITUDE = context.getString(R.string.sensordata_key_longitude);
+
 	}
 
 	public static synchronized DatabaseHandler getInstance(Context context) {
@@ -107,7 +112,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ " INTEGER," + KEY_TIME + " TEXT," + KEY_ACCELERATION
 				+ " REAL," + KEY_TEMPERATURE + " REAL," + KEY_LIGHT + " REAL,"
 				+ KEY_PRESSURE + " REAL," + KEY_HUMIDITY + " REAL," + KEY_SOUND
-				+ " REAL)";
+				+ " REAL," + KEY_LATITUDE + " REAL," + KEY_LONGITUDE + " REAL)";
 		db.execSQL(CREATE_SENSORDATA_TABLE);
 
 		String CREATE_REVIEWS_TABLE = "CREATE TABLE " + TABLE_REVIEWS + "("
@@ -182,14 +187,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<Float> pressure = new ArrayList<Float>();
 		ArrayList<Float> humidity = new ArrayList<Float>();
 		ArrayList<Float> sound = new ArrayList<Float>();
+		ArrayList<Float> latitude = new ArrayList<Float>();
+		ArrayList<Float> longitude = new ArrayList<Float>();
 
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		String selectQuery = "SELECT " + KEY_TIME + "," + KEY_ACCELERATION
 				+ "," + KEY_TEMPERATURE + "," + KEY_LIGHT + "," + KEY_PRESSURE
-				+ "," + KEY_HUMIDITY + "," + KEY_SOUND + " FROM "
-				+ TABLE_SENSORDATA + " WHERE " + REVIEW_ID + "=" + id
-				+ " ORDER BY " + KEY_TIME + " ASC";
+				+ "," + KEY_HUMIDITY + "," + KEY_SOUND + "," + KEY_LATITUDE
+				+ "," + KEY_LONGITUDE + " FROM " + TABLE_SENSORDATA + " WHERE "
+				+ REVIEW_ID + "=" + id + " ORDER BY " + KEY_TIME + " ASC";
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()) {
 			do {
@@ -200,6 +207,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				pressure.add(cursor.getFloat(4));
 				humidity.add(cursor.getFloat(5));
 				sound.add(cursor.getFloat(6));
+				latitude.add(cursor.getFloat(7));
+				longitude.add(cursor.getFloat(8));
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
@@ -212,6 +221,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		data.put(KEY_PRESSURE, pressure);
 		data.put(KEY_HUMIDITY, humidity);
 		data.put(KEY_SOUND, sound);
+		data.put(KEY_LATITUDE, latitude);
+		data.put(KEY_LONGITUDE, longitude);
 
 		TripData tripSensorData = new TripData(trip, timestamps, data);
 		return tripSensorData;
@@ -294,7 +305,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<ReviewItem> reviewsList = new ArrayList<ReviewItem>();
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + TABLE_REVIEWS + " WHERE "
-				+ KEY_REVIEWED + "=0" + " AND " + KEY_END_TIME + "<>\"\"" + " ORDER BY " + KEY_END_TIME + " DESC";
+				+ KEY_REVIEWED + "=0" + " AND " + KEY_END_TIME + "<>\"\""
+				+ " ORDER BY " + KEY_END_TIME + " DESC";
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -406,9 +418,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (cursor.moveToFirst()) {
 			do {
-				ReviewItem trip = new ReviewItem(cursor.getLong(0), cursor.getString(1),
-						cursor.getString(2), cursor.getString(3),
-						cursor.getString(4), stringToDate(cursor.getString(5)),
+				ReviewItem trip = new ReviewItem(cursor.getLong(0),
+						cursor.getString(1), cursor.getString(2),
+						cursor.getString(3), cursor.getString(4),
+						stringToDate(cursor.getString(5)),
 						stringToDate(cursor.getString(6)), cursor.getInt(7));
 				TripFeedback feedback = new TripFeedback(trip);
 				feedback.addInput(KEY_HAPPY,
