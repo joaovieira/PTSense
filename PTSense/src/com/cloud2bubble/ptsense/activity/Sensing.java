@@ -44,6 +44,12 @@ public class Sensing extends Activity implements SensingManager {
 								NowFragment.class));
 		actionBar.addTab(tab);
 
+		Intent i = getIntent();
+		if (i != null){
+			int tabSelector = i.getIntExtra("tab", 0);
+			actionBar.setSelectedNavigationItem(tabSelector);
+		}
+		
 		// open in second tab
 		actionBar.setSelectedNavigationItem(1);
 

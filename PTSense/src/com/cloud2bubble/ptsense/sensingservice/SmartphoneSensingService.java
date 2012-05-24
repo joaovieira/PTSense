@@ -13,13 +13,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
+import com.cloud2bubble.ptsense.activity.Home;
 import com.cloud2bubble.ptsense.activity.Sensing;
+import com.cloud2bubble.ptsense.activity.TripReviews;
 import com.cloud2bubble.ptsense.database.SensorData;
 import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -48,9 +51,9 @@ public class SmartphoneSensingService extends Service implements
 			ambTemperatureValues;
 	private static ArrayBlockingQueue<Double> soundValues;
 
-	private static List<Float> tmpLightValues, tmpAccelerationsX, tmpAccelerationsY,
-			tmpAccelerationsZ, tmpPressureValues, tmpRelHumidityValues,
-			tmpAmbTemperatureValues;
+	private static List<Float> tmpLightValues, tmpAccelerationsX,
+			tmpAccelerationsY, tmpAccelerationsZ, tmpPressureValues,
+			tmpRelHumidityValues, tmpAmbTemperatureValues;
 	private static List<Double> tmpSoundValues;
 
 	private static Float currentX, currentdX, currentY, currentdY, currentZ,
@@ -120,12 +123,14 @@ public class SmartphoneSensingService extends Service implements
 					.contains(getString(R.string.sensordata_key_sound))) {
 				soundRecorder = new MediaRecorder();
 				File sampleDir = Environment.getExternalStorageDirectory();
-				String soundOutputPath = sampleDir + File.separator + outputFile
-						+ ".3gp";
+				String soundOutputPath = sampleDir + File.separator
+						+ outputFile + ".3gp";
 
 				soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-				soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-				soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+				soundRecorder
+						.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+				soundRecorder
+						.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 				soundRecorder.setOutputFile(soundOutputPath);
 			}
 
@@ -193,9 +198,17 @@ public class SmartphoneSensingService extends Service implements
 				R.drawable.ic_stat_sensing,
 				getText(R.string.notification_sensing_ticker_text),
 				System.currentTimeMillis());
-		Intent notificationIntent = new Intent(this, Sensing.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-				notificationIntent, 0);
+
+		Intent[] intents = new Intent[2];
+		intents[0] = Intent.makeRestartActivityTask(new ComponentName(this,
+				Home.class));
+
+		// "Trip Reviews"
+		intents[1] = new Intent(this, Sensing.class);
+		intents[1].putExtra("tab", 1);
+
+		PendingIntent pendingIntent = PendingIntent.getActivities(this,
+				PTSense.ONGOING_NOTIFICATION, intents, 0);
 		notification.setLatestEventInfo(this,
 				getText(R.string.notification_sensing_title),
 				getText(R.string.notification_sensing_message), pendingIntent);
@@ -391,7 +404,7 @@ public class SmartphoneSensingService extends Service implements
 		}
 
 		private void updateSensorDatabase() {
-			//Log.d("SmartphoneSensingService", "Updating SensorDatabase");
+			// Log.d("SmartphoneSensingService", "Updating SensorDatabase");
 
 			drainBuffers();
 
