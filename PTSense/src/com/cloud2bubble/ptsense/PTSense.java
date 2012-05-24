@@ -93,7 +93,7 @@ public class PTSense extends Application {
 				&& !currentTrip.destination.isEmpty();
 	}
 	
-	public DatabaseHandler getDatabase(){
+	public synchronized DatabaseHandler getDatabase(){
 		return this.database;
 	}
 	

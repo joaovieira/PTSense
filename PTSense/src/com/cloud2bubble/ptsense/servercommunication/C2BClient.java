@@ -47,21 +47,19 @@ public class C2BClient extends IntentService {
 
 	private boolean COMMUNICATION_RUNNING;
 	JSONObject responseJSON;
-	
-	PTSense app;
 
 	public C2BClient() {
 		super("C2BClient");
 	}
-	
+
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		app = (PTSense) getApplication();
 		if (intent.hasExtra("trip_id")) {
 			long tripId = intent.getLongExtra("trip_id", -1);
 			if (tripId != -1) {
 
-				Log.d("C2BClient", "Sending trip data to server with id=" + tripId);
+				Log.d("C2BClient", "Sending trip data to server with id="
+						+ tripId);
 				sendTripData(tripId);
 				stopSelf();
 			}
@@ -72,8 +70,9 @@ public class C2BClient extends IntentService {
 	}
 
 	private void sendPendingData() {
+		PTSense app = (PTSense) getApplication();
 		DatabaseHandler database = app.getDatabase();
-		
+
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
 			List<TripFeedback> pendingsFeedbacks = database
@@ -84,11 +83,16 @@ public class C2BClient extends IntentService {
 			Iterator<TripData> itr2 = pendingTripData.iterator();
 			while (itr2.hasNext()) {
 				TripData tripData = itr2.next();
-				if (!sendDataToServer(tripData)) {
-					done = false;
-					break;
+				if (app.isSensing()
+						&& tripData.getTrip().getId() == app.getCurrentTrip().getId()) {
+					continue;
 				} else {
-					database.removeTripData(tripData);
+					if (!sendDataToServer(tripData)) {
+						done = false;
+						break;
+					} else {
+						database.removeTripData(tripData);
+					}
 				}
 			}
 
@@ -118,13 +122,11 @@ public class C2BClient extends IntentService {
 	}
 
 	private void sendTripData(long id) {
+		PTSense app = (PTSense) getApplication();
 		DatabaseHandler database = app.getDatabase();
-		
+
 		// send trip data to server and wait for inference
 		if (hasDataConnection()) {
-
-			Log.d("C2BClient", "Getting trip data from database");
-			
 			TripData tripData = database.getTripData(id);
 			if (sendDataToServer(tripData)) {
 				database.removeTripData(tripData);
@@ -178,11 +180,13 @@ public class C2BClient extends IntentService {
 	}
 
 	private void notifyForFeedback(ReviewItem trip) {
+		PTSense app = (PTSense) getApplication();
 		String tickerText = getString(R.string.notification_review_title)
 				+ " for " + trip.serviceToString() + " "
 				+ trip.directionToString();
 
-		int feedbackCount = app.incrementNotificationCount(PTSense.FEEDBACK_NOTIFICATION);
+		int feedbackCount = app
+				.incrementNotificationCount(PTSense.FEEDBACK_NOTIFICATION);
 		PendingIntent contentIntent = PendingIntent.getActivities(this,
 				PTSense.FEEDBACK_NOTIFICATION,
 				makeMessageIntentStack(this, trip, feedbackCount),
@@ -201,13 +205,13 @@ public class C2BClient extends IntentService {
 						Notification.DEFAULT_LIGHTS
 								| Notification.DEFAULT_SOUND)
 				.setTicker(tickerText).setWhen(System.currentTimeMillis());
-		
+
 		if (feedbackCount > 1) {
 			feedbackBuilder.setNumber(feedbackCount);
 		}
 
 		Notification feedbackNotification = feedbackBuilder.getNotification();
-		
+
 		NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		nManager.notify(PTSense.FEEDBACK_NOTIFICATION, feedbackNotification);
 	}
@@ -252,15 +256,6 @@ public class C2BClient extends IntentService {
 	private boolean sendDataToServer(ServerObject object) {
 		final TelephonyManager tm = (TelephonyManager) getBaseContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
-
-		/*
-		 * String json; try { JSONObject sendJSON = object.toJSON();
-		 * sendJSON.put("device_id", tm.getDeviceId()); json =
-		 * sendJSON.toString(1);
-		 * 
-		 * Log.d("C2BClient", "sent data to server: JSON=" + json); } catch
-		 * (JSONException e) { e.printStackTrace(); }
-		 */
 
 		JSONObject sendJSON = object.toJSON();
 		try {

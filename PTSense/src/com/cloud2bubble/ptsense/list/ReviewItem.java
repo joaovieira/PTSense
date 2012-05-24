@@ -11,10 +11,7 @@ public class ReviewItem implements Serializable {
 
 	private long databaseID;
 	private boolean reviewed = false;
-	public String line;
-	public String service;
-	public String origin;
-	public String destination;
+	public String line, service, origin, destination;
 	public Calendar startTime = null;
 	public Calendar endTime = null;
 

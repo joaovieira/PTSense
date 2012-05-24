@@ -1,8 +1,5 @@
 package com.cloud2bubble.ptsense.activity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.cloud2bubble.ptsense.R;
 
 import android.app.ActionBar;
@@ -16,8 +13,6 @@ import android.preference.PreferenceActivity;
 import android.view.MenuItem;
 
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
-
-	static Map<String,String> sensors = new HashMap<String,String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

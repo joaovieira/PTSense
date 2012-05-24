@@ -19,6 +19,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -97,7 +98,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	}
 
-	public static synchronized DatabaseHandler getInstance(Context context) {
+	public static DatabaseHandler getInstance(Context context) {
 		if (instance == null) {
 			instance = new DatabaseHandler(context);
 		}
@@ -149,8 +150,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Add new sensor data
 	public long addSensorData(SensorData sensorData) {
-		SQLiteDatabase db = this.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(REVIEW_ID, sensorData.refTripId);
 		values.put(KEY_TIME, sensorData.time);
@@ -163,9 +162,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			values.put(pairs.getKey(), pairs.getValue().toString());
 		}
 
+		SQLiteDatabase db = this.getWritableDatabase();
 		long rowID = db.insert(TABLE_SENSORDATA, null, values);
 		db.close(); // Close database connection
-
 		return rowID;
 	}
 
@@ -190,29 +189,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<Float> latitude = new ArrayList<Float>();
 		ArrayList<Float> longitude = new ArrayList<Float>();
 
-		SQLiteDatabase db = this.getWritableDatabase();
-
 		String selectQuery = "SELECT " + KEY_TIME + "," + KEY_ACCELERATION
 				+ "," + KEY_TEMPERATURE + "," + KEY_LIGHT + "," + KEY_PRESSURE
 				+ "," + KEY_HUMIDITY + "," + KEY_SOUND + "," + KEY_LATITUDE
 				+ "," + KEY_LONGITUDE + " FROM " + TABLE_SENSORDATA + " WHERE "
 				+ REVIEW_ID + "=" + id + " ORDER BY " + KEY_TIME + " ASC";
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()) {
-			do {
-				timestamps.add(stringToDate(cursor.getString(0)));
-				acceleration.add(cursor.getFloat(1));
-				temperature.add(cursor.getFloat(2));
-				light.add(cursor.getFloat(3));
-				pressure.add(cursor.getFloat(4));
-				humidity.add(cursor.getFloat(5));
-				sound.add(cursor.getFloat(6));
-				latitude.add(cursor.getFloat(7));
-				longitude.add(cursor.getFloat(8));
-			} while (cursor.moveToNext());
+
+		synchronized (this) {
+			SQLiteDatabase db = this.getWritableDatabase();
+			Cursor cursor = db.rawQuery(selectQuery, null);
+
+			if (cursor.moveToFirst()) {
+				do {
+					timestamps.add(stringToDate(cursor.getString(0)));
+					acceleration.add(cursor.getFloat(1));
+					temperature.add(cursor.getFloat(2));
+					light.add(cursor.getFloat(3));
+					pressure.add(cursor.getFloat(4));
+					humidity.add(cursor.getFloat(5));
+					sound.add(cursor.getFloat(6));
+					latitude.add(cursor.getFloat(7));
+					longitude.add(cursor.getFloat(8));
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			db.close();
 		}
-		cursor.close();
-		db.close();
 
 		Map<String, ArrayList<Float>> data = new HashMap<String, ArrayList<Float>>();
 		data.put(KEY_ACCELERATION, acceleration);
@@ -233,18 +235,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<Long> tripIds = new ArrayList<Long>();
 		List<TripData> tripData = new ArrayList<TripData>();
 
-		SQLiteDatabase db = this.getWritableDatabase();
 		String selectQuery = "SELECT DISTINCT " + REVIEW_ID + " FROM "
 				+ TABLE_SENSORDATA + ";";
-		Cursor cursor = db.rawQuery(selectQuery, null);
 
-		if (cursor.moveToFirst()) {
-			do {
-				tripIds.add(cursor.getLong(0));
-			} while (cursor.moveToNext());
+		synchronized (this) {
+			SQLiteDatabase db = this.getWritableDatabase();
+			Cursor cursor = db.rawQuery(selectQuery, null);
+
+			if (cursor.moveToFirst()) {
+				do {
+					tripIds.add(cursor.getLong(0));
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			db.close();
 		}
-		cursor.close();
-		db.close();
 
 		Iterator<Long> itr = tripIds.iterator();
 		while (itr.hasNext()) {
@@ -256,8 +261,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Add new review
 	public long addPendingReview(ReviewItem reviewItem) {
-		SQLiteDatabase db = this.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(KEY_LINE, reviewItem.line);
 		values.put(KEY_SERVICE, reviewItem.service);
@@ -268,6 +271,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		int intReviewed = (reviewItem.isReviewed()) ? 1 : 0;
 		values.put(KEY_REVIEWED, intReviewed);
 
+		SQLiteDatabase db = this.getWritableDatabase();
 		long rowID = db.insert(TABLE_REVIEWS, null, values);
 		db.close(); // Close database connection
 
@@ -308,29 +312,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_REVIEWED + "=0" + " AND " + KEY_END_TIME + "<>\"\""
 				+ " ORDER BY " + KEY_END_TIME + " DESC";
 
-		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor cursor = db.rawQuery(selectQuery, null);
+		synchronized (this) {
+			SQLiteDatabase db = this.getWritableDatabase();
+			Cursor cursor = db.rawQuery(selectQuery, null);
 
-		if (cursor.moveToFirst()) {
-			do {
-				ReviewItem review = new ReviewItem(cursor.getLong(0),
-						cursor.getString(1), cursor.getString(2),
-						cursor.getString(3), cursor.getString(4),
-						stringToDate(cursor.getString(5)),
-						stringToDate(cursor.getString(6)), cursor.getInt(7));
-				reviewsList.add(review);
-			} while (cursor.moveToNext());
+			if (cursor.moveToFirst()) {
+				do {
+					ReviewItem review = new ReviewItem(cursor.getLong(0),
+							cursor.getString(1), cursor.getString(2),
+							cursor.getString(3), cursor.getString(4),
+							stringToDate(cursor.getString(5)),
+							stringToDate(cursor.getString(6)), cursor.getInt(7));
+					reviewsList.add(review);
+				} while (cursor.moveToNext());
+			}
+
+			cursor.close();
+			db.close();
 		}
-
-		cursor.close();
-		db.close();
 		return reviewsList;
 	}
 
 	// update review as reviewed
 	public int updateReviewAsReviewed(ReviewItem reviewItem) {
-		SQLiteDatabase db = this.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(KEY_LINE, reviewItem.line);
 		values.put(KEY_SERVICE, reviewItem.service);
@@ -341,6 +345,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_REVIEWED, 1);
 
 		// updating row
+		SQLiteDatabase db = this.getWritableDatabase();
 		int ret = db.update(TABLE_REVIEWS, values, KEY_ID + " = ?",
 				new String[] { String.valueOf(reviewItem.getId()) });
 		db.close();
@@ -349,8 +354,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// update finish time to review
 	public int updatePendingReview(ReviewItem reviewItem) {
-		SQLiteDatabase db = this.getWritableDatabase();
-
 		int reviewed = reviewItem.isReviewed() ? 1 : 0;
 		ContentValues values = new ContentValues();
 		values.put(KEY_LINE, reviewItem.line);
@@ -362,6 +365,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_REVIEWED, reviewed);
 
 		// updating row
+		SQLiteDatabase db = this.getWritableDatabase();
 		int ret = db.update(TABLE_REVIEWS, values, KEY_ID + " = ?",
 				new String[] { String.valueOf(reviewItem.getId()) });
 		db.close();
@@ -370,8 +374,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Add new Feedback
 	public long addPendingFeedback(TripFeedback feedback) {
-		SQLiteDatabase db = this.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(REVIEW_ID, feedback.getReviewId());
 
@@ -384,6 +386,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		values.put(KEY_COMMENT, feedback.getComment());
 
+		SQLiteDatabase db = this.getWritableDatabase();
 		long rowID = db.insert(TABLE_FEEDBACKS, null, values);
 		db.close(); // Close database connection
 
@@ -400,9 +403,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Get all Feedbacks
 	public List<TripFeedback> getAllPendingFeedbacks() {
+		Log.d("DatabaseHandler", "Getting all trip data...");
+
 		List<TripFeedback> feedbackList = new ArrayList<TripFeedback>();
 		// Select All Query
-		String selectQuery = "SELECT " + TABLE_FEEDBACKS + "." + KEY_ID + ","
+		String selectQuery = "SELECT " + TABLE_REVIEWS + "." + KEY_ID + ","
 				+ KEY_LINE + "," + KEY_SERVICE + "," + KEY_ORIGIN + ","
 				+ KEY_DESTINATION + "," + KEY_START_TIME + "," + KEY_END_TIME
 				+ "," + KEY_HAPPY + "," + KEY_RELAXED + "," + KEY_NOISY + ","
@@ -413,40 +418,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ TABLE_FEEDBACKS + "." + REVIEW_ID + "=" + TABLE_REVIEWS + "."
 				+ KEY_ID;
 
-		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor cursor = db.rawQuery(selectQuery, null);
+		synchronized (this) {
 
-		if (cursor.moveToFirst()) {
-			do {
-				ReviewItem trip = new ReviewItem(cursor.getLong(0),
-						cursor.getString(1), cursor.getString(2),
-						cursor.getString(3), cursor.getString(4),
-						stringToDate(cursor.getString(5)),
-						stringToDate(cursor.getString(6)), cursor.getInt(7));
-				TripFeedback feedback = new TripFeedback(trip);
-				feedback.addInput(KEY_HAPPY,
-						Double.parseDouble(cursor.getString(7)));
-				feedback.addInput(KEY_RELAXED,
-						Double.parseDouble(cursor.getString(8)));
-				feedback.addInput(KEY_NOISY,
-						Double.parseDouble(cursor.getString(9)));
-				feedback.addInput(KEY_CROWDED,
-						Double.parseDouble(cursor.getString(10)));
-				feedback.addInput(KEY_SMOOTHNESS,
-						Double.parseDouble(cursor.getString(11)));
-				feedback.addInput(KEY_AMBIENCE,
-						Double.parseDouble(cursor.getString(12)));
-				feedback.addInput(KEY_FAST,
-						Double.parseDouble(cursor.getString(13)));
-				feedback.addInput(KEY_RELIABLE,
-						Double.parseDouble(cursor.getString(14)));
-				feedback.addComment(cursor.getString(15));
-				feedbackList.add(feedback);
-			} while (cursor.moveToNext());
+			SQLiteDatabase db = this.getWritableDatabase();
+			Cursor cursor = db.rawQuery(selectQuery, null);
+
+			if (cursor.moveToFirst()) {
+				do {
+					ReviewItem trip = new ReviewItem(cursor.getLong(0),
+							cursor.getString(1), cursor.getString(2),
+							cursor.getString(3), cursor.getString(4),
+							stringToDate(cursor.getString(5)),
+							stringToDate(cursor.getString(6)), cursor.getInt(7));
+					TripFeedback feedback = new TripFeedback(trip);
+					feedback.addInput(KEY_HAPPY,
+							Double.parseDouble(cursor.getString(7)));
+					feedback.addInput(KEY_RELAXED,
+							Double.parseDouble(cursor.getString(8)));
+					feedback.addInput(KEY_NOISY,
+							Double.parseDouble(cursor.getString(9)));
+					feedback.addInput(KEY_CROWDED,
+							Double.parseDouble(cursor.getString(10)));
+					feedback.addInput(KEY_SMOOTHNESS,
+							Double.parseDouble(cursor.getString(11)));
+					feedback.addInput(KEY_AMBIENCE,
+							Double.parseDouble(cursor.getString(12)));
+					feedback.addInput(KEY_FAST,
+							Double.parseDouble(cursor.getString(13)));
+					feedback.addInput(KEY_RELIABLE,
+							Double.parseDouble(cursor.getString(14)));
+					feedback.addComment(cursor.getString(15));
+					feedbackList.add(feedback);
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			db.close();
 		}
-
-		cursor.close();
-		db.close();
 		return feedbackList;
 	}
 

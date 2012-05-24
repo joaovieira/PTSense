@@ -32,22 +32,19 @@ public class StartSensingDialog extends DialogFragment implements
 	Activity activity;
 	Map<String, String[]> serviceLines;
 	AutoCompleteTextView selectOrigin, selectDestination, selectLine;
-	Button bStart, bCancel;
+	Button bStart;
 	String selectedService;
 
 	int stateApp;
-	ReviewItem currentTrip;
-	PTSense app;
 
 	public StartSensingDialog(Context cxt) {
 		this.activity = (Activity) cxt;
-		app = (PTSense) activity.getApplication();
+		PTSense app = (PTSense) activity.getApplication();
 		this.stateApp = app.getState();
 	}
 	
 	public StartSensingDialog(Context cxt, String stop) {
 		this.activity = (Activity) cxt;
-		app = (PTSense) activity.getApplication();
 		this.stateApp = -1;
 	}
 
@@ -55,7 +52,6 @@ public class StartSensingDialog extends DialogFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Holo_Dialog);
-		currentTrip = app.getCurrentTrip();
 	}
 
 	@Override
@@ -65,6 +61,9 @@ public class StartSensingDialog extends DialogFragment implements
 				false);
 		getDialog().setTitle(R.string.start_dialog_title);
 		setCancelable(true);
+		
+		PTSense app = (PTSense) activity.getApplication();
+		ReviewItem currentTrip = app.getCurrentTrip();
 
 		TextView serviceTitle = (TextView) v.findViewById(R.id.tvService);
 		TextView lineTitle = (TextView) v.findViewById(R.id.tvLine);
@@ -76,7 +75,7 @@ public class StartSensingDialog extends DialogFragment implements
 		originTitle.setText(R.string.origin);
 		destinationTitle.setText(R.string.destination);
 
-		bCancel = (Button) v.findViewById(android.R.id.button2);
+		Button bCancel = (Button) v.findViewById(android.R.id.button2);
 		bStart = (Button) v.findViewById(android.R.id.button1);
 		bCancel.setText(R.string.alert_dialog_cancel);
 		if (stateApp == PTSense.STATE_STOPPED) {
@@ -209,6 +208,7 @@ public class StartSensingDialog extends DialogFragment implements
 	}
 
 	public void onClick(View v) {
+		PTSense app = (PTSense) activity.getApplication();
 		switch (v.getId()) {
 		case android.R.id.button1:
 			if (stateApp == PTSense.STATE_STOPPED) {

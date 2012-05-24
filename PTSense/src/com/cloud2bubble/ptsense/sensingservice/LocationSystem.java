@@ -10,7 +10,7 @@ import android.util.Log;
 
 public class LocationSystem implements LocationListener {
 
-	private static final int FREQUENCY = 1000 * 60;
+	private static final int FREQUENCY = 1000 * 45;
 	private static final int MIN_DISTANCE = 0;
 
 	LocationManager locationManager;

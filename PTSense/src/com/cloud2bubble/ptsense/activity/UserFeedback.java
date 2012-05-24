@@ -32,14 +32,9 @@ import android.widget.TextView;
 
 public class UserFeedback extends Activity implements OnClickListener {
 
-	LinearLayout sbHappy, sbRelaxed, sbNoisy, sbCrowded, sbSmoothness,
-			sbAmbience, sbFast, sbReliable;
 	ReviewItem trip;
 	Map<String, SeekBar> inputs = new HashMap<String, SeekBar>();
 	EditText etFeedback;
-	TripFeedback feedback;
-	
-	PTSense app;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +47,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 		actionBar.setCustomView(actionCustomView);
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
-		app = (PTSense) getApplication();
+		PTSense app = (PTSense) getApplication();
 		app.resetNotificationCount(PTSense.FEEDBACK_NOTIFICATION);
 		
 		Bundle extras = getIntent().getExtras();
@@ -84,7 +79,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 
 			etFeedback = (EditText) findViewById(R.id.eTFeedback);
 
-			sbHappy = (LinearLayout) findViewById(R.id.sbHappy);
+			LinearLayout sbHappy = (LinearLayout) findViewById(R.id.sbHappy);
 			TextView happyTitle = (TextView) sbHappy.findViewById(R.id.tvTitle);
 			final TextView happyProgress = (TextView) sbHappy
 					.findViewById(R.id.tvProgress);
@@ -106,7 +101,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 				}
 			});
 
-			sbRelaxed = (LinearLayout) findViewById(R.id.sbRelaxed);
+			LinearLayout sbRelaxed = (LinearLayout) findViewById(R.id.sbRelaxed);
 			TextView relaxedTitle = (TextView) sbRelaxed
 					.findViewById(R.id.tvTitle);
 			final TextView relaxedProgress = (TextView) sbRelaxed
@@ -129,7 +124,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 				}
 			});
 
-			sbNoisy = (LinearLayout) findViewById(R.id.sbNoisy);
+			LinearLayout sbNoisy = (LinearLayout) findViewById(R.id.sbNoisy);
 			TextView noisyTitle = (TextView) sbNoisy.findViewById(R.id.tvTitle);
 			final TextView noisyProgress = (TextView) sbNoisy
 					.findViewById(R.id.tvProgress);
@@ -151,7 +146,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 				}
 			});
 
-			sbCrowded = (LinearLayout) findViewById(R.id.sbCrowded);
+			LinearLayout sbCrowded = (LinearLayout) findViewById(R.id.sbCrowded);
 			TextView crowdedTitle = (TextView) sbCrowded
 					.findViewById(R.id.tvTitle);
 			final TextView crowdedProgress = (TextView) sbCrowded
@@ -174,7 +169,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 				}
 			});
 
-			sbSmoothness = (LinearLayout) findViewById(R.id.sbSmoothness);
+			LinearLayout sbSmoothness = (LinearLayout) findViewById(R.id.sbSmoothness);
 			TextView smoothnessTitle = (TextView) sbSmoothness
 					.findViewById(R.id.tvTitle);
 			final TextView smoothnessProgress = (TextView) sbSmoothness
@@ -203,7 +198,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 						}
 					});
 
-			sbAmbience = (LinearLayout) findViewById(R.id.sbAmbience);
+			LinearLayout sbAmbience = (LinearLayout) findViewById(R.id.sbAmbience);
 			TextView ambienceTitle = (TextView) sbAmbience
 					.findViewById(R.id.tvTitle);
 			final TextView ambienceProgress = (TextView) sbAmbience
@@ -229,7 +224,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 						}
 					});
 
-			sbFast = (LinearLayout) findViewById(R.id.sbFast);
+			LinearLayout sbFast = (LinearLayout) findViewById(R.id.sbFast);
 			TextView fastTitle = (TextView) sbFast.findViewById(R.id.tvTitle);
 			final TextView fastProgress = (TextView) sbFast
 					.findViewById(R.id.tvProgress);
@@ -251,7 +246,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 				}
 			});
 
-			sbReliable = (LinearLayout) findViewById(R.id.sbReliable);
+			LinearLayout sbReliable = (LinearLayout) findViewById(R.id.sbReliable);
 			TextView reliableTitle = (TextView) sbReliable
 					.findViewById(R.id.tvTitle);
 			final TextView reliableProgress = (TextView) sbReliable
@@ -298,8 +293,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.tvActionModeCloseButton:
-			processUserInput();
-			if (insertFeedbackIntoDatabase()) {
+			TripFeedback feedback = processUserInput();
+			if (insertFeedbackIntoDatabase(feedback)) {
 				Toast.makeText(UserFeedback.this, R.string.feedback_saved,
 						Toast.LENGTH_SHORT).show();
 			}
@@ -310,8 +305,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 		}
 	}
 
-	private void processUserInput() {
-		feedback = new TripFeedback(trip);
+	private TripFeedback processUserInput() {
+		TripFeedback feedback = new TripFeedback(trip);
 		Iterator<Entry<String, SeekBar>> it = inputs.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, SeekBar> input = (Map.Entry<String, SeekBar>) it
@@ -321,9 +316,11 @@ public class UserFeedback extends Activity implements OnClickListener {
 		}
 		feedback.addComment(etFeedback.getText().toString());
 		feedback.getTrip().setReviewed();
+		return feedback;
 	}
 
-	private boolean insertFeedbackIntoDatabase() {
+	private boolean insertFeedbackIntoDatabase(TripFeedback feedback) {
+		PTSense app = (PTSense) getApplication();
 		DatabaseHandler database = app.getDatabase();
 		
 		ReviewItem oldReview = feedback.getTrip();

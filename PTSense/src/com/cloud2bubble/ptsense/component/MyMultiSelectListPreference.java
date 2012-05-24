@@ -18,31 +18,31 @@ import android.util.AttributeSet;
 
 public class MyMultiSelectListPreference extends MultiSelectListPreference {
 
-	Map<String, String> sensors = new HashMap<String, String>();
-
 	public MyMultiSelectListPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		Map<String, String> sensorSelectList = getAvailableSensors(context);
 		setEntries(sensorSelectList.keySet().toArray(new String[0]));
 		setEntryValues(sensorSelectList.values().toArray(new String[0]));
-		Set<String> defaultValue = getDefaultValueSet();
+		Set<String> defaultValue = getDefaultValueSet(sensorSelectList);
 		setDefaultValue(defaultValue);
 	}
 
-	private Set<String> getDefaultValueSet() {
+	private Set<String> getDefaultValueSet(Map<String, String> sensors) {
 		Set<String> defaultValue = new HashSet<String>();
 		Iterator<Entry<String, String>> it = sensors.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry<String, String> pairs = (Map.Entry<String, String>)it.next();
-	        defaultValue.add(pairs.getValue());
-	    }
-	    return defaultValue;
+		while (it.hasNext()) {
+			Map.Entry<String, String> pairs = (Map.Entry<String, String>) it
+					.next();
+			defaultValue.add(pairs.getValue());
+		}
+		return defaultValue;
 	}
 
 	private Map<String, String> getAvailableSensors(Context cxt) {
-		// Get the SensorManager
 		SensorManager mSensorManager = (SensorManager) cxt
 				.getSystemService(Context.SENSOR_SERVICE);
+
+		Map<String, String> sensors = new HashMap<String, String>();
 
 		if (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
 			sensors.put("Accelerometer",
@@ -70,5 +70,5 @@ public class MyMultiSelectListPreference extends MultiSelectListPreference {
 
 		return sensors;
 	}
-	
+
 }

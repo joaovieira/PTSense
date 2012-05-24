@@ -15,7 +15,6 @@ import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Sensing;
 import com.cloud2bubble.ptsense.database.SensorData;
-import com.cloud2bubble.ptsense.database.DatabaseHandler;
 import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
 import android.app.Notification;
@@ -33,31 +32,28 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
 public class SmartphoneSensingService extends Service implements
 		SensorEventListener {
 
-	private Thread sensorThread = null;
-	private SensorManager sensorManager;
 	public static Sensor mAcceleration, mAmbTemperature, mLight, mPressure,
 			mProximity, mRelHumidity = null;
 	public static MediaRecorder soundRecorder = null;
 	public static LocationSystem locationSystem;
 
-	private ArrayBlockingQueue<Float> lightValues, accelerationsX,
+	private static ArrayBlockingQueue<Float> lightValues, accelerationsX,
 			accelerationsY, accelerationsZ, pressureValues, relHumidityValues,
 			ambTemperatureValues;
-	private ArrayBlockingQueue<Double> soundValues;
+	private static ArrayBlockingQueue<Double> soundValues;
 
-	private List<Float> tmpLightValues, tmpAccelerationsX, tmpAccelerationsY,
+	private static List<Float> tmpLightValues, tmpAccelerationsX, tmpAccelerationsY,
 			tmpAccelerationsZ, tmpPressureValues, tmpRelHumidityValues,
 			tmpAmbTemperatureValues;
-	private List<Double> tmpSoundValues;
+	private static List<Double> tmpSoundValues;
 
-	private Float currentX, currentdX, currentY, currentdY, currentZ,
+	private static Float currentX, currentdX, currentY, currentdY, currentZ,
 			currentdZ, currentLight, currentPressure, currentTemp,
 			currentHumidity;
 
@@ -65,20 +61,17 @@ public class SmartphoneSensingService extends Service implements
 	private final Handler handler = new Handler();
 	Intent uiIntent;
 
-	String soundOutputPath;
 	private final String outputFile = "PTSense_output";
 
 	PTSense app;
-	private DatabaseHandler database;
 	long tripId;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
 		app = (PTSense) getApplication();
-		database = app.getDatabase();
 
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
@@ -127,9 +120,13 @@ public class SmartphoneSensingService extends Service implements
 					.contains(getString(R.string.sensordata_key_sound))) {
 				soundRecorder = new MediaRecorder();
 				File sampleDir = Environment.getExternalStorageDirectory();
-				soundOutputPath = sampleDir + File.separator + outputFile
+				String soundOutputPath = sampleDir + File.separator + outputFile
 						+ ".3gp";
-				setupSoundRecorder();
+
+				soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+				soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+				soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+				soundRecorder.setOutputFile(soundOutputPath);
 			}
 
 			if (sensorsAllowed.contains(getString(R.string.gps)))
@@ -206,6 +203,7 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void registerSensorListeners() {
+		SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		if (mAcceleration != null)
 			sensorManager.registerListener(this, mAcceleration,
 					SensorManager.SENSOR_DELAY_NORMAL);
@@ -235,6 +233,7 @@ public class SmartphoneSensingService extends Service implements
 	}
 
 	private void unregisterSensorListeners() {
+		SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		sensorManager.unregisterListener(this);
 
 		if (locationSystem != null)
@@ -246,17 +245,8 @@ public class SmartphoneSensingService extends Service implements
 		handler.postDelayed(sendUpdatesToUI, 200);
 
 		// calculate average and insert store into database every 2 seconds
-		sensorThread = new PreProcessThread();
+		Thread sensorThread = new PreProcessThread();
 		handler.postDelayed(sensorThread, 1000);
-	}
-
-	private void setupSoundRecorder() {
-		if (soundRecorder != null) {
-			soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-			soundRecorder.setOutputFile(soundOutputPath);
-		}
 	}
 
 	private void startSoundRecording() {
@@ -284,7 +274,6 @@ public class SmartphoneSensingService extends Service implements
 		Intent i = new Intent(this, C2BClient.class);
 		i.putExtra("trip_id", tripId);
 		startService(i);
-		Log.d("SmartphoneSensingService", "Continuing previous thread");
 	}
 
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -444,7 +433,7 @@ public class SmartphoneSensingService extends Service implements
 						coordinates.second);
 			}
 
-			database.addSensorData(data);
+			app.getDatabase().addSensorData(data);
 
 			clearTempBuffers();
 			// TODO define listener to reset file when reached max file size

@@ -2,7 +2,6 @@ package com.cloud2bubble.ptsense.activity;
 
 import com.cloud2bubble.ptsense.R;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,8 +16,7 @@ public class PlanTrip extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.feature_not_supported);
 
-		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		TextView text = (TextView) findViewById(android.R.id.text1);
 		text.setText("Here you will be able to easily plan your trip using system inferences to determine the best routes for you.");
