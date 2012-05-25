@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Home;
+import com.cloud2bubble.ptsense.activity.Settings;
 import com.cloud2bubble.ptsense.activity.TripReviews;
 import com.cloud2bubble.ptsense.activity.UserFeedback;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
@@ -36,7 +37,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -145,8 +145,7 @@ public class C2BClient extends IntentService {
 		// now just show a notification asking for user feedback
 		ReviewItem trip = database.getReview(id);
 
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = Settings.getPrefs(this);
 		String shouldNotifiy = prefs.getString("notifications", "fail");
 
 		if (!shouldNotifiy.equals("2"))

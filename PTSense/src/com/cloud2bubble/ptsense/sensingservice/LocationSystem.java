@@ -87,21 +87,6 @@ public class LocationSystem implements LocationListener {
 			// A new location is always better than no location
 			return true;
 		}
-
-		// Check whether the new location fix is newer or older
-		long timeDelta = location.getTime() - currentBestLocation.getTime();
-		boolean isNewer = timeDelta > 0;
-
-		// Check whether the new location fix is more or less accurate
-		int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation
-				.getAccuracy());
-		boolean isMoreAccurate = accuracyDelta < 0;
-
-		// Determine location quality using a combination of timeliness and
-		// accuracy
-		if (isNewer && isMoreAccurate) {
-			return true;
-		}
-		return false;
+		return location.getTime() > currentBestLocation.getTime();
 	}
 }

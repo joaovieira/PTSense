@@ -37,28 +37,47 @@ public class NowFragment extends Fragment {
 		sensingActivity = getActivity();
 
 		items = new ArrayList<Item>();
+		int sensorCount = 0;
 
 		items.add(new SectionItem("smartphone", "Smartphone Sensors"));
-		if (SmartphoneSensingService.mAcceleration != null)
+		if (SmartphoneSensingService.mAcceleration != null) {
 			items.add(new EntryItem("oscilation", "Oscilation", "m/s²"));
+			sensorCount++;
+		}
 
-		if (SmartphoneSensingService.mAmbTemperature != null)
+		if (SmartphoneSensingService.mAmbTemperature != null) {
 			items.add(new EntryItem("temperature", "Temperature", "ºC"));
+			sensorCount++;
+		}
 
-		if (SmartphoneSensingService.mLight != null)
+		if (SmartphoneSensingService.mLight != null) {
 			items.add(new EntryItem("light", "Light Intensity", "lux"));
+			sensorCount++;
+		}
 
-		if (SmartphoneSensingService.mPressure != null)
+		if (SmartphoneSensingService.mPressure != null) {
 			items.add(new EntryItem("pressure", "Pressure", "hPa"));
+			sensorCount++;
+		}
 
-		if (SmartphoneSensingService.mRelHumidity != null)
+		if (SmartphoneSensingService.mRelHumidity != null) {
 			items.add(new EntryItem("humidity", "Relative Humidity", "%"));
+			sensorCount++;
+		}
 
-		if (SmartphoneSensingService.soundRecorder != null)
+		if (SmartphoneSensingService.soundRecorder != null) {
 			items.add(new EntryItem("sound", "Sound Level", "dB"));
+			sensorCount++;
+		}
 
-		if (SmartphoneSensingService.locationSystem != null)
+		if (SmartphoneSensingService.locationSystem != null) {
 			items.add(new EntryItem("position", "Position", ""));
+			sensorCount++;
+		}
+		
+		if (sensorCount == 0)
+			items.add(new EmptyItem("smartphone",
+					"No smartphone sensors selected"));
 
 		items.add(new SectionItem("environment", "Environment Sensors"));
 

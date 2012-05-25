@@ -324,8 +324,8 @@ public class UserFeedback extends Activity implements OnClickListener {
 		DatabaseHandler database = app.getDatabase();
 		
 		ReviewItem oldReview = feedback.getTrip();
-		database.addPendingFeedback(feedback);
 		database.updateReviewAsReviewed(oldReview);
+		database.addPendingFeedback(feedback);
 		Intent serviceIntent = new Intent(this, C2BClient.class);
 		this.startService(serviceIntent);
 		return true;

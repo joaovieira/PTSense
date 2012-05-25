@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
+    <string-array name="sensors_values">
+        <item>light</item>
+        <item>acceleration</item>
+    </string-array>
+    
     <string-array name="notifications">
         <item>All</item>
         <item>None</item>

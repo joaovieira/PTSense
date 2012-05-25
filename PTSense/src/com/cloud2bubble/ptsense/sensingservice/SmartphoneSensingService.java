@@ -15,7 +15,7 @@ import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Home;
 import com.cloud2bubble.ptsense.activity.Sensing;
-import com.cloud2bubble.ptsense.activity.TripReviews;
+import com.cloud2bubble.ptsense.activity.Settings;
 import com.cloud2bubble.ptsense.database.SensorData;
 import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
@@ -34,17 +34,18 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
+import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
 public class SmartphoneSensingService extends Service implements
 		SensorEventListener {
 
-	public static Sensor mAcceleration, mAmbTemperature, mLight, mPressure,
-			mProximity, mRelHumidity = null;
+	public static Sensor mAcceleration = null, mAmbTemperature = null,
+			mLight = null, mPressure = null, mProximity = null,
+			mRelHumidity = null;
 	public static MediaRecorder soundRecorder = null;
-	public static LocationSystem locationSystem;
+	public static LocationSystem locationSystem = null;
 
 	private static ArrayBlockingQueue<Float> lightValues, accelerationsX,
 			accelerationsY, accelerationsZ, pressureValues, relHumidityValues,
@@ -76,18 +77,12 @@ public class SmartphoneSensingService extends Service implements
 
 		app = (PTSense) getApplication();
 
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = Settings.getPrefs(this);
 		Set<String> sensorsAllowed = prefs.getStringSet("smartphone_sensors",
 				null);
-
-		/*
-		 * Boolean a = prefs.getBoolean("automatic_routines", false); String b =
-		 * prefs.getString("notifications", "fail");
-		 * Log.d("SmartphoneSensingService", "preferences: sensors=" +
-		 * sensorsAllowed.toString() + " routines=" + a + " notifications=" +
-		 * b);
-		 */
+		
+		Log.d("SmartphoneSensingService", "notifications pref value:" + prefs.getString("notifications", "fail"));
+		//Log.d("SmartphoneSensingService", "smartphone_sensors pref value:" + sensorsAllowed.toString());
 
 		if (sensorsAllowed != null) {
 

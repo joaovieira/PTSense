@@ -341,7 +341,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_ORIGIN, reviewItem.origin);
 		values.put(KEY_DESTINATION, reviewItem.destination);
 		values.put(KEY_START_TIME, dateToString(reviewItem.startTime));
-		values.put(KEY_START_TIME, dateToString(reviewItem.endTime));
+		values.put(KEY_END_TIME, dateToString(reviewItem.endTime));
 		values.put(KEY_REVIEWED, 1);
 
 		// updating row
