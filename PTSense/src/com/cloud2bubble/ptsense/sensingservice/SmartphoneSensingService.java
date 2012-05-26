@@ -80,9 +80,12 @@ public class SmartphoneSensingService extends Service implements
 		SharedPreferences prefs = Settings.getPrefs(this);
 		Set<String> sensorsAllowed = prefs.getStringSet("smartphone_sensors",
 				null);
-		
-		Log.d("SmartphoneSensingService", "notifications pref value:" + prefs.getString("notifications", "fail"));
-		//Log.d("SmartphoneSensingService", "smartphone_sensors pref value:" + sensorsAllowed.toString());
+
+		Log.d("SmartphoneSensingService",
+				"notifications pref value:"
+						+ prefs.getString("notifications", "fail"));
+		// Log.d("SmartphoneSensingService", "smartphone_sensors pref value:" +
+		// sensorsAllowed.toString());
 
 		if (sensorsAllowed != null) {
 
@@ -152,7 +155,8 @@ public class SmartphoneSensingService extends Service implements
 		tmpAccelerationsZ = new ArrayList<Float>(15);
 		tmpSoundValues = new ArrayList<Double>(15);
 
-		currentX = currentY = currentZ = currentLight = currentPressure = currentTemp = currentHumidity = 0.0f;
+		currentX = currentY = currentZ = currentdX = currentdY = currentdZ = 
+				currentLight = currentPressure = currentTemp = currentHumidity = 0.0f;
 
 		uiIntent = new Intent(BROADCAST_ACTION);
 	}
