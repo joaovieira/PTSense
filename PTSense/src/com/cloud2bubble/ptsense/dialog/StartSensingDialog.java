@@ -42,7 +42,7 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 		PTSense app = (PTSense) activity.getApplication();
 		this.stateApp = app.getState();
 	}
-	
+
 	public StartSensingDialog(Context cxt, String stop) {
 		this.activity = (Activity) cxt;
 		this.stateApp = -1;
@@ -51,7 +51,6 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setStyle(SherlockDialogFragment.STYLE_NORMAL, android.R.style.Theme_Holo_Dialog);
 	}
 
 	@Override
@@ -61,7 +60,7 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 				false);
 		getDialog().setTitle(R.string.start_dialog_title);
 		setCancelable(true);
-		
+
 		PTSense app = (PTSense) activity.getApplication();
 		ReviewItem currentTrip = app.getCurrentTrip();
 
@@ -93,8 +92,9 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 		selectLine = (AutoCompleteTextView) v.findViewById(R.id.acLine);
 		Spinner selectService = (Spinner) v.findViewById(R.id.sService);
 		ArrayAdapter<String> adapterService = new ArrayAdapter<String>(
-				activity, R.layout.autocomplete_list_item, PTService.SERVICES
+				activity, R.layout.autocomplete_list_item_closed, PTService.SERVICES
 						.keySet().toArray(new String[0]));
+		adapterService.setDropDownViewResource(R.layout.autocomplete_list_item);
 		selectService.setAdapter(adapterService);
 
 		selectOrigin.setHint(R.string.autocomplete_origin_hint);

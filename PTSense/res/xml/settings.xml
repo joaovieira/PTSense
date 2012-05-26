@@ -24,12 +24,12 @@
         </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings.category.inferencing" >
-        <SwitchPreference
+        <CheckBoxPreference
             android:key="automatic_routines"
             android:defaultValue="true"
             android:summary="@string/settings.header2.automatic_routines.summary"
             android:title="@string/settings.header2.automatic_routines.title" >
-        </SwitchPreference>
+        </CheckBoxPreference>
 
         <ListPreference
             android:entries="@array/notifications"

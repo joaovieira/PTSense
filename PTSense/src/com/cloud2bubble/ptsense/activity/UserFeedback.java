@@ -44,6 +44,8 @@ public class UserFeedback extends SherlockActivity implements OnClickListener {
 		ActionBar actionBar = getSupportActionBar();
 		View actionCustomView = getLayoutInflater().inflate(
 				R.layout.action_mode_bar, null);
+		TextView done = (TextView) actionCustomView.findViewById(R.id.tvActionModeCloseButton);
+		done.setText(getString(R.string.done).toUpperCase());
 		actionBar.setCustomView(actionCustomView);
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 
@@ -65,17 +67,20 @@ public class UserFeedback extends SherlockActivity implements OnClickListener {
 			tvDate.setText(trip.endTimeToString());
 			tvCloseButton.setOnClickListener(this);
 
+			TextView question = (TextView) findViewById(R.id.tvQuestion);
+			question.setText(getString(R.string.feedback_question).toUpperCase());
+			
 			TextView sepPersonal = (TextView) findViewById(R.id.sepPersonal);
 			sepPersonal
-					.setText(getString(R.string.feedback_separator_personal));
+					.setText(getString(R.string.feedback_separator_personal).toUpperCase());
 			TextView sepEnvironment = (TextView) findViewById(R.id.sepEnvironment);
 			sepEnvironment
-					.setText(getString(R.string.feedback_separator_environment));
+					.setText(getString(R.string.feedback_separator_environment).toUpperCase());
 			TextView sepService = (TextView) findViewById(R.id.sepService);
-			sepService.setText(getString(R.string.feedback_separator_service));
+			sepService.setText(getString(R.string.feedback_separator_service).toUpperCase());
 			TextView sepFeedback = (TextView) findViewById(R.id.sepFeedback);
 			sepFeedback
-					.setText(getString(R.string.feedback_separator_feedback));
+					.setText(getString(R.string.feedback_separator_feedback).toUpperCase());
 
 			etFeedback = (EditText) findViewById(R.id.eTFeedback);
 

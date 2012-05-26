@@ -11,10 +11,10 @@
         android:id="@android:id/text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:layout_marginLeft="8dip"
         android:includeFontPadding="false"
         android:paddingTop="8dip"
-        android:textAppearance="?android:attr/textAppearanceLargeInverse" />
+        android:textAppearance="@style/MyTextAppearance.Large.Inverse" />
 
     <TextView
         android:id="@android:id/text2"
@@ -24,7 +24,7 @@
         android:layout_below="@android:id/text1"
         android:includeFontPadding="false"
         android:paddingBottom="8dip"
-        android:textAppearance="?android:attr/textAppearanceSmallInverse" />
+        android:textAppearance="@style/MyTextAppearance.Small.Inverse" />
 
     <TextView
         android:id="@+id/tvNotification"

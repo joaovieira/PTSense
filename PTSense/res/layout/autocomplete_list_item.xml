@@ -3,9 +3,4 @@
     android:id="@android:id/text1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-    android:paddingRight="?android:attr/listPreferredItemPaddingRight"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textColor="?android:attr/textColorPrimaryInverse" />
+    android:padding="10dip" />

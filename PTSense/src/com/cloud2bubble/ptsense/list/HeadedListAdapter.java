@@ -2,6 +2,7 @@ package com.cloud2bubble.ptsense.list;
 
 import java.util.ArrayList;
 
+import com.cloud2bubble.ptsense.R;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +50,7 @@ public class HeadedListAdapter extends ArrayAdapter<Item> {
 				value.setText(ei.toString());
 				break;
 			case Item.EMPTY:
-				v = vi.inflate(android.R.layout.simple_list_item_1, null);
+				v = vi.inflate(R.layout.no_sensor_list_item, null);
 				TextView text = (TextView) v.findViewById(android.R.id.text1);
 
 				text.setText(((EmptyItem) i).getText());

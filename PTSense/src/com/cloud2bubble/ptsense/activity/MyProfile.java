@@ -2,7 +2,7 @@ package com.cloud2bubble.ptsense.activity;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.tabfragment.PreferencesFragment;
@@ -11,7 +11,7 @@ import com.cloud2bubble.ptsense.tabfragment.RoutinesFragment;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class MyProfile extends SherlockActivity{
+public class MyProfile extends SherlockFragmentActivity{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

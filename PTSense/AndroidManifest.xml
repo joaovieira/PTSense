@@ -39,7 +39,7 @@
             android:name=".activity.Settings"
             android:hardwareAccelerated="true"
             android:label="@string/settings"
-            android:theme="@android:style/Theme.Holo" >
+            android:theme="@style/Theme.Sherlock" >
             <intent-filter>
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>

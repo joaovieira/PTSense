@@ -6,9 +6,11 @@
     android:orientation="vertical" >
 
     <ListView
+        style="@style/Sherlock.__Widget.Holo.ListView"
         android:id="@+id/lvReviewList"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:divider="@drawable/list_divider_holo_light">
     </ListView>
 
     <TextView

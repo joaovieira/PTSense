@@ -2,7 +2,7 @@ package com.cloud2bubble.ptsense.activity;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.tabfragment.SystemReviewsFragment;
@@ -12,7 +12,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class TripReviews extends SherlockActivity {
+public class TripReviews extends SherlockFragmentActivity {
 
 	public static final int REQUEST_FEEDBACK_CODE = 9;
 

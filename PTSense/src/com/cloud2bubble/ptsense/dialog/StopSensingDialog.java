@@ -25,7 +25,7 @@ public class StopSensingDialog extends SherlockDialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		return new AlertDialog.Builder(new ContextThemeWrapper(getActivity(),
-				android.R.style.Theme_Holo_Dialog))
+				com.actionbarsherlock.R.style.Theme_Sherlock_Light_Dialog))
 				.setMessage("This will stop sensing conditions. Do you want to continue?")
 				.setCancelable(true)
 				.setPositiveButton(R.string.yes,

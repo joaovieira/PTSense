@@ -156,7 +156,7 @@ public class Home extends SherlockFragmentActivity implements OnClickListener, S
 				app.setState(PTSense.STATE_STOPPED);
 				stopSensing();
 			} else {
-				DialogFragment startDialogFragment = new StartSensingDialog(
+				SherlockDialogFragment startDialogFragment = new StartSensingDialog(
 						this, "stop");
 				startDialogFragment.show(getSupportFragmentManager(), "start_dialog");
 			}

@@ -5,18 +5,18 @@
 
     <TextView
         android:id="@+id/tvActionModeCloseButton"
-        style="?android:attr/actionModeCloseButtonStyle"
+        style="@style/MyActionModeCloseButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginRight="16dip"
         android:clickable="true"
-        android:drawableLeft="?android:attr/actionModeCloseDrawable"
+        android:drawableLeft="@drawable/ic_cab_done_holo_light"
         android:drawablePadding="8dip"
         android:focusable="true"
         android:paddingLeft="8dip"
         android:paddingRight="30dip"
         android:text="@string/done"
-        android:textAppearance="@android:style/TextAppearance.Holo.Widget.ActionBar.Menu" >
+        android:textAppearance="@style/TextAppearance.Sherlock.Widget.ActionBar.Menu" >
     </TextView>
 
 </LinearLayout>

@@ -42,7 +42,8 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="4"
             android:gravity="right"
-            android:textAppearance="?android:attr/textAppearanceSmallInverse" />
+            android:textAppearance="?android:attr/textAppearanceSmallInverse"
+            android:textColor="?android:attr/textColorPrimaryInverse" />
     </LinearLayout>
 
     <LinearLayout
@@ -51,6 +52,7 @@
         android:orientation="vertical" >
 
         <TextView
+            android:id="@+id/tvQuestion"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="24dip"
@@ -67,11 +69,12 @@
             android:layout_height="wrap_content" >
 
             <LinearLayout
-                style="@style/MyListView"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="10dip" >
+                android:paddingBottom="10dip"
+                android:paddingLeft="16dip"
+                android:paddingRight="16dip" >
 
                 <include
                     android:id="@+id/sepPersonal"
@@ -122,11 +125,11 @@
                     layout="@android:layout/preference_category" />
 
                 <EditText
+                    android:background="@color/edit_text_holo_light"
                     android:id="@+id/eTFeedback"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/feedback.hint" />
-                
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

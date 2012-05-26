@@ -23,7 +23,6 @@
 
             <TextView
                 android:id="@+id/tvService"
-                style="?android:attr/textAppearance"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />
 
@@ -35,14 +34,12 @@
 
             <TextView
                 android:id="@+id/tvLine"
-                style="?android:attr/textAppearance"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dip" />
 
             <AutoCompleteTextView
                 android:id="@+id/acLine"
-                style="?android:attr/autoCompleteTextViewStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionNext"
@@ -54,14 +51,12 @@
 
             <TextView
                 android:id="@+id/tvOrigin"
-                style="?android:attr/textAppearance"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dip" />
 
             <AutoCompleteTextView
                 android:id="@+id/acOrigin"
-                style="?android:attr/autoCompleteTextViewStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionNext"
@@ -73,14 +68,12 @@
 
             <TextView
                 android:id="@+id/tvDestination"
-                style="?android:attr/textAppearance"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dip" />
 
             <AutoCompleteTextView
                 android:id="@+id/acDestination"
-                style="?android:attr/autoCompleteTextViewStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
@@ -96,14 +89,13 @@
         android:id="@+id/buttonPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="?android:attr/dividerHorizontal"
+        android:divider="@drawable/list_divider_holo_dark"
         android:dividerPadding="0dip"
         android:minHeight="48dip"
         android:orientation="vertical"
         android:showDividers="beginning" >
 
         <LinearLayout
-            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:measureWithLargestChild="true"
@@ -111,7 +103,6 @@
 
             <Button
                 android:id="@android:id/button2"
-                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -122,7 +113,6 @@
 
             <Button
                 android:id="@android:id/button1"
-                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"

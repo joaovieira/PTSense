@@ -47,10 +47,6 @@ public class MyMultiSelectListPreference extends MultiSelectListPreference {
 			sensors.put("Accelerometer",
 					cxt.getString(R.string.sensordata_key_acceleration));
 
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null)
-			sensors.put("Ambient Temperature",
-					cxt.getString(R.string.sensordata_key_temperature));
-
 		if (mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null)
 			sensors.put("Light", cxt.getString(R.string.sensordata_key_light));
 
@@ -58,16 +54,16 @@ public class MyMultiSelectListPreference extends MultiSelectListPreference {
 			sensors.put("Pressure",
 					cxt.getString(R.string.sensordata_key_pressure));
 
-		if (mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY) != null)
-			sensors.put("Relative Humidity",
-					cxt.getString(R.string.sensordata_key_humidity));
-
 		sensors.put("Microphone", cxt.getString(R.string.sensordata_key_sound));
 
 		if ((LocationManager) cxt.getSystemService(Context.LOCATION_SERVICE) != null)
 			sensors.put("GPS", cxt.getString(R.string.gps));
 
 		return sensors;
+	}
+	
+	@Override
+	protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
 	}
 
 }

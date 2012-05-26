@@ -6,8 +6,10 @@
     android:orientation="vertical" >
 
     <ListView
+        style="@style/Sherlock.__Widget.Holo.ListView"
+        android:paddingLeft="16dip"
+        android:paddingRight="16dip"
         android:id="@+id/lvSensingNow"
-        style="@style/MyListView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
     </ListView>

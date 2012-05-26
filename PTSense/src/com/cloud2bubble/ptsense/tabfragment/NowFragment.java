@@ -39,7 +39,7 @@ public class NowFragment extends SherlockFragment {
 		items = new ArrayList<Item>();
 		int sensorCount = 0;
 
-		items.add(new SectionItem("smartphone", "Smartphone Sensors"));
+		items.add(new SectionItem("smartphone", "Smartphone Sensors".toUpperCase()));
 		if (SmartphoneSensingService.mAcceleration != null) {
 			items.add(new EntryItem("oscilation", "Oscilation", "m/s²"));
 			sensorCount++;
@@ -79,17 +79,17 @@ public class NowFragment extends SherlockFragment {
 			items.add(new EmptyItem("smartphone",
 					"No smartphone sensors selected"));
 
-		items.add(new SectionItem("environment", "Environment Sensors"));
+		items.add(new SectionItem("environment", "Environment Sensors".toUpperCase()));
 
 		// TODO change with external environment sensors connected
 		if (true)
 			items.add(new EmptyItem("env_sensors",
-					"No environment sensors connected"));
+					"No environment sensors connected".toUpperCase()));
 
-		items.add(new SectionItem("body", "Body Sensors"));
+		items.add(new SectionItem("body", "Body Sensors".toUpperCase()));
 
 		if (true)
-			items.add(new EmptyItem("body_sensors", "No body sensors connected"));
+			items.add(new EmptyItem("body_sensors", "No body sensors connected".toUpperCase()));
 
 		adapter = new HeadedListAdapter(sensingActivity, items);
 	}

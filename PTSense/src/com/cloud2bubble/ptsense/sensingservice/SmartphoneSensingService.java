@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.cloud2bubble.ptsense.PTSense;
@@ -16,13 +16,11 @@ import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.Home;
 import com.cloud2bubble.ptsense.activity.Sensing;
 import com.cloud2bubble.ptsense.activity.Settings;
+import com.cloud2bubble.ptsense.component.MultiSelectListPreference;
 import com.cloud2bubble.ptsense.database.SensorData;
 import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -78,53 +76,58 @@ public class SmartphoneSensingService extends Service implements
 		app = (PTSense) getApplication();
 
 		SharedPreferences prefs = Settings.getPrefs(this);
-		Set<String> sensorsAllowed = prefs.getStringSet("smartphone_sensors",
-				null);
+		String persistedPrefs = prefs.getString("smartphone_sensors", null);
+		// List<String> sensorsAllowed =
+		// Arrays.asList(MultiSelectListPreference.fromPersistedPreferenceValue(persistedPrefs));
 
-		Log.d("SmartphoneSensingService",
-				"notifications pref value:"
-						+ prefs.getString("notifications", "fail"));
 		// Log.d("SmartphoneSensingService", "smartphone_sensors pref value:" +
 		// sensorsAllowed.toString());
 
-		if (sensorsAllowed != null) {
+		/*
+		 * if (sensorsAllowed != null) {
+		 * 
+		 * if (sensorsAllowed
+		 * .contains(getString(R.string.sensordata_key_acceleration)))
+		 */
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
+			mAcceleration = sensorManager
+					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-			if (sensorsAllowed
-					.contains(getString(R.string.sensordata_key_acceleration)))
-				mAcceleration = sensorManager
-						.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		/*
+		 * if (sensorsAllowed
+		 * .contains(getString(R.string.sensordata_key_light)))
+		 */
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null)
+			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-			if (sensorsAllowed
-					.contains(getString(R.string.sensordata_key_light)))
-				mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+		/*
+		 * if (sensorsAllowed
+		 * .contains(getString(R.string.sensordata_key_pressure)))
+		 */
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null)
+			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
 
-			if (sensorsAllowed
-					.contains(getString(R.string.sensordata_key_pressure)))
-				mPressure = sensorManager
-						.getDefaultSensor(Sensor.TYPE_PRESSURE);
+		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
+			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
-			if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
-				mProximity = sensorManager
-						.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-
-			if (sensorsAllowed
-					.contains(getString(R.string.sensordata_key_sound))) {
-				soundRecorder = new MediaRecorder();
-				File sampleDir = Environment.getExternalStorageDirectory();
-				String soundOutputPath = sampleDir + File.separator
-						+ outputFile + ".3gp";
-
-				soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-				soundRecorder
-						.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-				soundRecorder
-						.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-				soundRecorder.setOutputFile(soundOutputPath);
-			}
-
-			if (sensorsAllowed.contains(getString(R.string.gps)))
-				locationSystem = new LocationSystem(this);
-		}
+		/*
+		 * if (sensorsAllowed
+		 * .contains(getString(R.string.sensordata_key_sound))) {
+		 */
+		/*
+		 * soundRecorder = new MediaRecorder(); File sampleDir =
+		 * Environment.getExternalStorageDirectory(); String soundOutputPath =
+		 * sampleDir + File.separator + outputFile + ".3gp";
+		 * 
+		 * soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		 * soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		 * soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+		 * soundRecorder.setOutputFile(soundOutputPath); /* }
+		 * 
+		 * if (sensorsAllowed.contains(getString(R.string.gps)))
+		 */
+		locationSystem = new LocationSystem(this);
+		// }
 
 		lightValues = new ArrayBlockingQueue<Float>(15); // 200ms * 2sec = 10
 															// values
@@ -141,7 +144,7 @@ public class SmartphoneSensingService extends Service implements
 		tmpAccelerationsZ = new ArrayList<Float>(15);
 		tmpSoundValues = new ArrayList<Double>(15);
 
-		currentX = currentY = currentZ = currentLight = currentPressure = 0.0f;
+		currentX = currentY = currentZ = currentLight = currentdX = currentdY = currentdZ = currentPressure = 0.0f;
 
 		uiIntent = new Intent(BROADCAST_ACTION);
 	}
@@ -197,7 +200,8 @@ public class SmartphoneSensingService extends Service implements
 												.putExtra("tab", 1))
 								.getPendingIntent(0, 0));
 
-		startForeground(PTSense.ONGOING_NOTIFICATION, feedbackBuilder.getNotification());
+		startForeground(PTSense.ONGOING_NOTIFICATION,
+				feedbackBuilder.getNotification());
 	}
 
 	private void registerSensorListeners() {

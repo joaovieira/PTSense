@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:drawableLeft="@drawable/ic_sad_droid"
-        android:drawablePadding="10dip"
+        android:drawablePadding="6dip"
         android:gravity="center"
         android:text="@string/feature_not_supported"
         android:textColor="@color/droid_green"

@@ -2,15 +2,19 @@
 <resources>
 
     <style name="MyActionBar.Home" parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
+        <item name="background">@drawable/ab_solid_light_blue</item>
         <item name="android:background">@drawable/ab_solid_light_blue</item>
     </style>
 
     <style name="MyActionBar.TabStyle" parent="Widget.Sherlock.Light.ActionBar.TabView">
+        <item name="background">@color/actionbar_tab_bg</item>
         <item name="android:background">@color/actionbar_tab_bg</item>
     </style>
 
     <style name="MyActionBar.TabBarStyle" parent="Widget.Sherlock.Light.ActionBar.TabBar">
+        <item name="background">@drawable/tab_bottom</item>
         <item name="android:background">@drawable/tab_bottom</item>
+        <item name="divider">@drawable/list_divider_holo_dark</item>
         <item name="android:divider">@drawable/list_divider_holo_dark</item>
     </style>
 
@@ -18,7 +22,7 @@
         <item name="android:textColor">@color/actionbar_tab_text</item>
     </style>
 
-    <style name="MyListViewSeparator">
+    <style name="MyListViewSeparator" parent="Widget.Sherlock.Light.ActionBar.TabText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
@@ -29,16 +33,68 @@
         <item name="android:paddingTop">8dip</item>
         <item name="android:paddingBottom">8dip</item>
         <item name="android:background">@drawable/list_section_divider_blue</item>
-        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="MyTextAppearance.Small" parent="@android:style/TextAppearance.Small">
-        <item name="android:textColor">?android:attr/textColorHintInverse</item>
+        <item name="android:textColor">@color/hint_foreground_holo_dark</item>
     </style>
 
     <style name="MyTextAppearance.ListItem.Small" parent="@android:style/TextAppearance.Small">
-        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
+        <item name="android:textColor">@color/secondary_text_holo_dark</item>
         <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- Android Holo Light Styles -->
+    <style name="MyTextAppearance.Small.Inverse" parent="TextAppearance.Sherlock.Light.Small">
+        <item name="android:textColor">@color/primary_text_holo_dark</item>
+        <item name="android:textColorHint">@color/hint_foreground_holo_dark</item>
+        <item name="android:textColorHighlight">@color/highlighted_text_holo_light</item>
+        <item name="android:textColorLink">@color/holo_blue_light</item>
+    </style>
+
+    <style name="MyTextAppearance.Large.Inverse" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@color/primary_text_holo_dark</item>
+        <item name="android:textColorHint">@color/hint_foreground_holo_dark</item>
+        <item name="android:textColorHighlight">@color/highlighted_text_holo_dark</item>
+        <item name="android:textColorLink">@color/holo_blue_light</item>
+    </style>
+
+    <style name="MyButtonBarStyle" parent="@android:style/ButtonBar">
+        <item name="android:paddingTop">0dip</item>
+        <item name="android:paddingLeft">0dip</item>
+        <item name="android:paddingRight">0dip</item>
+        <item name="android:paddingBottom">0dip</item>
+        <item name="android:divider">@drawable/list_divider_holo_dark</item>
+        <item name="android:showDividers">middle</item>
+        <item name="android:dividerPadding">12dip</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="MyAutoCompleteTextViewStyle" parent="@android:style/Widget.AutoCompleteTextView">
+        <item name="android:dropDownSelector">@color/list_selector_holo_dark</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_holo_dark</item>
+    </style>
+
+    <style name="MyActionModeCloseButtonStyle" parent="@android:style/Widget.ActionButton">
+        <item name="android:minWidth">56dip</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingLeft">12dip</item>
+        <item name="android:paddingRight">12dip</item>
+        <item name="android:scaleType">center</item>
+        <item name="android:background">@color/btn_cab_done_holo_light</item>
+    </style>
+    
+    <style name="MySeekBarStyle">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:minHeight">13dip</item>
+        <item name="android:maxHeight">13dip</item>
+        <item name="android:thumb">@color/scrubber_control_selector_holo</item>
+        <item name="android:thumbOffset">16dip</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingLeft">16dip</item>
+        <item name="android:paddingRight">16dip</item>
+        <item name="android:progressDrawable">@color/scrubber_progress_horizontal_holo_light</item>
+        <item name="android:indeterminateDrawable">@color/scrubber_progress_horizontal_holo_light</item>
     </style>
 
 </resources>

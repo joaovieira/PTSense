@@ -11,10 +11,10 @@
         android:id="@android:id/text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="?android:attr/listPreferredItemPaddingLeft"
+        android:layout_marginLeft="8dip"
         android:includeFontPadding="false"
         android:paddingTop="8dip"
-        android:textAppearance="?android:attr/textAppearanceLargeInverse" />
+        android:textAppearance="@style/MyTextAppearance.Large.Inverse" />
 
     <TextView
         android:id="@android:id/text2"
@@ -23,7 +23,7 @@
         android:layout_alignLeft="@android:id/text1"
         android:layout_below="@android:id/text1"
         android:includeFontPadding="false"
-        android:textAppearance="?android:attr/textAppearanceSmallInverse" />
+        android:textAppearance="@style/MyTextAppearance.Small.Inverse" />
 
     <Button
         android:id="@+id/bToggleSensing"
@@ -32,8 +32,8 @@
         android:layout_alignParentRight="true"
         android:background="@color/sense_button_start"
         android:text="@string/start"
-        android:textAppearance="?android:attr/textAppearanceLargeInverse"
-        android:textColor="?android:attr/textColorPrimaryInverse"
+        android:textAppearance="@style/MyTextAppearance.Large.Inverse"
+        android:textColor="@color/primary_text_holo_dark"
         android:paddingLeft="14dip" 
         android:paddingRight="14dip"/>
 

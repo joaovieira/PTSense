@@ -12,17 +12,18 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-public class Settings extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener {
+public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	static final String PREFS_NAME = "defaults";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
+		/*ActionBar actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);*/
 
 		getPrefs(this);
         getPreferenceManager().setSharedPreferencesName(PREFS_NAME);
@@ -36,7 +37,7 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
 		}
 	}
 
-	@Override
+	/*@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
@@ -48,7 +49,7 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
+	}*/
 	
 	@Override 
     protected void onResume(){
