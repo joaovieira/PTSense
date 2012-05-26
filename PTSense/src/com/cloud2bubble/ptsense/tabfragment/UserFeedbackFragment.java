@@ -2,6 +2,7 @@ package com.cloud2bubble.ptsense.tabfragment;
 
 import java.util.ArrayList;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.activity.TripReviews;
@@ -11,7 +12,6 @@ import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.list.ReviewListAdapter;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class UserFeedbackFragment extends Fragment {
+public class UserFeedbackFragment extends SherlockFragment {
 
 	private Activity activity;
 

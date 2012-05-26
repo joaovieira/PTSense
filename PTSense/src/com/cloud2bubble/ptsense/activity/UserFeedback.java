@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.database.DatabaseHandler;
@@ -12,8 +14,6 @@ import com.cloud2bubble.ptsense.database.TripFeedback;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,7 +30,7 @@ import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-public class UserFeedback extends Activity implements OnClickListener {
+public class UserFeedback extends SherlockActivity implements OnClickListener {
 
 	ReviewItem trip;
 	Map<String, SeekBar> inputs = new HashMap<String, SeekBar>();
@@ -41,7 +41,7 @@ public class UserFeedback extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_feedback);
 
-		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = getSupportActionBar();
 		View actionCustomView = getLayoutInflater().inflate(
 				R.layout.action_mode_bar, null);
 		actionBar.setCustomView(actionCustomView);

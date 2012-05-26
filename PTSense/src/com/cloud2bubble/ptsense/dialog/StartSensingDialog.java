@@ -2,13 +2,13 @@ package com.cloud2bubble.ptsense.dialog;
 
 import java.util.Map;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.PTService;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,7 +26,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class StartSensingDialog extends DialogFragment implements
+public class StartSensingDialog extends SherlockDialogFragment implements
 		OnClickListener {
 
 	Activity activity;
@@ -51,7 +51,7 @@ public class StartSensingDialog extends DialogFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Holo_Dialog);
+		setStyle(SherlockDialogFragment.STYLE_NORMAL, android.R.style.Theme_Holo_Dialog);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class StartSensingDialog extends DialogFragment implements
 		selectLine.setEnabled(false);
 
 		if (stateApp != PTSense.STATE_STOPPED) {
-			if (!currentTrip.service.isEmpty()) {
+			if (!currentTrip.service.equals("")) {
 				selectedService = currentTrip.service;
 				int pos = adapterService.getPosition(selectedService);
 				selectService.setSelection(pos, true);
@@ -119,7 +119,7 @@ public class StartSensingDialog extends DialogFragment implements
 				selectLine.setEnabled(true);
 			}
 
-			if (!currentTrip.line.isEmpty()) {
+			if (!currentTrip.line.equals("")) {
 				selectLine.setText(currentTrip.line);
 				selectOrigin.setEnabled(true);
 				selectDestination.setEnabled(true);
@@ -131,10 +131,10 @@ public class StartSensingDialog extends DialogFragment implements
 				selectDestination.setAdapter(adapterStops);
 			}
 
-			if (!currentTrip.origin.isEmpty())
+			if (!currentTrip.origin.equals(""))
 				selectOrigin.setText(currentTrip.origin);
 
-			if (!currentTrip.destination.isEmpty())
+			if (!currentTrip.destination.equals(""))
 				selectDestination.setText(currentTrip.destination);
 
 			if (stateApp == -1) {

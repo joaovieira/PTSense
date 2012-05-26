@@ -13,7 +13,6 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
-import android.preference.MultiSelectListPreference;
 import android.util.AttributeSet;
 
 public class MyMultiSelectListPreference extends MultiSelectListPreference {

@@ -1,42 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.PTSense.Home" parent="@android:style/Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/MyActionBar.Home</item>
-    </style>
-
-    <style name="Theme.PTSense" parent="@android:style/Theme.Holo.Light">
-        <item name="android:actionBarStyle">@android:style/Widget.Holo.Light.ActionBar.Solid</item>
-        <item name="android:actionBarTabStyle">@style/MyActionBar.TabStyle</item>
-        <item name="android:actionBarTabBarStyle">@style/MyActionBar.TabBarStyle</item>
-        <item name="android:actionBarTabTextStyle">@style/MyActionBar.TabTextStyle</item>
-        <item name="android:actionBarWidgetTheme">@android:style/Theme.Holo</item>
-        <item name="android:listSeparatorTextViewStyle">@style/MyListViewSeparator</item>
-        <item name="android:textAppearanceListItem">?android:attr/textAppearanceMedium</item>
-        <item name="android:textAppearanceListItemSmall">@style/MyTextAppearance.ListItem.Small</item>
-        <item name="android:textAppearanceSmall">@style/MyTextAppearance.Small</item>
-    </style>
-
-    <style name="MyActionBar.Home" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+    <style name="MyActionBar.Home" parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@drawable/ab_solid_light_blue</item>
     </style>
 
-    <style name="MyActionBar.TabStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
+    <style name="MyActionBar.TabStyle" parent="Widget.Sherlock.Light.ActionBar.TabView">
         <item name="android:background">@color/actionbar_tab_bg</item>
     </style>
 
-    <style name="MyActionBar.TabBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabBar">
+    <style name="MyActionBar.TabBarStyle" parent="Widget.Sherlock.Light.ActionBar.TabBar">
         <item name="android:background">@drawable/tab_bottom</item>
         <item name="android:divider">@drawable/list_divider_holo_dark</item>
     </style>
 
-    <style name="MyActionBar.TabTextStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabText">
+    <style name="MyActionBar.TabTextStyle" parent="Widget.Sherlock.Light.ActionBar.TabText">
         <item name="android:textColor">@color/actionbar_tab_text</item>
-    </style>
-
-    <style name="MyListView" parent="@android:style/Widget.Holo.Light.ListView">
-        <item name="android:paddingLeft">16dip</item>
-        <item name="android:paddingRight">16dip</item>
     </style>
 
     <style name="MyListViewSeparator">

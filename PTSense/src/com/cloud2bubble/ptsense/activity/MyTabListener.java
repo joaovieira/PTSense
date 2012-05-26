@@ -1,10 +1,11 @@
 package com.cloud2bubble.ptsense.activity;
 
-import android.app.ActionBar.Tab;
-import android.app.ActionBar.TabListener;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.ActionBar.TabListener;
+
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 
 public class MyTabListener<T extends Fragment> implements TabListener{
 	private Fragment mFragment;

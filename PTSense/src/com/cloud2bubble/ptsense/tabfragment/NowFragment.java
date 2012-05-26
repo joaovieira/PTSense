@@ -3,6 +3,7 @@ package com.cloud2bubble.ptsense.tabfragment;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.list.EmptyItem;
 import com.cloud2bubble.ptsense.list.EntryItem;
@@ -12,7 +13,6 @@ import com.cloud2bubble.ptsense.list.SectionItem;
 import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class NowFragment extends Fragment {
+public class NowFragment extends SherlockFragment {
 
 	private Activity sensingActivity;
 

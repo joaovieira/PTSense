@@ -1,18 +1,18 @@
 package com.cloud2bubble.ptsense.dialog;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 
-public class StopSensingDialog extends DialogFragment {
+public class StopSensingDialog extends SherlockDialogFragment {
 
 	static Activity activity;
 

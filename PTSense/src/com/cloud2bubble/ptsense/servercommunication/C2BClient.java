@@ -37,6 +37,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -84,7 +86,8 @@ public class C2BClient extends IntentService {
 			while (itr2.hasNext()) {
 				TripData tripData = itr2.next();
 				if (app.isSensing()
-						&& tripData.getTrip().getId() == app.getCurrentTrip().getId()) {
+						&& tripData.getTrip().getId() == app.getCurrentTrip()
+								.getId()) {
 					continue;
 				} else {
 					if (!sendDataToServer(tripData)) {
@@ -186,14 +189,14 @@ public class C2BClient extends IntentService {
 
 		int feedbackCount = app
 				.incrementNotificationCount(PTSense.FEEDBACK_NOTIFICATION);
-		PendingIntent contentIntent = PendingIntent.getActivities(this,
+		/*PendingIntent contentIntent = PendingIntent.getActivities(this,
 				PTSense.FEEDBACK_NOTIFICATION,
 				makeMessageIntentStack(this, trip, feedbackCount),
-				PendingIntent.FLAG_CANCEL_CURRENT);
+				PendingIntent.FLAG_CANCEL_CURRENT);*/
 		Resources res = this.getResources();
-		Notification.Builder feedbackBuilder = new Notification.Builder(this);
+		NotificationCompat.Builder feedbackBuilder = new NotificationCompat.Builder(
+				this);
 		feedbackBuilder
-				.setContentIntent(contentIntent)
 				.setSmallIcon(R.drawable.ic_stat_feedback)
 				.setAutoCancel(true)
 				.setContentTitle(
@@ -203,7 +206,10 @@ public class C2BClient extends IntentService {
 				.setDefaults(
 						Notification.DEFAULT_LIGHTS
 								| Notification.DEFAULT_SOUND)
-				.setTicker(tickerText).setWhen(System.currentTimeMillis());
+				.setTicker(tickerText)
+				.setWhen(System.currentTimeMillis())
+				.setContentIntent(makeMessageIntentStack(this, trip, feedbackCount));
+		;
 
 		if (feedbackCount > 1) {
 			feedbackBuilder.setNumber(feedbackCount);
@@ -220,32 +226,42 @@ public class C2BClient extends IntentService {
 	 * stack for the incoming message details state that the application should
 	 * be in when launching it from a notification.
 	 */
-	static Intent[] makeMessageIntentStack(Context context, ReviewItem trip,
-			int notificationsCount) {
+	static PendingIntent makeMessageIntentStack(Context context,
+			ReviewItem trip, int notificationsCount) {
 		// A typical convention for notifications is to launch the user deeply
 		// into an application representing the data in the notification; to
 		// accomplish this, we can build an array of intents to insert the back
 		// stack stack history above the item being displayed.
-		int numIntents = (notificationsCount == 1) ? 3 : 2;
-		Intent[] intents = new Intent[numIntents];
+		//int numIntents = (notificationsCount == 1) ? 3 : 2;
+		//Intent[] intents = new Intent[numIntents];
 
 		// First: root activity.
 		// This is a convenient way to make the proper Intent to launch and
 		// reset an application's task.
-		intents[0] = Intent.makeRestartActivityTask(new ComponentName(context,
-				Home.class));
+		/*
+		 * intents[0] = Intent.makeRestartActivityTask(new
+		 * ComponentName(context, Home.class));
+		 */
+		TaskStackBuilder intentStack = TaskStackBuilder.from(context)
+				.addParentStack(Home.class);
 
 		// "Trip Reviews"
-		intents[1] = new Intent(context, TripReviews.class);
-		intents[1].putExtra("tab", 1);
+		/*
+		 * intents[1] = new Intent(context, TripReviews.class);
+		 * intents[1].putExtra("tab", 1);
+		 */
+		intentStack.addNextIntent(new Intent(context, TripReviews.class)
+				.putExtra("tab", 1));
 
 		if (notificationsCount == 1) {
 			// Now the activity to display to the user. Also fill in the data it
 			// should display.
-			intents[2] = new Intent(context, UserFeedback.class);
-			intents[2].putExtra("review_item", trip);
+			/*intents[2] = new Intent(context, UserFeedback.class);
+			intents[2].putExtra("review_item", trip);*/
+			intentStack.addNextIntent(new Intent(context, UserFeedback.class)
+			.putExtra("review_item", trip));
 		}
-		return intents;
+		return intentStack.getPendingIntent(0, 0);
 	}
 
 	/**

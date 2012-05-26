@@ -25,6 +25,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -34,6 +35,8 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
@@ -48,18 +51,15 @@ public class SmartphoneSensingService extends Service implements
 	public static LocationSystem locationSystem = null;
 
 	private static ArrayBlockingQueue<Float> lightValues, accelerationsX,
-			accelerationsY, accelerationsZ, pressureValues, relHumidityValues,
-			ambTemperatureValues;
+			accelerationsY, accelerationsZ, pressureValues;
 	private static ArrayBlockingQueue<Double> soundValues;
 
 	private static List<Float> tmpLightValues, tmpAccelerationsX,
-			tmpAccelerationsY, tmpAccelerationsZ, tmpPressureValues,
-			tmpRelHumidityValues, tmpAmbTemperatureValues;
+			tmpAccelerationsY, tmpAccelerationsZ, tmpPressureValues;
 	private static List<Double> tmpSoundValues;
 
 	private static Float currentX, currentdX, currentY, currentdY, currentZ,
-			currentdZ, currentLight, currentPressure, currentTemp,
-			currentHumidity;
+			currentdZ, currentLight, currentPressure;
 
 	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
 	private final Handler handler = new Handler();
@@ -80,9 +80,12 @@ public class SmartphoneSensingService extends Service implements
 		SharedPreferences prefs = Settings.getPrefs(this);
 		Set<String> sensorsAllowed = prefs.getStringSet("smartphone_sensors",
 				null);
-		
-		Log.d("SmartphoneSensingService", "notifications pref value:" + prefs.getString("notifications", "fail"));
-		//Log.d("SmartphoneSensingService", "smartphone_sensors pref value:" + sensorsAllowed.toString());
+
+		Log.d("SmartphoneSensingService",
+				"notifications pref value:"
+						+ prefs.getString("notifications", "fail"));
+		// Log.d("SmartphoneSensingService", "smartphone_sensors pref value:" +
+		// sensorsAllowed.toString());
 
 		if (sensorsAllowed != null) {
 
@@ -92,11 +95,6 @@ public class SmartphoneSensingService extends Service implements
 						.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 			if (sensorsAllowed
-					.contains(getString(R.string.sensordata_key_temperature)))
-				mAmbTemperature = sensorManager
-						.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-
-			if (sensorsAllowed
 					.contains(getString(R.string.sensordata_key_light)))
 				mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
@@ -104,11 +102,6 @@ public class SmartphoneSensingService extends Service implements
 					.contains(getString(R.string.sensordata_key_pressure)))
 				mPressure = sensorManager
 						.getDefaultSensor(Sensor.TYPE_PRESSURE);
-
-			if (sensorsAllowed
-					.contains(getString(R.string.sensordata_key_humidity)))
-				mRelHumidity = sensorManager
-						.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
 
 			if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
 				mProximity = sensorManager
@@ -136,8 +129,6 @@ public class SmartphoneSensingService extends Service implements
 		lightValues = new ArrayBlockingQueue<Float>(15); // 200ms * 2sec = 10
 															// values
 		pressureValues = new ArrayBlockingQueue<Float>(15);
-		relHumidityValues = new ArrayBlockingQueue<Float>(15);
-		ambTemperatureValues = new ArrayBlockingQueue<Float>(15);
 		accelerationsX = new ArrayBlockingQueue<Float>(15);
 		accelerationsY = new ArrayBlockingQueue<Float>(15);
 		accelerationsZ = new ArrayBlockingQueue<Float>(15);
@@ -145,14 +136,12 @@ public class SmartphoneSensingService extends Service implements
 
 		tmpLightValues = new ArrayList<Float>(15);
 		tmpPressureValues = new ArrayList<Float>(15);
-		tmpRelHumidityValues = new ArrayList<Float>(15);
-		tmpAmbTemperatureValues = new ArrayList<Float>(15);
 		tmpAccelerationsX = new ArrayList<Float>(15);
 		tmpAccelerationsY = new ArrayList<Float>(15);
 		tmpAccelerationsZ = new ArrayList<Float>(15);
 		tmpSoundValues = new ArrayList<Double>(15);
 
-		currentX = currentY = currentZ = currentLight = currentPressure = currentTemp = currentHumidity = 0.0f;
+		currentX = currentY = currentZ = currentLight = currentPressure = 0.0f;
 
 		uiIntent = new Intent(BROADCAST_ACTION);
 	}
@@ -188,26 +177,27 @@ public class SmartphoneSensingService extends Service implements
 
 	@SuppressWarnings("deprecation")
 	private void startOnGoingNotification() {
-		// TODO later update: use Notification.Builder after Api 11...
-		Notification notification = new Notification(
-				R.drawable.ic_stat_sensing,
-				getText(R.string.notification_sensing_ticker_text),
-				System.currentTimeMillis());
+		Resources res = this.getResources();
+		NotificationCompat.Builder feedbackBuilder = new NotificationCompat.Builder(
+				this);
+		feedbackBuilder
+				.setSmallIcon(R.drawable.ic_stat_sensing)
+				.setContentTitle(
+						res.getString(R.string.notification_sensing_title))
+				.setContentText(
+						res.getString(R.string.notification_sensing_message))
+				.setTicker(getText(R.string.notification_sensing_ticker_text))
+				.setWhen(System.currentTimeMillis())
+				.setContentIntent(
+						TaskStackBuilder
+								.from(this)
+								.addParentStack(Home.class)
+								.addNextIntent(
+										new Intent(this, Sensing.class)
+												.putExtra("tab", 1))
+								.getPendingIntent(0, 0));
 
-		Intent[] intents = new Intent[2];
-		intents[0] = Intent.makeRestartActivityTask(new ComponentName(this,
-				Home.class));
-
-		// "Trip Reviews"
-		intents[1] = new Intent(this, Sensing.class);
-		intents[1].putExtra("tab", 1);
-
-		PendingIntent pendingIntent = PendingIntent.getActivities(this,
-				PTSense.ONGOING_NOTIFICATION, intents, 0);
-		notification.setLatestEventInfo(this,
-				getText(R.string.notification_sensing_title),
-				getText(R.string.notification_sensing_message), pendingIntent);
-		startForeground(PTSense.ONGOING_NOTIFICATION, notification);
+		startForeground(PTSense.ONGOING_NOTIFICATION, feedbackBuilder.getNotification());
 	}
 
 	private void registerSensorListeners() {
@@ -304,10 +294,6 @@ public class SmartphoneSensingService extends Service implements
 				currentdZ = dZ;
 				accelerationsZ.offer(currentZ);
 				break;
-			case Sensor.TYPE_AMBIENT_TEMPERATURE:
-				currentTemp = event.values[0];
-				ambTemperatureValues.offer(currentTemp);
-				break;
 			case Sensor.TYPE_LIGHT:
 				currentLight = event.values[0];
 				lightValues.offer(currentLight);
@@ -315,10 +301,6 @@ public class SmartphoneSensingService extends Service implements
 			case Sensor.TYPE_PRESSURE:
 				currentPressure = event.values[0];
 				pressureValues.offer(currentPressure);
-				break;
-			case Sensor.TYPE_RELATIVE_HUMIDITY:
-				currentHumidity = event.values[0];
-				relHumidityValues.offer(currentHumidity);
 				break;
 			case Sensor.TYPE_PROXIMITY:
 				// TODO cancel readings from light, humidity, pressure when
@@ -352,17 +334,11 @@ public class SmartphoneSensingService extends Service implements
 				uiIntent.putExtra("oscilation", oscilation);
 			}
 
-			if (mAmbTemperature != null)
-				uiIntent.putExtra("temperature", df.format(currentTemp));
-
 			if (mLight != null)
 				uiIntent.putExtra("light", df.format(currentLight));
 
 			if (mPressure != null)
 				uiIntent.putExtra("pressure", df.format(currentPressure));
-
-			if (mRelHumidity != null)
-				uiIntent.putExtra("humidity", df.format(currentHumidity));
 
 			if (locationSystem != null) {
 				String position = formatCoordinates(locationSystem
@@ -411,11 +387,6 @@ public class SmartphoneSensingService extends Service implements
 			data.addData(getString(R.string.sensordata_key_acceleration),
 					accelFinal);
 
-			Float tempFinal = DataProcessor
-					.processTemperatureData(tmpAmbTemperatureValues);
-			data.addData(getString(R.string.sensordata_key_temperature),
-					tempFinal);
-
 			Float lightFinal = DataProcessor.processLightData(tmpLightValues);
 			data.addData(getString(R.string.sensordata_key_light), lightFinal);
 
@@ -423,11 +394,6 @@ public class SmartphoneSensingService extends Service implements
 					.processPressureData(tmpPressureValues);
 			data.addData(getString(R.string.sensordata_key_pressure),
 					pressureFinal);
-
-			Float humidityFinal = DataProcessor
-					.processHumidityData(tmpRelHumidityValues);
-			data.addData(getString(R.string.sensordata_key_humidity),
-					humidityFinal);
 
 			Float soundFinal = DataProcessor.processSoundData(tmpSoundValues);
 			data.addData(getString(R.string.sensordata_key_sound), soundFinal);
@@ -453,8 +419,6 @@ public class SmartphoneSensingService extends Service implements
 			tmpAccelerationsY.clear();
 			tmpAccelerationsZ.clear();
 			tmpPressureValues.clear();
-			tmpRelHumidityValues.clear();
-			tmpAmbTemperatureValues.clear();
 			tmpSoundValues.clear();
 		}
 
@@ -464,8 +428,6 @@ public class SmartphoneSensingService extends Service implements
 			accelerationsY.drainTo(tmpAccelerationsY);
 			accelerationsZ.drainTo(tmpAccelerationsZ);
 			pressureValues.drainTo(tmpPressureValues);
-			relHumidityValues.drainTo(tmpRelHumidityValues);
-			ambTemperatureValues.drainTo(tmpAmbTemperatureValues);
 			soundValues.drainTo(tmpSoundValues);
 		}
 

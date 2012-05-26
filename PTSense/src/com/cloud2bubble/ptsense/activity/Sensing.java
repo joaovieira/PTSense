@@ -1,5 +1,11 @@
 package com.cloud2bubble.ptsense.activity;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.dialog.SensingManager;
@@ -9,23 +15,17 @@ import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 import com.cloud2bubble.ptsense.tabfragment.NowFragment;
 import com.cloud2bubble.ptsense.tabfragment.ThisLineFragment;
 
-import android.app.ActionBar;
-import android.app.DialogFragment;
-import android.app.ActionBar.Tab;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.support.v4.app.DialogFragment;
 
-public class Sensing extends Activity implements SensingManager {
+public class Sensing extends SherlockFragmentActivity implements SensingManager {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		Tab tab = actionBar
@@ -59,7 +59,7 @@ public class Sensing extends Activity implements SensingManager {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		MenuInflater inflater = getMenuInflater();
+		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.sensing_activity, menu);
 		return true;
 	}
@@ -92,12 +92,12 @@ public class Sensing extends Activity implements SensingManager {
 		switch (dialog) {
 		case PTSense.DIALOG_START_SENSING:
 			DialogFragment startDialogFragment = new StartSensingDialog(this);
-			startDialogFragment.show(getFragmentManager(), "start_dialog");
+			startDialogFragment.show(getSupportFragmentManager(), "start_dialog");
 			break;
 		case PTSense.DIALOG_STOP_SENSING:
 			DialogFragment stopDialogFragment = StopSensingDialog
 					.newInstance(this);
-			stopDialogFragment.show(getFragmentManager(), "stop_dialog");
+			stopDialogFragment.show(getSupportFragmentManager(), "stop_dialog");
 			break;
 		}
 	}
@@ -117,7 +117,7 @@ public class Sensing extends Activity implements SensingManager {
 			} else {
 				DialogFragment startDialogFragment = new StartSensingDialog(
 						this, "stop");
-				startDialogFragment.show(getFragmentManager(), "start_dialog");
+				startDialogFragment.show(getSupportFragmentManager(), "start_dialog");
 			}
 			break;
 		}

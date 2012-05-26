@@ -1,5 +1,9 @@
 package com.cloud2bubble.ptsense.activity;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloud2bubble.ptsense.PTSense;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.dialog.SensingManager;
@@ -7,22 +11,15 @@ import com.cloud2bubble.ptsense.dialog.StartSensingDialog;
 import com.cloud2bubble.ptsense.dialog.StopSensingDialog;
 import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 
-import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class Home extends Activity implements OnClickListener, SensingManager {
+public class Home extends SherlockFragmentActivity implements OnClickListener, SensingManager {
 
 	RelativeLayout bOption1, bOption2, bOption3;
 	Button bToggleSensing;
@@ -73,7 +70,7 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		getMenuInflater().inflate(R.menu.home_activity, menu);
+		getSupportMenuInflater().inflate(R.menu.home_activity, menu);
 		return true;
 	}
 
@@ -129,13 +126,13 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 	public void showSenseDialog(int dialog) {
 		switch (dialog) {
 		case PTSense.DIALOG_START_SENSING:
-			DialogFragment startDialogFragment = new StartSensingDialog(this);
-			startDialogFragment.show(getFragmentManager(), "start_dialog");
+			SherlockDialogFragment startDialogFragment = new StartSensingDialog(this);
+			startDialogFragment.show(getSupportFragmentManager(), "start_dialog");
 			break;
 		case PTSense.DIALOG_STOP_SENSING:
-			DialogFragment stopDialogFragment = StopSensingDialog
+			SherlockDialogFragment stopDialogFragment = StopSensingDialog
 					.newInstance(this);
-			stopDialogFragment.show(getFragmentManager(), "stop_dialog");
+			stopDialogFragment.show(getSupportFragmentManager(), "stop_dialog");
 			break;
 		}
 	}
@@ -161,7 +158,7 @@ public class Home extends Activity implements OnClickListener, SensingManager {
 			} else {
 				DialogFragment startDialogFragment = new StartSensingDialog(
 						this, "stop");
-				startDialogFragment.show(getFragmentManager(), "start_dialog");
+				startDialogFragment.show(getSupportFragmentManager(), "start_dialog");
 			}
 			break;
 		}

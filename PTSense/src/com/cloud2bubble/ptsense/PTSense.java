@@ -88,9 +88,9 @@ public class PTSense extends Application {
 	}
 
 	public boolean isTripInfoCompleted() {
-		return !currentTrip.service.isEmpty() && !currentTrip.line.isEmpty()
-				&& !currentTrip.origin.isEmpty()
-				&& !currentTrip.destination.isEmpty();
+		return !currentTrip.service.equals("") && !currentTrip.line.equals("")
+				&& !currentTrip.origin.equals("")
+				&& !currentTrip.destination.equals("");
 	}
 	
 	public synchronized DatabaseHandler getDatabase(){

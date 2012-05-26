@@ -1,17 +1,18 @@
 package com.cloud2bubble.ptsense.activity;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.tabfragment.SystemReviewsFragment;
 import com.cloud2bubble.ptsense.tabfragment.UserFeedbackFragment;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ActionBar.Tab;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
-public class TripReviews extends Activity {
+public class TripReviews extends SherlockActivity {
 
 	public static final int REQUEST_FEEDBACK_CODE = 9;
 
@@ -22,7 +23,7 @@ public class TripReviews extends Activity {
 		// android.R.id.content as the container for each fragment
 
 		// setup action bar for tabs
-		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		Tab tab = actionBar

@@ -1,17 +1,17 @@
 package com.cloud2bubble.ptsense.activity;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.tabfragment.PreferencesFragment;
 import com.cloud2bubble.ptsense.tabfragment.RoutinesFragment;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
-public class MyProfile extends Activity{
+public class MyProfile extends SherlockActivity{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +20,7 @@ public class MyProfile extends Activity{
 	    // android.R.id.content as the container for each fragment
 		
 		// setup action bar for tabs
-	    ActionBar actionBar = getActionBar();
+	    ActionBar actionBar = getSupportActionBar();
 	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 	    Tab tab = actionBar.newTab()

@@ -1,8 +1,10 @@
 package com.cloud2bubble.ptsense.activity;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.cloud2bubble.ptsense.R;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,18 +12,16 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.view.MenuItem;
 
-public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
+public class Settings extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener {
 	static final String PREFS_NAME = "defaults";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		getPrefs(this);
