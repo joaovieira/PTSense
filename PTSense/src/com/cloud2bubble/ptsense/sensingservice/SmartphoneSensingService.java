@@ -171,7 +171,6 @@ public class SmartphoneSensingService extends Service implements
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void startOnGoingNotification() {
 		Resources res = this.getResources();
 		NotificationCompat.Builder feedbackBuilder = new NotificationCompat.Builder(

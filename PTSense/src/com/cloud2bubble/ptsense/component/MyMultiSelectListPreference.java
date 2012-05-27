@@ -1,12 +1,7 @@
 package com.cloud2bubble.ptsense.component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import com.cloud2bubble.ptsense.R;
 
@@ -15,7 +10,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.util.AttributeSet;
-import android.util.Log;
 
 public class MyMultiSelectListPreference extends MultiSelectListPreference {
 
