@@ -79,7 +79,7 @@ public class MultiSelectListPreference extends ListPreference {
 	@Override
 	public void setValue(String value) {
 		super.setValue(value);
-		Log.d("MultiSelectListPreference", "settings value with:" + value);
+		//Log.d("MultiSelectListPreference", "settings value with:" + value);
 		updateCheckedEntryIndexes();
 	}
 

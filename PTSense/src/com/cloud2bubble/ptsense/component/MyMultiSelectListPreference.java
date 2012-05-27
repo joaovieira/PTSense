@@ -21,15 +21,12 @@ public class MyMultiSelectListPreference extends MultiSelectListPreference {
 
 	public MyMultiSelectListPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		Log.d("MyMultiSelectListPreference", "creator");
 		Map<String, String> sensorSelectList = getAvailableSensors(context);
-
-		Log.d("MyMultiSelectListPreference", "settings entries and entryvalues");
 		setEntries(sensorSelectList.keySet().toArray(new String[0]));
 		setEntryValues(sensorSelectList.values().toArray(new String[0]));
 		String defaultValue = getDefaultValue();
 
-		Log.d("MyMultiSelectListPreference", "settings default value with:" + defaultValue);
+		//Log.d("MyMultiSelectListPreference", "settings default value with:" + defaultValue);
 		setDefaultValue(defaultValue);
 	}
 

@@ -102,22 +102,21 @@ public class SmartphoneSensingService extends Service implements
 				mProximity = sensorManager
 						.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
-			/*
-			 * if (sensorsAllowed
-			 * .contains(getString(R.string.sensordata_key_sound))) {
-			 */
-			/*
-			 * soundRecorder = new MediaRecorder(); File sampleDir =
-			 * Environment.getExternalStorageDirectory(); String soundOutputPath
-			 * = sampleDir + File.separator + outputFile + ".3gp";
-			 * 
-			 * soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			 * soundRecorder
-			 * .setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			 * soundRecorder
-			 * .setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-			 * soundRecorder.setOutputFile(soundOutputPath); }
-			 */
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_sound))) {
+
+				soundRecorder = new MediaRecorder();
+				File sampleDir = Environment.getExternalStorageDirectory();
+				String soundOutputPath = sampleDir + File.separator
+						+ outputFile + ".3gp";
+
+				soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+				soundRecorder
+						.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+				soundRecorder
+						.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+				soundRecorder.setOutputFile(soundOutputPath);
+			}
 
 			if (sensorsAllowed.contains(getString(R.string.gps)))
 				locationSystem = new LocationSystem(this);

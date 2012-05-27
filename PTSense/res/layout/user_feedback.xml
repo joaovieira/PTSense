@@ -124,6 +124,7 @@
                     android:id="@+id/sepFeedback"
                     layout="@android:layout/preference_category" />
 
+                    <!-- android:background="@color/edit_text_holo_light"  -->
                 <EditText
                     android:id="@+id/eTFeedback"
                     android:layout_width="fill_parent"
