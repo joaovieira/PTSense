@@ -125,7 +125,6 @@
                     layout="@android:layout/preference_category" />
 
                 <EditText
-                    android:background="@color/edit_text_holo_light"
                     android:id="@+id/eTFeedback"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"

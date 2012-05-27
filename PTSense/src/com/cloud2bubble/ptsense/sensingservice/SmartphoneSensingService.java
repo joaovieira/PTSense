@@ -77,57 +77,51 @@ public class SmartphoneSensingService extends Service implements
 
 		SharedPreferences prefs = Settings.getPrefs(this);
 		String persistedPrefs = prefs.getString("smartphone_sensors", null);
-		// List<String> sensorsAllowed =
-		// Arrays.asList(MultiSelectListPreference.fromPersistedPreferenceValue(persistedPrefs));
+		List<String> sensorsAllowed = Arrays.asList(MultiSelectListPreference
+				.fromPersistedPreferenceValue(persistedPrefs));
 
-		// Log.d("SmartphoneSensingService", "smartphone_sensors pref value:" +
-		// sensorsAllowed.toString());
+		Log.d("SmartphoneSensingService", "smartphone_sensors pref value:"
+				+ sensorsAllowed.toString());
 
-		/*
-		 * if (sensorsAllowed != null) {
-		 * 
-		 * if (sensorsAllowed
-		 * .contains(getString(R.string.sensordata_key_acceleration)))
-		 */
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null)
-			mAcceleration = sensorManager
-					.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		if (sensorsAllowed != null) {
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_acceleration)))
+				mAcceleration = sensorManager
+						.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-		/*
-		 * if (sensorsAllowed
-		 * .contains(getString(R.string.sensordata_key_light)))
-		 */
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT) != null)
-			mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_light)))
+				mLight = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
 
-		/*
-		 * if (sensorsAllowed
-		 * .contains(getString(R.string.sensordata_key_pressure)))
-		 */
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE) != null)
-			mPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+			if (sensorsAllowed
+					.contains(getString(R.string.sensordata_key_pressure)))
+				mPressure = sensorManager
+						.getDefaultSensor(Sensor.TYPE_PRESSURE);
 
-		if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
-			mProximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+			if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null)
+				mProximity = sensorManager
+						.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
-		/*
-		 * if (sensorsAllowed
-		 * .contains(getString(R.string.sensordata_key_sound))) {
-		 */
-		/*
-		 * soundRecorder = new MediaRecorder(); File sampleDir =
-		 * Environment.getExternalStorageDirectory(); String soundOutputPath =
-		 * sampleDir + File.separator + outputFile + ".3gp";
-		 * 
-		 * soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		 * soundRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		 * soundRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-		 * soundRecorder.setOutputFile(soundOutputPath); /* }
-		 * 
-		 * if (sensorsAllowed.contains(getString(R.string.gps)))
-		 */
-		locationSystem = new LocationSystem(this);
-		// }
+			/*
+			 * if (sensorsAllowed
+			 * .contains(getString(R.string.sensordata_key_sound))) {
+			 */
+			/*
+			 * soundRecorder = new MediaRecorder(); File sampleDir =
+			 * Environment.getExternalStorageDirectory(); String soundOutputPath
+			 * = sampleDir + File.separator + outputFile + ".3gp";
+			 * 
+			 * soundRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			 * soundRecorder
+			 * .setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			 * soundRecorder
+			 * .setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+			 * soundRecorder.setOutputFile(soundOutputPath); }
+			 */
+
+			if (sensorsAllowed.contains(getString(R.string.gps)))
+				locationSystem = new LocationSystem(this);
+		}
 
 		lightValues = new ArrayBlockingQueue<Float>(15); // 200ms * 2sec = 10
 															// values

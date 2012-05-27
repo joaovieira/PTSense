@@ -12,6 +12,7 @@ import com.cloud2bubble.ptsense.dialog.StopSensingDialog;
 import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;

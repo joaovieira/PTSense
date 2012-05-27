@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
+import android.util.Log;
 
 // android:defaultValue="entryValue1|entryValue2"
 public class MultiSelectListPreference extends ListPreference {
@@ -78,6 +79,7 @@ public class MultiSelectListPreference extends ListPreference {
 	@Override
 	public void setValue(String value) {
 		super.setValue(value);
+		Log.d("MultiSelectListPreference", "settings value with:" + value);
 		updateCheckedEntryIndexes();
 	}
 

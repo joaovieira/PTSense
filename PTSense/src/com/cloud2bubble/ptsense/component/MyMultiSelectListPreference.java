@@ -1,5 +1,6 @@
 package com.cloud2bubble.ptsense.component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,27 +15,27 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class MyMultiSelectListPreference extends MultiSelectListPreference {
 
 	public MyMultiSelectListPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		Log.d("MyMultiSelectListPreference", "creator");
 		Map<String, String> sensorSelectList = getAvailableSensors(context);
+
+		Log.d("MyMultiSelectListPreference", "settings entries and entryvalues");
 		setEntries(sensorSelectList.keySet().toArray(new String[0]));
 		setEntryValues(sensorSelectList.values().toArray(new String[0]));
-		Set<String> defaultValue = getDefaultValueSet(sensorSelectList);
+		String defaultValue = getDefaultValue();
+
+		Log.d("MyMultiSelectListPreference", "settings default value with:" + defaultValue);
 		setDefaultValue(defaultValue);
 	}
 
-	private Set<String> getDefaultValueSet(Map<String, String> sensors) {
-		Set<String> defaultValue = new HashSet<String>();
-		Iterator<Entry<String, String>> it = sensors.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, String> pairs = (Map.Entry<String, String>) it
-					.next();
-			defaultValue.add(pairs.getValue());
-		}
-		return defaultValue;
+	private String getDefaultValue() {
+		CharSequence[] entryVals = getEntryValues();
+		return toPersistedPreferenceValue(entryVals);
 	}
 
 	private Map<String, String> getAvailableSensors(Context cxt) {
@@ -60,10 +61,6 @@ public class MyMultiSelectListPreference extends MultiSelectListPreference {
 			sensors.put("GPS", cxt.getString(R.string.gps));
 
 		return sensors;
-	}
-	
-	@Override
-	protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
 	}
 
 }
