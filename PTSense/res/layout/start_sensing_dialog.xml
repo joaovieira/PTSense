@@ -46,10 +46,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionNext"
-                android:paddingBottom="8dip"
-                android:paddingLeft="16dip"
-                android:paddingRight="16dip"
-                android:paddingTop="8dip"
+                android:padding="8dip"
                 android:singleLine="true" />
 
             <TextView
@@ -65,10 +62,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionNext"
-                android:paddingBottom="8dip"
-                android:paddingLeft="16dip"
-                android:paddingRight="16dip"
-                android:paddingTop="8dip"
+                android:padding="8dip"
                 android:singleLine="true" />
 
             <TextView
@@ -84,10 +78,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
-                android:paddingBottom="8dip"
-                android:paddingLeft="16dip"
-                android:paddingRight="16dip"
-                android:paddingTop="8dip"
+                android:padding="8dip"
                 android:singleLine="true" />
         </LinearLayout>
     </LinearLayout>
