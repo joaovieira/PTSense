@@ -9,14 +9,15 @@ import com.cloud2bubble.ptsense.R;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -26,8 +27,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class StartSensingDialog extends SherlockDialogFragment implements
-		OnClickListener {
+public class StartSensingDialog extends SherlockDialogFragment {
 
 	Activity activity;
 	Map<String, String[]> serviceLines;
@@ -47,20 +47,13 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 		this.activity = (Activity) cxt;
 		this.stateApp = -1;
 	}
-
+	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.start_sensing_dialog, container,
-				false);
-		getDialog().setTitle(R.string.start_dialog_title);
-		setCancelable(true);
-
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		LayoutInflater vi = (LayoutInflater) activity
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View v = vi.inflate(R.layout.start_sensing_dialog, null);
+		
 		PTSense app = (PTSense) activity.getApplication();
 		ReviewItem currentTrip = app.getCurrentTrip();
 
@@ -74,15 +67,14 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 		originTitle.setText(R.string.origin);
 		destinationTitle.setText(R.string.destination);
 
-		Button bCancel = (Button) v.findViewById(android.R.id.button2);
+		String positiveButtonText;
 		bStart = (Button) v.findViewById(android.R.id.button1);
-		bCancel.setText(R.string.alert_dialog_cancel);
 		if (stateApp == PTSense.STATE_STOPPED) {
-			bStart.setText(R.string.start);
+			positiveButtonText = getString(R.string.start);
 		} else if (stateApp == PTSense.STATE_SENSING) {
-			bStart.setText(R.string.done);
+			positiveButtonText = getString(R.string.done);
 		} else {
-			bStart.setText(R.string.stop);
+			positiveButtonText = getString(R.string.stop);
 			bStart.setEnabled(false);
 		}
 
@@ -181,10 +173,47 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 			public void onNothingSelected(AdapterView<?> arg0) {
 			}
 		});
+		
+		
+		return new AlertDialog.Builder(getActivity())
+				.setTitle(R.string.start_dialog_title)
+				.setView(v)
+				.setCancelable(true)
+				.setPositiveButton(positiveButtonText,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								PTSense app = (PTSense) activity.getApplication();
+								if (stateApp == PTSense.STATE_STOPPED) {
+									String service = selectedService;
+									String line = selectLine.getText().toString();
+									String origin = selectOrigin.getText().toString();
+									String destination = selectDestination.getText().toString();
 
-		bCancel.setOnClickListener(this);
-		bStart.setOnClickListener(this);
-		return v;
+									app.createTrip(service, line, origin, destination);
+
+									((SensingManager) activity).doPositiveClick(
+											PTSense.DIALOG_START_SENSING, stateApp);
+								} else {
+									String service = selectedService;
+									String line = selectLine.getText().toString();
+									String origin = selectOrigin.getText().toString();
+									String destination = selectDestination.getText().toString();
+
+									app.updateTrip(service, line, origin, destination);
+
+									if (stateApp == -1)
+										((SensingManager) activity).doPositiveClick(
+												PTSense.DIALOG_START_SENSING, stateApp);
+								}
+								dismiss();
+							}
+						})
+				.setNegativeButton(R.string.alert_dialog_cancel,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								dismiss();
+							}
+						}).create();
 	}
 
 	protected void clearStops() {
@@ -205,40 +234,6 @@ public class StartSensingDialog extends SherlockDialogFragment implements
 
 	private boolean checkEditText(AutoCompleteTextView view) {
 		return !view.getText().toString().trim().equals("");
-	}
-
-	public void onClick(View v) {
-		PTSense app = (PTSense) activity.getApplication();
-		switch (v.getId()) {
-		case android.R.id.button1:
-			if (stateApp == PTSense.STATE_STOPPED) {
-				String service = selectedService;
-				String line = selectLine.getText().toString();
-				String origin = selectOrigin.getText().toString();
-				String destination = selectDestination.getText().toString();
-
-				app.createTrip(service, line, origin, destination);
-
-				((SensingManager) activity).doPositiveClick(
-						PTSense.DIALOG_START_SENSING, stateApp);
-			} else {
-				String service = selectedService;
-				String line = selectLine.getText().toString();
-				String origin = selectOrigin.getText().toString();
-				String destination = selectDestination.getText().toString();
-
-				app.updateTrip(service, line, origin, destination);
-
-				if (stateApp == -1)
-					((SensingManager) activity).doPositiveClick(
-							PTSense.DIALOG_START_SENSING, stateApp);
-			}
-			dismiss();
-			break;
-		case android.R.id.button2:
-			dismiss();
-			break;
-		}
 	}
 
 	private class LocalTextWatcher implements TextWatcher {
