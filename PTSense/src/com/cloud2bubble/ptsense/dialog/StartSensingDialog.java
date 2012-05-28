@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -68,14 +69,12 @@ public class StartSensingDialog extends SherlockDialogFragment {
 		destinationTitle.setText(R.string.destination);
 
 		String positiveButtonText;
-		bStart = (Button) v.findViewById(android.R.id.button1);
 		if (stateApp == PTSense.STATE_STOPPED) {
 			positiveButtonText = getString(R.string.start);
 		} else if (stateApp == PTSense.STATE_SENSING) {
 			positiveButtonText = getString(R.string.done);
 		} else {
 			positiveButtonText = getString(R.string.stop);
-			bStart.setEnabled(false);
 		}
 
 		selectOrigin = (AutoCompleteTextView) v.findViewById(R.id.acOrigin);
@@ -214,6 +213,21 @@ public class StartSensingDialog extends SherlockDialogFragment {
 								dismiss();
 							}
 						}).create();
+	}
+	
+	
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		
+		bStart = (Button) ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE);
+		if(bStart != null)
+			Log.d("button", bStart.toString());
+		
+		if (stateApp == -1){
+			bStart.setEnabled(false);
+		}
 	}
 
 	protected void clearStops() {

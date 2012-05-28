@@ -59,9 +59,6 @@ public class C2BClient extends IntentService {
 		if (intent.hasExtra("trip_id")) {
 			long tripId = intent.getLongExtra("trip_id", -1);
 			if (tripId != -1) {
-
-				Log.d("C2BClient", "Sending trip data to server with id="
-						+ tripId);
 				sendTripData(tripId);
 				stopSelf();
 			}

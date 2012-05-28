@@ -15,7 +15,10 @@ import com.cloud2bubble.ptsense.sensingservice.SmartphoneSensingService;
 import com.cloud2bubble.ptsense.tabfragment.NowFragment;
 import com.cloud2bubble.ptsense.tabfragment.ThisLineFragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
@@ -125,6 +128,30 @@ public class Sensing extends SherlockFragmentActivity implements SensingManager 
 
 	public void stopSensing() {
 		stopService(new Intent(this, SmartphoneSensingService.class));
+		goBack();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		registerReceiver(broadcastReceiver, new IntentFilter(
+				SmartphoneSensingService.TIMEOUT_ACTION));
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		unregisterReceiver(broadcastReceiver);
+	}
+	
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			goBack();
+		}
+	};
+
+	protected void goBack() {
 		Intent homeIntent = new Intent(this, Home.class);
 		homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(homeIntent);

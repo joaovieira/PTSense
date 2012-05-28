@@ -108,7 +108,7 @@ public class NowFragment extends SherlockFragment {
 	public void onResume() {
 		super.onResume();
 		sensingActivity.registerReceiver(broadcastReceiver, new IntentFilter(
-				SmartphoneSensingService.BROADCAST_ACTION));
+				SmartphoneSensingService.UPDATE_UI_ACTION));
 	}
 
 	@Override
