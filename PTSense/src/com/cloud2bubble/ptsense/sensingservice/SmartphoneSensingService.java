@@ -59,7 +59,7 @@ public class SmartphoneSensingService extends Service implements
 			currentdZ, currentLight, currentPressure, currentProximity;
 
 	public static final String UPDATE_UI_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
-	public static final String TIMEOUT_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
+	public static final String TIMEOUT_ACTION = "com.cloud2bubble.ptsense.GOBACK";
 	private final Handler handler = new Handler();
 	Intent uiIntent;
 
