@@ -45,11 +45,6 @@ public class NowFragment extends SherlockFragment {
 			sensorCount++;
 		}
 
-		if (SmartphoneSensingService.mAmbTemperature != null) {
-			items.add(new EntryItem("temperature", "Temperature", "ºC"));
-			sensorCount++;
-		}
-
 		if (SmartphoneSensingService.mLight != null) {
 			items.add(new EntryItem("light", "Light Intensity", "lux"));
 			sensorCount++;
@@ -57,11 +52,6 @@ public class NowFragment extends SherlockFragment {
 
 		if (SmartphoneSensingService.mPressure != null) {
 			items.add(new EntryItem("pressure", "Pressure", "hPa"));
-			sensorCount++;
-		}
-
-		if (SmartphoneSensingService.mRelHumidity != null) {
-			items.add(new EntryItem("humidity", "Relative Humidity", "%"));
 			sensorCount++;
 		}
 

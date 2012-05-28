@@ -42,9 +42,8 @@ import android.widget.Toast;
 public class SmartphoneSensingService extends Service implements
 		SensorEventListener {
 
-	public static Sensor mAcceleration = null, mAmbTemperature = null,
-			mLight = null, mPressure = null, mProximity = null,
-			mRelHumidity = null;
+	public static Sensor mAcceleration = null, mLight = null, mPressure = null,
+			mProximity = null;
 	public static MediaRecorder soundRecorder = null;
 	public static LocationSystem locationSystem = null;
 
@@ -57,7 +56,7 @@ public class SmartphoneSensingService extends Service implements
 	private static List<Double> tmpSoundValues;
 
 	private static Float currentX, currentdX, currentY, currentdY, currentZ,
-			currentdZ, currentLight, currentPressure;
+			currentdZ, currentLight, currentPressure, currentProximity;
 
 	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
 	private final Handler handler = new Handler();
@@ -137,7 +136,8 @@ public class SmartphoneSensingService extends Service implements
 		tmpAccelerationsZ = new ArrayList<Float>(15);
 		tmpSoundValues = new ArrayList<Double>(15);
 
-		currentX = currentY = currentZ = currentLight = currentdX = currentdY = currentdZ = currentPressure = 0.0f;
+		currentX = currentY = currentZ = currentLight = currentdX = currentdY
+				= currentdZ = currentPressure = currentProximity = 0.0f;
 
 		uiIntent = new Intent(BROADCAST_ACTION);
 	}
@@ -202,10 +202,6 @@ public class SmartphoneSensingService extends Service implements
 			sensorManager.registerListener(this, mAcceleration,
 					SensorManager.SENSOR_DELAY_NORMAL);
 
-		if (mAmbTemperature != null)
-			sensorManager.registerListener(this, mAmbTemperature,
-					SensorManager.SENSOR_DELAY_NORMAL);
-
 		if (mLight != null)
 			sensorManager.registerListener(this, mLight,
 					SensorManager.SENSOR_DELAY_NORMAL);
@@ -216,10 +212,6 @@ public class SmartphoneSensingService extends Service implements
 
 		if (mProximity != null)
 			sensorManager.registerListener(this, mProximity,
-					SensorManager.SENSOR_DELAY_NORMAL);
-
-		if (mRelHumidity != null)
-			sensorManager.registerListener(this, mRelHumidity,
 					SensorManager.SENSOR_DELAY_NORMAL);
 
 		if (locationSystem != null)
@@ -301,6 +293,7 @@ public class SmartphoneSensingService extends Service implements
 			case Sensor.TYPE_PROXIMITY:
 				// TODO cancel readings from light, humidity, pressure when
 				// close to things for more than 10sec
+				currentProximity = event.values[0];
 				break;
 			}
 		}
@@ -402,6 +395,9 @@ public class SmartphoneSensingService extends Service implements
 				data.addData(getString(R.string.sensordata_key_longitude),
 						coordinates.second);
 			}
+
+			data.addData(getString(R.string.sensordata_key_proximity),
+					currentProximity);
 
 			app.getDatabase().addSensorData(data);
 

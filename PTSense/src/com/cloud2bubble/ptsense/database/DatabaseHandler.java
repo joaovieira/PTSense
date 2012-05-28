@@ -40,10 +40,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String REVIEW_ID = "review_id";
 	private static final String KEY_TIME = "time";
 	private static String KEY_ACCELERATION;
-	private static String KEY_TEMPERATURE;
 	private static String KEY_LIGHT;
 	private static String KEY_PRESSURE;
-	private static String KEY_HUMIDITY;
+	private static String KEY_PROXIMITY;
 	private static String KEY_SOUND;
 	private static String KEY_LATITUDE;
 	private static String KEY_LONGITUDE;
@@ -78,12 +77,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		KEY_ACCELERATION = context
 				.getString(R.string.sensordata_key_acceleration);
-		KEY_TEMPERATURE = context
-				.getString(R.string.sensordata_key_temperature);
 		KEY_LIGHT = context.getString(R.string.sensordata_key_light);
 		KEY_PRESSURE = context.getString(R.string.sensordata_key_pressure);
-		KEY_HUMIDITY = context.getString(R.string.sensordata_key_humidity);
+		KEY_PROXIMITY = context.getString(R.string.sensordata_key_proximity);
 		KEY_SOUND = context.getString(R.string.sensordata_key_sound);
+		KEY_LATITUDE = context.getString(R.string.sensordata_key_latitude);
+		KEY_LONGITUDE = context.getString(R.string.sensordata_key_longitude);
 
 		KEY_HAPPY = context.getString(R.string.feedback_key_happy);
 		KEY_RELAXED = context.getString(R.string.feedback_key_relaxed);
@@ -93,8 +92,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		KEY_AMBIENCE = context.getString(R.string.feedback_key_ambience);
 		KEY_FAST = context.getString(R.string.feedback_key_fast);
 		KEY_RELIABLE = context.getString(R.string.feedback_key_reliable);
-		KEY_LATITUDE = context.getString(R.string.sensordata_key_latitude);
-		KEY_LONGITUDE = context.getString(R.string.sensordata_key_longitude);
 
 	}
 
@@ -111,9 +108,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_SENSORDATA_TABLE = "CREATE TABLE " + TABLE_SENSORDATA
 				+ "(" + KEY_ID + " INTEGER PRIMARY KEY," + REVIEW_ID
 				+ " INTEGER," + KEY_TIME + " TEXT," + KEY_ACCELERATION
-				+ " REAL," + KEY_TEMPERATURE + " REAL," + KEY_LIGHT + " REAL,"
-				+ KEY_PRESSURE + " REAL," + KEY_HUMIDITY + " REAL," + KEY_SOUND
-				+ " REAL," + KEY_LATITUDE + " REAL," + KEY_LONGITUDE + " REAL)";
+				+ " REAL," + KEY_LIGHT + " REAL," + KEY_PRESSURE + " REAL,"
+				+ KEY_PROXIMITY + " REAL," + KEY_SOUND + " REAL,"
+				+ KEY_LATITUDE + " REAL," + KEY_LONGITUDE + " REAL)";
 		db.execSQL(CREATE_SENSORDATA_TABLE);
 
 		String CREATE_REVIEWS_TABLE = "CREATE TABLE " + TABLE_REVIEWS + "("
@@ -181,19 +178,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ReviewItem trip = getReview(id);
 		ArrayList<Calendar> timestamps = new ArrayList<Calendar>();
 		ArrayList<Float> acceleration = new ArrayList<Float>();
-		ArrayList<Float> temperature = new ArrayList<Float>();
 		ArrayList<Float> light = new ArrayList<Float>();
 		ArrayList<Float> pressure = new ArrayList<Float>();
-		ArrayList<Float> humidity = new ArrayList<Float>();
+		ArrayList<Float> proximity = new ArrayList<Float>();
 		ArrayList<Float> sound = new ArrayList<Float>();
 		ArrayList<Float> latitude = new ArrayList<Float>();
 		ArrayList<Float> longitude = new ArrayList<Float>();
 
 		String selectQuery = "SELECT " + KEY_TIME + "," + KEY_ACCELERATION
-				+ "," + KEY_TEMPERATURE + "," + KEY_LIGHT + "," + KEY_PRESSURE
-				+ "," + KEY_HUMIDITY + "," + KEY_SOUND + "," + KEY_LATITUDE
-				+ "," + KEY_LONGITUDE + " FROM " + TABLE_SENSORDATA + " WHERE "
-				+ REVIEW_ID + "=" + id + " ORDER BY " + KEY_TIME + " ASC";
+				+ "," + KEY_LIGHT + "," + KEY_PRESSURE + "," + KEY_PROXIMITY
+				+ "," + KEY_SOUND + "," + KEY_LATITUDE + "," + KEY_LONGITUDE
+				+ " FROM " + TABLE_SENSORDATA + " WHERE " + REVIEW_ID + "="
+				+ id + " ORDER BY " + KEY_TIME + " ASC";
 
 		synchronized (this) {
 			SQLiteDatabase db = this.getWritableDatabase();
@@ -203,13 +199,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				do {
 					timestamps.add(stringToDate(cursor.getString(0)));
 					acceleration.add(cursor.getFloat(1));
-					temperature.add(cursor.getFloat(2));
-					light.add(cursor.getFloat(3));
-					pressure.add(cursor.getFloat(4));
-					humidity.add(cursor.getFloat(5));
-					sound.add(cursor.getFloat(6));
-					latitude.add(cursor.getFloat(7));
-					longitude.add(cursor.getFloat(8));
+					light.add(cursor.getFloat(2));
+					pressure.add(cursor.getFloat(3));
+					proximity.add(cursor.getFloat(4));
+					sound.add(cursor.getFloat(5));
+					latitude.add(cursor.getFloat(6));
+					longitude.add(cursor.getFloat(7));
 				} while (cursor.moveToNext());
 			}
 			cursor.close();
@@ -218,10 +213,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		Map<String, ArrayList<Float>> data = new HashMap<String, ArrayList<Float>>();
 		data.put(KEY_ACCELERATION, acceleration);
-		data.put(KEY_TEMPERATURE, temperature);
 		data.put(KEY_LIGHT, light);
 		data.put(KEY_PRESSURE, pressure);
-		data.put(KEY_HUMIDITY, humidity);
 		data.put(KEY_SOUND, sound);
 		data.put(KEY_LATITUDE, latitude);
 		data.put(KEY_LONGITUDE, longitude);
