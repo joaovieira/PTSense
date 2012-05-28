@@ -59,7 +59,7 @@ public class SmartphoneSensingService extends Service implements
 
 	private static Float currentX, currentdX, currentY, currentdY, currentZ,
 			currentdZ, currentLight, currentPressure, currentTemp,
-			currentHumidity;
+			currentHumidity, currentProximity;
 
 	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
 	private final Handler handler = new Handler();
@@ -155,8 +155,7 @@ public class SmartphoneSensingService extends Service implements
 		tmpAccelerationsZ = new ArrayList<Float>(15);
 		tmpSoundValues = new ArrayList<Double>(15);
 
-		currentX = currentY = currentZ = currentdX = currentdY = currentdZ = 
-				currentLight = currentPressure = currentTemp = currentHumidity = 0.0f;
+		currentX = currentY = currentZ = currentdX = currentdY = currentdZ = currentLight = currentPressure = currentTemp = currentHumidity = currentProximity = 0.0f;
 
 		uiIntent = new Intent(BROADCAST_ACTION);
 	}
@@ -325,8 +324,7 @@ public class SmartphoneSensingService extends Service implements
 				relHumidityValues.offer(currentHumidity);
 				break;
 			case Sensor.TYPE_PROXIMITY:
-				// TODO cancel readings from light, humidity, pressure when
-				// close to things for more than 10sec
+				currentProximity = event.values[0];
 				break;
 			}
 		}
@@ -444,6 +442,9 @@ public class SmartphoneSensingService extends Service implements
 				data.addData(getString(R.string.sensordata_key_longitude),
 						coordinates.second);
 			}
+
+			data.addData(getString(R.string.sensordata_key_proximity),
+					currentProximity);
 
 			app.getDatabase().addSensorData(data);
 
