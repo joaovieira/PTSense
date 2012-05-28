@@ -61,7 +61,8 @@ public class SmartphoneSensingService extends Service implements
 			currentdZ, currentLight, currentPressure, currentTemp,
 			currentHumidity, currentProximity;
 
-	public static final String BROADCAST_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
+	public static final String UPDATE_UI_ACTION = "com.cloud2bubble.ptsense.DISPLAYEVENT";
+	public static final String TIMEOUT_ACTION = "com.cloud2bubble.ptsense.GOBACK";
 	private final Handler handler = new Handler();
 	Intent uiIntent;
 
@@ -157,7 +158,7 @@ public class SmartphoneSensingService extends Service implements
 
 		currentX = currentY = currentZ = currentdX = currentdY = currentdZ = currentLight = currentPressure = currentTemp = currentHumidity = currentProximity = 0.0f;
 
-		uiIntent = new Intent(BROADCAST_ACTION);
+		uiIntent = new Intent(UPDATE_UI_ACTION);
 	}
 
 	@Override
@@ -255,6 +256,9 @@ public class SmartphoneSensingService extends Service implements
 		handler.removeCallbacks(sendUpdatesToUI);
 		handler.postDelayed(sendUpdatesToUI, 200);
 
+		// 1h timeout
+		handler.postDelayed(timeoutForceStop, 3600000);
+
 		// calculate average and insert store into database every 2 seconds
 		Thread sensorThread = new PreProcessThread();
 		handler.postDelayed(sensorThread, 1000);
@@ -327,6 +331,15 @@ public class SmartphoneSensingService extends Service implements
 				currentProximity = event.values[0];
 				break;
 			}
+		}
+	};
+
+	private Runnable timeoutForceStop = new Runnable() {
+		public void run() {
+			app.setState(PTSense.STATE_STOPPED);
+			uiIntent = new Intent(TIMEOUT_ACTION);
+			sendBroadcast(uiIntent);
+			stopSelf();
 		}
 	};
 

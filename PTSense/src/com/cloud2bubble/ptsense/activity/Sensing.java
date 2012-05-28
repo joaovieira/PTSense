@@ -13,7 +13,10 @@ import android.app.ActionBar;
 import android.app.DialogFragment;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -125,6 +128,30 @@ public class Sensing extends Activity implements SensingManager {
 
 	public void stopSensing() {
 		stopService(new Intent(this, SmartphoneSensingService.class));
+		goBack();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		registerReceiver(broadcastReceiver, new IntentFilter(
+				SmartphoneSensingService.TIMEOUT_ACTION));
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		unregisterReceiver(broadcastReceiver);
+	}
+	
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			goBack();
+		}
+	};
+
+	protected void goBack() {
 		Intent homeIntent = new Intent(this, Home.class);
 		homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(homeIntent);
