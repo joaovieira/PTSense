@@ -77,7 +77,7 @@ public class TripData implements ServerObject {
 				// populate array with sensor values
 				JSONArray jsonValues = new JSONArray();
 				for (Float f : pairs.getValue()) {
-					if (f.isNaN())
+					if (f.isNaN() || f.isInfinite())
 						jsonValues.put(JSONObject.NULL);
 					else
 						jsonValues.put(f);

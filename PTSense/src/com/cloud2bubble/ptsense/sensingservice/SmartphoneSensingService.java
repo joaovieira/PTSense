@@ -259,6 +259,10 @@ public class SmartphoneSensingService extends Service implements
 		// 1h timeout
 		handler.postDelayed(timeoutForceStop, 3600000);
 
+		// initiate sound sampling
+		if (soundRecorder != null)
+			soundRecorder.getMaxAmplitude();
+
 		// calculate average and insert store into database every 2 seconds
 		Thread sensorThread = new PreProcessThread();
 		handler.postDelayed(sensorThread, 1000);
@@ -269,7 +273,6 @@ public class SmartphoneSensingService extends Service implements
 			try {
 				soundRecorder.prepare();
 				soundRecorder.start();
-				soundRecorder.getMaxAmplitude();
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
