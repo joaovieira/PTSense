@@ -86,7 +86,7 @@ public class C2BClient extends IntentService {
 				} else {
 					if (!sendDataToServer(tripData)) {
 						done = false;
-						break;
+						continue;
 					} else {
 						database.removeTripData(tripData);
 					}
@@ -98,7 +98,7 @@ public class C2BClient extends IntentService {
 				TripFeedback feedback = itr.next();
 				if (!sendDataToServer(feedback)) {
 					done = false;
-					break;
+					continue;
 				} else {
 					database.removePendingFeedback(feedback);
 					database.removePendingReview(feedback.getTrip());
