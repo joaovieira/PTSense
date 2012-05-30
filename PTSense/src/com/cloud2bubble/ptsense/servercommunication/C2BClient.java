@@ -109,8 +109,8 @@ public class C2BClient extends IntentService {
 					continue;
 				} else {
 					Log.d("C2bClient", "Removing feedback and review from trip with id:" + feedback.getTrip().getId());
-					//database.removePendingFeedback(feedback);
-					//database.removePendingReview(feedback.getTrip());
+					database.removePendingFeedback(feedback);
+					database.removePendingReview(feedback.getTrip());
 				}
 			}
 
@@ -136,7 +136,7 @@ public class C2BClient extends IntentService {
 			TripData tripData = database.getTripData(id);
 			if (sendDataToServer(tripData)) {
 				Log.d("C2bClient", "Removing trip data from trip with id:" + tripData.getTrip().getId());
-				//database.removeTripData(tripData);
+				database.removeTripData(tripData);
 				ignoreInternetConnections();
 			} else {
 				// if could not transmit information start listening for
