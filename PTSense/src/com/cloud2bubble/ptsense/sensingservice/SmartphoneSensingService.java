@@ -105,7 +105,7 @@ public class SmartphoneSensingService extends Service implements
 			if (sensorsAllowed
 					.contains(getString(R.string.sensordata_key_sound))) {
 
-				soundRecorder = new MediaRecorder();
+				/*soundRecorder = new MediaRecorder();
 				File sampleDir = Environment.getExternalStorageDirectory();
 				String soundOutputPath = sampleDir + File.separator
 						+ outputFile + ".3gp";
@@ -115,7 +115,7 @@ public class SmartphoneSensingService extends Service implements
 						.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 				soundRecorder
 						.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-				soundRecorder.setOutputFile(soundOutputPath);
+				soundRecorder.setOutputFile(soundOutputPath);*/
 			}
 
 			if (sensorsAllowed.contains(getString(R.string.gps)))
@@ -137,8 +137,7 @@ public class SmartphoneSensingService extends Service implements
 		tmpAccelerationsZ = new ArrayList<Float>(15);
 		tmpSoundValues = new ArrayList<Double>(15);
 
-		currentX = currentY = currentZ = currentLight = currentdX = currentdY
-				= currentdZ = currentPressure = currentProximity = 0.0f;
+		currentX = currentY = currentZ = currentLight = currentdX = currentdY = currentdZ = currentPressure = currentProximity = 0.0f;
 
 		uiIntent = new Intent(UPDATE_UI_ACTION);
 	}
@@ -150,13 +149,24 @@ public class SmartphoneSensingService extends Service implements
 		startSoundRecording();
 		collectDataFromSensors();
 
+		Log.d("SmartphoneSensingService",
+				"Trip started sensing with id:" + app.getCurrentTripId());
+		Log.d("SmartphoneSensingService", "Sensors used: accel="
+				+ mAcceleration + " light=" + mLight + " pressure=" + mPressure
+				+ " proximity=" + mProximity + " sound=" + soundRecorder
+				+ " gps=" + locationSystem);
+
 		tripId = app.getCurrentTripId();
 		return START_STICKY;
 	}
 
 	@Override
 	public void onDestroy() {
+		Log.d("SmartphoneSensingService", "Stopping sensor service");
+		Log.d("SmartphoneSensingService", "Unregistering sensors");
 		unregisterSensorListeners();
+
+		Log.d("SmartphoneSensingService", "Stopping sound recording");
 		stopSoundRecording();
 		stopForeground(true);
 
@@ -164,6 +174,11 @@ public class SmartphoneSensingService extends Service implements
 				Toast.LENGTH_SHORT).show();
 
 		app.updateTripEndTime(new GregorianCalendar());
+		Log.d("SmartphoneSensingService", "Updated time for trip with id:"
+				+ app.getCurrentTripId() + " with time:"
+				+ new GregorianCalendar());
+
+		Log.d("SmartphoneSensingService", "Sending trip data to server...");
 		sendTripToServer();
 	}
 
@@ -230,7 +245,7 @@ public class SmartphoneSensingService extends Service implements
 	private void collectDataFromSensors() {
 		handler.removeCallbacks(sendUpdatesToUI);
 		handler.postDelayed(sendUpdatesToUI, 200);
-		
+
 		// 1h timeout
 		handler.postDelayed(timeoutForceStop, 3600000);
 
@@ -300,7 +315,7 @@ public class SmartphoneSensingService extends Service implements
 			}
 		}
 	};
-	
+
 	private Runnable timeoutForceStop = new Runnable() {
 		public void run() {
 			app.setState(PTSense.STATE_STOPPED);
@@ -375,8 +390,6 @@ public class SmartphoneSensingService extends Service implements
 		}
 
 		private void updateSensorDatabase() {
-			// Log.d("SmartphoneSensingService", "Updating SensorDatabase");
-
 			drainBuffers();
 
 			String currentTime = getCurrentTimeStamp();
@@ -410,6 +423,7 @@ public class SmartphoneSensingService extends Service implements
 			data.addData(getString(R.string.sensordata_key_proximity),
 					currentProximity);
 
+			Log.d("SmartphoneSensingService", "Updating SensorDatabase with data:" + data.toString());
 			app.getDatabase().addSensorData(data);
 
 			clearTempBuffers();

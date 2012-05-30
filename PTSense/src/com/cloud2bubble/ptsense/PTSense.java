@@ -6,6 +6,7 @@ import com.cloud2bubble.ptsense.database.DatabaseHandler;
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 import android.app.Application;
+import android.util.Log;
 
 public class PTSense extends Application {
 
@@ -61,6 +62,8 @@ public class PTSense extends Application {
 				new GregorianCalendar(), null);
 
 		long tripId = database.addPendingReview(newTrip);
+
+		Log.d("PTSense", this + ", creating new trip with id:" + tripId);
 		newTrip.setDatabaseId(tripId);
 		this.currentTrip = newTrip;
 	}
@@ -71,6 +74,7 @@ public class PTSense extends Application {
 
 	public void updateTrip(String service, String line, String origin,
 			String destination) {
+		Log.d("PTSense", this + ", updating trip with: service=" + service + " line=" + line + " origin=" + origin + " destination=" + destination);
 		currentTrip.service = service;
 		currentTrip.line = line;
 		currentTrip.origin = origin;
@@ -79,6 +83,7 @@ public class PTSense extends Application {
 	}
 	
 	public void updateTripEndTime(GregorianCalendar time) {
+		Log.d("PTSense", this + ", updating trip end time");
 		currentTrip.setEndTime(time);
 		updateTripInDatabase();
 	}

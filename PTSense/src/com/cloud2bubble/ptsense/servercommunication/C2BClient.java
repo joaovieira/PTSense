@@ -59,10 +59,12 @@ public class C2BClient extends IntentService {
 		if (intent.hasExtra("trip_id")) {
 			long tripId = intent.getLongExtra("trip_id", -1);
 			if (tripId != -1) {
+				Log.d("C2BClient", "Sending trip data with id:" + tripId);
 				sendTripData(tripId);
 				stopSelf();
 			}
 		} else {
+			Log.d("C2BClient", "Sending pending data");
 			sendPendingData();
 			stopSelf();
 		}
@@ -82,6 +84,7 @@ public class C2BClient extends IntentService {
 			Iterator<TripData> itr2 = pendingTripData.iterator();
 			while (itr2.hasNext()) {
 				TripData tripData = itr2.next();
+				Log.d("C2bClient", "Sending tripdata for trip:" + tripData.getTrip().toString());
 				if (app.isSensing()
 						&& tripData.getTrip().getId() == app.getCurrentTrip()
 								.getId()) {
@@ -89,8 +92,9 @@ public class C2BClient extends IntentService {
 				} else {
 					if (!sendDataToServer(tripData)) {
 						done = false;
-						break;
+						continue;
 					} else {
+						Log.d("C2bClient", "Removing tripdata from trip with id:" + tripData.getTrip().getId());
 						database.removeTripData(tripData);
 					}
 				}
@@ -99,10 +103,12 @@ public class C2BClient extends IntentService {
 			Iterator<TripFeedback> itr = pendingsFeedbacks.iterator();
 			while (itr.hasNext()) {
 				TripFeedback feedback = itr.next();
+				Log.d("C2bClient", "Sending feedback for trip:" + feedback.getTrip().toString());
 				if (!sendDataToServer(feedback)) {
 					done = false;
-					break;
+					continue;
 				} else {
+					Log.d("C2bClient", "Removing feedback and review from trip with id:" + feedback.getTrip().getId());
 					database.removePendingFeedback(feedback);
 					database.removePendingReview(feedback.getTrip());
 				}
@@ -129,6 +135,7 @@ public class C2BClient extends IntentService {
 		if (hasDataConnection()) {
 			TripData tripData = database.getTripData(id);
 			if (sendDataToServer(tripData)) {
+				Log.d("C2bClient", "Removing trip data from trip with id:" + tripData.getTrip().getId());
 				database.removeTripData(tripData);
 				ignoreInternetConnections();
 			} else {
@@ -142,6 +149,7 @@ public class C2BClient extends IntentService {
 			listenInternetConnections();
 		}
 
+		Log.d("C2bClient", "Getting ReviewItem for feedback notification for trip with id:" + id);
 		// now just show a notification asking for user feedback
 		ReviewItem trip = database.getReview(id);
 
@@ -258,7 +266,7 @@ public class C2BClient extends IntentService {
 			intentStack.addNextIntent(new Intent(context, UserFeedback.class)
 			.putExtra("review_item", trip));
 		}
-		return intentStack.getPendingIntent(0, 0);
+		return intentStack.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
 	/**

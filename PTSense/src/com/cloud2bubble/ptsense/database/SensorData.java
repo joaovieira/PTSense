@@ -21,4 +21,12 @@ public class SensorData {
 	public Map<String, Float> getData() {
 		return data;
 	}
+	
+	public String toString(){
+		String ret = "";
+		ret += "tripId:" + refTripId;
+		ret += " time:" + time;
+		ret += " data:" + data.toString();
+		return ret;
+	}
 }

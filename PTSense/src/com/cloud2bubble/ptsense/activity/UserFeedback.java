@@ -17,6 +17,7 @@ import com.cloud2bubble.ptsense.servercommunication.C2BClient;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -57,6 +58,9 @@ public class UserFeedback extends SherlockActivity implements OnClickListener {
 			return;
 		}
 		trip = (ReviewItem) extras.get("review_item");
+		
+		Log.d("UserFeedback", "Reviewing item for trip with id:" + trip.getId());
+		
 		if (trip != null) {
 			TextView tvService = (TextView) findViewById(R.id.tvService);
 			TextView tvDirection = (TextView) findViewById(R.id.tvDirection);

@@ -1,7 +1,10 @@
 package com.cloud2bubble.ptsense.list;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import android.util.Log;
 
 public class ReviewItem implements Serializable {
 
@@ -16,7 +19,8 @@ public class ReviewItem implements Serializable {
 	public Calendar endTime = null;
 
 	public ReviewItem(long l, String line, String service, String origin,
-			String destination, Calendar startTime, Calendar endTime, int reviewed) {
+			String destination, Calendar startTime, Calendar endTime,
+			int reviewed) {
 		this.databaseID = l;
 		this.line = line;
 		this.service = service;
@@ -101,7 +105,7 @@ public class ReviewItem implements Serializable {
 	public void setDatabaseId(long tripId) {
 		databaseID = tripId;
 	}
-	
+
 	public long getId() {
 		return this.databaseID;
 	}
@@ -113,8 +117,29 @@ public class ReviewItem implements Serializable {
 	public void setReviewed() {
 		this.reviewed = true;
 	}
-	
-	public void setEndTime(Calendar endTime){
+
+	public void setEndTime(Calendar endTime) {
 		this.endTime = endTime;
+	}
+
+	public String toString() {
+		String ret = "";
+		ret += "ReviewItem={";
+		ret += " database_id:" + databaseID;
+		ret += " reviewed:" + reviewed;
+		ret += " line:" + line;
+		ret += " service:" + service;
+		ret += " origin:" + origin;
+		ret += " destination:" + destination;
+
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		ret += " start_time:" + sdfDate.format(startTime.getTime());
+
+		if (endTime != null)
+			ret += " end_time: " + sdfDate.format(endTime.getTime());
+		else
+			Log.d("ReviewItem", "ERROR! toString method had null endTime");
+		return ret;
 	}
 }

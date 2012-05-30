@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.cloud2bubble.ptsense.list.ReviewItem;
 
 public class TripData implements ServerObject {
@@ -44,6 +46,8 @@ public class TripData implements ServerObject {
 		JSONObject jsonTripData = new JSONObject();
 		try {
 			// trip info
+			Log.d("TripData", "getting json for tripdata for trip:" + trip.toString());
+			
 			JSONObject jsonTrip = new JSONObject();
 			jsonTrip.put("database_id", trip.getId());
 			jsonTrip.put("reviewed", trip.isReviewed());

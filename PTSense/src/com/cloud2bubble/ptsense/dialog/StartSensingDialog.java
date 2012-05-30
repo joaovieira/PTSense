@@ -37,6 +37,7 @@ public class StartSensingDialog extends SherlockDialogFragment {
 	String selectedService;
 
 	int stateApp;
+	PTSense app;
 
 	public StartSensingDialog(Context cxt) {
 		this.activity = (Activity) cxt;
@@ -55,7 +56,7 @@ public class StartSensingDialog extends SherlockDialogFragment {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = vi.inflate(R.layout.start_sensing_dialog, null);
 		
-		PTSense app = (PTSense) activity.getApplication();
+		app = (PTSense) activity.getApplication();
 		ReviewItem currentTrip = app.getCurrentTrip();
 
 		TextView serviceTitle = (TextView) v.findViewById(R.id.tvService);
@@ -181,7 +182,6 @@ public class StartSensingDialog extends SherlockDialogFragment {
 				.setPositiveButton(positiveButtonText,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-								PTSense app = (PTSense) activity.getApplication();
 								if (stateApp == PTSense.STATE_STOPPED) {
 									String service = selectedService;
 									String line = selectLine.getText().toString();
@@ -222,9 +222,6 @@ public class StartSensingDialog extends SherlockDialogFragment {
 		super.onStart();
 		
 		bStart = (Button) ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE);
-		if(bStart != null)
-			Log.d("button", bStart.toString());
-		
 		if (stateApp == -1){
 			bStart.setEnabled(false);
 		}
