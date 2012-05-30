@@ -105,7 +105,7 @@ public class SmartphoneSensingService extends Service implements
 			if (sensorsAllowed
 					.contains(getString(R.string.sensordata_key_sound))) {
 
-				/*soundRecorder = new MediaRecorder();
+				soundRecorder = new MediaRecorder();
 				File sampleDir = Environment.getExternalStorageDirectory();
 				String soundOutputPath = sampleDir + File.separator
 						+ outputFile + ".3gp";
@@ -115,7 +115,7 @@ public class SmartphoneSensingService extends Service implements
 						.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 				soundRecorder
 						.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-				soundRecorder.setOutputFile(soundOutputPath);*/
+				soundRecorder.setOutputFile(soundOutputPath);
 			}
 
 			if (sensorsAllowed.contains(getString(R.string.gps)))
@@ -162,6 +162,11 @@ public class SmartphoneSensingService extends Service implements
 
 	@Override
 	public void onDestroy() {
+		app.updateTripEndTime(new GregorianCalendar());
+		Log.d("SmartphoneSensingService", "Updated time for trip with id:"
+				+ app.getCurrentTripId() + " with time:"
+				+ new GregorianCalendar());
+		
 		Log.d("SmartphoneSensingService", "Stopping sensor service");
 		Log.d("SmartphoneSensingService", "Unregistering sensors");
 		unregisterSensorListeners();
@@ -172,11 +177,6 @@ public class SmartphoneSensingService extends Service implements
 
 		Toast.makeText(SmartphoneSensingService.this, "Sensing stopped",
 				Toast.LENGTH_SHORT).show();
-
-		app.updateTripEndTime(new GregorianCalendar());
-		Log.d("SmartphoneSensingService", "Updated time for trip with id:"
-				+ app.getCurrentTripId() + " with time:"
-				+ new GregorianCalendar());
 
 		Log.d("SmartphoneSensingService", "Sending trip data to server...");
 		sendTripToServer();

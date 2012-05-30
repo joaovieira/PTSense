@@ -46,8 +46,9 @@ public class TripData implements ServerObject {
 		JSONObject jsonTripData = new JSONObject();
 		try {
 			// trip info
-			Log.d("TripData", "getting json for tripdata for trip:" + trip.toString());
-			
+			Log.d("TripData",
+					"getting json for tripdata for trip:" + trip.toString());
+
 			JSONObject jsonTrip = new JSONObject();
 			jsonTrip.put("database_id", trip.getId());
 			jsonTrip.put("reviewed", trip.isReviewed());
@@ -59,8 +60,17 @@ public class TripData implements ServerObject {
 			SimpleDateFormat sdfDate = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss");
 
-			jsonTrip.put("start_time", sdfDate.format(trip.startTime.getTime()));
-			jsonTrip.put("end_time", sdfDate.format(trip.endTime.getTime()));
+			if (trip.startTime != null)
+				jsonTrip.put("start_time",
+						sdfDate.format(trip.startTime.getTime()));
+			else
+				jsonTrip.put("start_time", "ERROR");
+
+			if (trip.endTime != null)
+				jsonTrip.put("end_time", sdfDate.format(trip.endTime.getTime()));
+			else
+				jsonTrip.put("end_time", "ERROR");
+
 			jsonTripData.put("trip_info", jsonTrip);
 
 			// sensor data
@@ -69,7 +79,10 @@ public class TripData implements ServerObject {
 			// timestamps
 			JSONArray jsonTimestamps = new JSONArray();
 			for (Calendar t : timestamps) {
-				jsonTimestamps.put(sdfDate.format(t.getTime()));
+				if (t != null)
+					jsonTimestamps.put(sdfDate.format(t.getTime()));
+				else
+					jsonTimestamps.put("ERROR");
 			}
 			jsonSensorData.put("timestamps", jsonTimestamps);
 
@@ -81,7 +94,9 @@ public class TripData implements ServerObject {
 				// populate array with sensor values
 				JSONArray jsonValues = new JSONArray();
 				for (Float f : pairs.getValue()) {
-					if (f.isNaN())
+					if (f == null)
+						jsonValues.put("ERROR");
+					else if (f.isNaN())
 						jsonValues.put(JSONObject.NULL);
 					else
 						jsonValues.put(f);
