@@ -166,7 +166,7 @@ public class SmartphoneSensingService extends Service implements
 		Log.d("SmartphoneSensingService", "Updated time for trip with id:"
 				+ app.getCurrentTripId() + " with time:"
 				+ new GregorianCalendar());
-		
+
 		Log.d("SmartphoneSensingService", "Stopping sensor service");
 		Log.d("SmartphoneSensingService", "Unregistering sensors");
 		unregisterSensorListeners();
@@ -249,6 +249,10 @@ public class SmartphoneSensingService extends Service implements
 		// 1h timeout
 		handler.postDelayed(timeoutForceStop, 3600000);
 
+		// take first sample of sound to initiate
+		if (soundRecorder != null)
+			soundRecorder.getMaxAmplitude();
+
 		// calculate average and insert store into database every 2 seconds
 		Thread sensorThread = new PreProcessThread();
 		handler.postDelayed(sensorThread, 1000);
@@ -259,7 +263,6 @@ public class SmartphoneSensingService extends Service implements
 			try {
 				soundRecorder.prepare();
 				soundRecorder.start();
-				soundRecorder.getMaxAmplitude();
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -423,7 +426,8 @@ public class SmartphoneSensingService extends Service implements
 			data.addData(getString(R.string.sensordata_key_proximity),
 					currentProximity);
 
-			Log.d("SmartphoneSensingService", "Updating SensorDatabase with data:" + data.toString());
+			Log.d("SmartphoneSensingService",
+					"Updating SensorDatabase with data:" + data.toString());
 			app.getDatabase().addSensorData(data);
 
 			clearTempBuffers();

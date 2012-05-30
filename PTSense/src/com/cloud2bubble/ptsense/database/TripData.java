@@ -96,6 +96,8 @@ public class TripData implements ServerObject {
 				for (Float f : pairs.getValue()) {
 					if (f == null)
 						jsonValues.put("ERROR");
+					else if (f == Float.NEGATIVE_INFINITY)	
+						jsonValues.put(JSONObject.NULL);
 					else if (f.isNaN())
 						jsonValues.put(JSONObject.NULL);
 					else
