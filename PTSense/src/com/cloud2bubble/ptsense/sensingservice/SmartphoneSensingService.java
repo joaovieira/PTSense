@@ -273,6 +273,7 @@ public class SmartphoneSensingService extends Service implements
 			try {
 				soundRecorder.prepare();
 				soundRecorder.start();
+				soundRecorder.getMaxAmplitude();
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

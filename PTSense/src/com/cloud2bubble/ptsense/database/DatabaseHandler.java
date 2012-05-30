@@ -298,17 +298,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_REVIEWS + " WHERE "
 				+ KEY_ID + "=" + id;
 
-		ReviewItem trip;
+		ReviewItem trip = null;
 		synchronized (this) {
 			Cursor cursor = db.rawQuery(selectQuery, null);
-			if (cursor != null)
-				cursor.moveToFirst();
+			if (cursor.moveToFirst()) {
 
-			trip = new ReviewItem(cursor.getLong(0), cursor.getString(1),
-					cursor.getString(2), cursor.getString(3),
-					cursor.getString(4), stringToDate(cursor.getString(5)),
-					stringToDate(cursor.getString(6)), cursor.getInt(7));
-
+				trip = new ReviewItem(cursor.getLong(0), cursor.getString(1),
+						cursor.getString(2), cursor.getString(3),
+						cursor.getString(4), stringToDate(cursor.getString(5)),
+						stringToDate(cursor.getString(6)), cursor.getInt(7));
+			}
 			cursor.close();
 			db.close();
 		}
@@ -430,7 +429,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ID;
 
 		synchronized (this) {
-
 			SQLiteDatabase db = this.getWritableDatabase();
 			Cursor cursor = db.rawQuery(selectQuery, null);
 

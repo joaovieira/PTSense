@@ -145,7 +145,7 @@ public class C2BClient extends IntentService {
 		SharedPreferences prefs = Settings.getPrefs(this);
 		String shouldNotifiy = prefs.getString("notifications", "fail");
 
-		if (!shouldNotifiy.equals("2"))
+		if (!shouldNotifiy.equals("2") && trip != null)
 			notifyForFeedback(trip);
 	}
 

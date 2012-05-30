@@ -42,23 +42,24 @@ public class TripData implements ServerObject {
 
 	public JSONObject toJSON() {
 		JSONObject jsonTripData = new JSONObject();
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
 		try {
-			// trip info
-			JSONObject jsonTrip = new JSONObject();
-			jsonTrip.put("database_id", trip.getId());
-			jsonTrip.put("reviewed", trip.isReviewed());
-			jsonTrip.put("line", trip.line);
-			jsonTrip.put("service", trip.service);
-			jsonTrip.put("origin", trip.origin);
-			jsonTrip.put("destination", trip.destination);
+			if (trip != null) {
+				// trip info
+				JSONObject jsonTrip = new JSONObject();
+				jsonTrip.put("database_id", trip.getId());
+				jsonTrip.put("reviewed", trip.isReviewed());
+				jsonTrip.put("line", trip.line);
+				jsonTrip.put("service", trip.service);
+				jsonTrip.put("origin", trip.origin);
+				jsonTrip.put("destination", trip.destination);
 
-			SimpleDateFormat sdfDate = new SimpleDateFormat(
-					"yyyy-MM-dd HH:mm:ss");
-
-			jsonTrip.put("start_time", sdfDate.format(trip.startTime.getTime()));
-			jsonTrip.put("end_time", sdfDate.format(trip.endTime.getTime()));
-			jsonTripData.put("trip_info", jsonTrip);
-
+				jsonTrip.put("start_time",
+						sdfDate.format(trip.startTime.getTime()));
+				jsonTrip.put("end_time", sdfDate.format(trip.endTime.getTime()));
+				jsonTripData.put("trip_info", jsonTrip);
+			}
 			// sensor data
 			JSONObject jsonSensorData = new JSONObject();
 
