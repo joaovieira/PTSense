@@ -44,35 +44,36 @@ public class TripData implements ServerObject {
 
 	public JSONObject toJSON() {
 		JSONObject jsonTripData = new JSONObject();
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
-			// trip info
-			Log.d("TripData",
-					"getting json for tripdata for trip:" + trip.toString());
+			if (trip != null) {
+				// trip info
+				Log.d("TripData",
+						"getting json for tripdata for trip:" + trip.toString());
 
-			JSONObject jsonTrip = new JSONObject();
-			jsonTrip.put("database_id", trip.getId());
-			jsonTrip.put("reviewed", trip.isReviewed());
-			jsonTrip.put("line", trip.line);
-			jsonTrip.put("service", trip.service);
-			jsonTrip.put("origin", trip.origin);
-			jsonTrip.put("destination", trip.destination);
+				JSONObject jsonTrip = new JSONObject();
+				jsonTrip.put("database_id", trip.getId());
+				jsonTrip.put("reviewed", trip.isReviewed());
+				jsonTrip.put("line", trip.line);
+				jsonTrip.put("service", trip.service);
+				jsonTrip.put("origin", trip.origin);
+				jsonTrip.put("destination", trip.destination);
 
-			SimpleDateFormat sdfDate = new SimpleDateFormat(
-					"yyyy-MM-dd HH:mm:ss");
+				if (trip.startTime != null)
+					jsonTrip.put("start_time",
+							sdfDate.format(trip.startTime.getTime()));
+				else
+					jsonTrip.put("start_time", "ERROR");
 
-			if (trip.startTime != null)
-				jsonTrip.put("start_time",
-						sdfDate.format(trip.startTime.getTime()));
-			else
-				jsonTrip.put("start_time", "ERROR");
+				if (trip.endTime != null)
+					jsonTrip.put("end_time",
+							sdfDate.format(trip.endTime.getTime()));
+				else
+					jsonTrip.put("end_time", "ERROR");
 
-			if (trip.endTime != null)
-				jsonTrip.put("end_time", sdfDate.format(trip.endTime.getTime()));
-			else
-				jsonTrip.put("end_time", "ERROR");
-
-			jsonTripData.put("trip_info", jsonTrip);
-
+				jsonTripData.put("trip_info", jsonTrip);
+			}
+			
 			// sensor data
 			JSONObject jsonSensorData = new JSONObject();
 
@@ -96,7 +97,7 @@ public class TripData implements ServerObject {
 				for (Float f : pairs.getValue()) {
 					if (f == null)
 						jsonValues.put("ERROR");
-					else if (f == Float.NEGATIVE_INFINITY)	
+					else if (f == Float.NEGATIVE_INFINITY)
 						jsonValues.put(JSONObject.NULL);
 					else if (f.isNaN())
 						jsonValues.put(JSONObject.NULL);
