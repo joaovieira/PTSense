@@ -294,12 +294,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public ReviewItem getReview(long id) {
-		SQLiteDatabase db = this.getWritableDatabase();
 		String selectQuery = "SELECT * FROM " + TABLE_REVIEWS + " WHERE "
 				+ KEY_ID + "=" + id;
 
 		ReviewItem trip = null;
 		synchronized (this) {
+			SQLiteDatabase db = this.getWritableDatabase();
 			Cursor cursor = db.rawQuery(selectQuery, null);
 			if (cursor.moveToFirst()) {
 
