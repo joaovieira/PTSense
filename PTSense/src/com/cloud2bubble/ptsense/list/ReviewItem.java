@@ -59,6 +59,7 @@ public class ReviewItem implements Serializable {
 	}
 
 	private String formatTime(int hour, int minute, int am_pm) {
+		hour = hour == 0 ? 12 : hour;
 		String time = hour + ":" + minute;
 		if (am_pm == Calendar.AM)
 			time += "AM";
