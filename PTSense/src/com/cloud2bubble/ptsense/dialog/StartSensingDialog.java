@@ -19,6 +19,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -49,15 +50,18 @@ public class StartSensingDialog extends SherlockDialogFragment {
 		this.activity = (Activity) cxt;
 		this.stateApp = -1;
 	}
-	
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		LayoutInflater vi = (LayoutInflater) activity
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = vi.inflate(R.layout.start_sensing_dialog, null);
-		
+
 		app = (PTSense) activity.getApplication();
 		ReviewItem currentTrip = app.getCurrentTrip();
+
+		Log.d("activity", getActivity().getComponentName().flattenToString());
+		Log.d("activity", activity.getComponentName().flattenToString());
 
 		TextView serviceTitle = (TextView) v.findViewById(R.id.tvService);
 		TextView lineTitle = (TextView) v.findViewById(R.id.tvLine);
@@ -84,8 +88,8 @@ public class StartSensingDialog extends SherlockDialogFragment {
 		selectLine = (AutoCompleteTextView) v.findViewById(R.id.acLine);
 		Spinner selectService = (Spinner) v.findViewById(R.id.sService);
 		ArrayAdapter<String> adapterService = new ArrayAdapter<String>(
-				activity, R.layout.autocomplete_list_item_closed, PTService.SERVICES
-						.keySet().toArray(new String[0]));
+				activity, R.layout.autocomplete_list_item_closed,
+				PTService.SERVICES.keySet().toArray(new String[0]));
 		adapterService.setDropDownViewResource(R.layout.autocomplete_list_item);
 		selectService.setAdapter(adapterService);
 
@@ -173,58 +177,73 @@ public class StartSensingDialog extends SherlockDialogFragment {
 			public void onNothingSelected(AdapterView<?> arg0) {
 			}
 		});
-		
-		
+
 		return new AlertDialog.Builder(getActivity())
 				.setTitle(R.string.start_dialog_title)
 				.setView(v)
 				.setCancelable(true)
 				.setPositiveButton(positiveButtonText,
 						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
 								if (stateApp == PTSense.STATE_STOPPED) {
 									String service = selectedService;
-									String line = selectLine.getText().toString();
-									String origin = selectOrigin.getText().toString();
-									String destination = selectDestination.getText().toString();
+									String line = selectLine.getText()
+											.toString();
+									String origin = selectOrigin.getText()
+											.toString();
+									String destination = selectDestination
+											.getText().toString();
 
-									app.createTrip(service, line, origin, destination);
+									app.createTrip(service, line, origin,
+											destination);
 
-									((SensingManager) activity).doPositiveClick(
-											PTSense.DIALOG_START_SENSING, stateApp);
+									((SensingManager) activity)
+											.doPositiveClick(
+													PTSense.DIALOG_START_SENSING,
+													stateApp);
 								} else {
 									String service = selectedService;
-									String line = selectLine.getText().toString();
-									String origin = selectOrigin.getText().toString();
-									String destination = selectDestination.getText().toString();
+									String line = selectLine.getText()
+											.toString();
+									String origin = selectOrigin.getText()
+											.toString();
+									String destination = selectDestination
+											.getText().toString();
 
-									app.updateTrip(service, line, origin, destination);
+									app.updateTrip(service, line, origin,
+											destination);
 
 									if (stateApp == -1)
-										((SensingManager) activity).doPositiveClick(
-												PTSense.DIALOG_START_SENSING, stateApp);
+										((SensingManager) activity)
+												.doPositiveClick(
+														PTSense.DIALOG_START_SENSING,
+														stateApp);
 								}
 								dismiss();
 							}
 						})
 				.setNegativeButton(R.string.alert_dialog_cancel,
 						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
 								dismiss();
 							}
 						}).create();
 	}
-	
-	
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		
-		bStart = (Button) ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE);
-		if (stateApp == -1){
+
+		bStart = (Button) ((AlertDialog) getDialog())
+				.getButton(AlertDialog.BUTTON_POSITIVE);
+		if (stateApp == -1) {
 			bStart.setEnabled(false);
 		}
+
+		getDialog().getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 	}
 
 	protected void clearStops() {

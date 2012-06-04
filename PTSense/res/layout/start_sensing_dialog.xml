@@ -1,72 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:paddingBottom="8dip"
-    android:paddingLeft="16dip"
-    android:paddingRight="16dip"
-    android:paddingTop="8dip" >
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/tvService"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="?android:attr/textColorPrimaryInverse" />
-
-    <Spinner
-        android:id="@+id/sService"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:prompt="@string/autocomplete.service.hint" />
-
-    <TextView
-        android:id="@+id/tvLine"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dip"
-        android:textColor="?android:attr/textColorPrimaryInverse" />
-
-    <AutoCompleteTextView
-        android:id="@+id/acLine"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:imeOptions="actionNext"
+        android:orientation="vertical"
         android:paddingBottom="8dip"
-        android:paddingTop="8dip"
-        android:singleLine="true"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:paddingLeft="16dip"
+        android:paddingRight="16dip"
+        android:paddingTop="8dip" >
 
-    <TextView
-        android:id="@+id/tvOrigin"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dip"
-        android:textColor="?android:attr/textColorPrimaryInverse" />
+        <TextView
+            android:id="@+id/tvService"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimaryInverse" />
 
-    <AutoCompleteTextView
-        android:id="@+id/acOrigin"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:imeOptions="actionNext"
-        android:paddingBottom="8dip"
-        android:paddingTop="8dip"
-        android:singleLine="true"
-        android:textColor="?android:attr/textColorPrimary" />
+        <Spinner
+            android:id="@+id/sService"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/autocomplete.service.hint" />
 
-    <TextView
-        android:id="@+id/tvDestination"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dip"
-        android:textColor="?android:attr/textColorPrimaryInverse" />
+        <TextView
+            android:id="@+id/tvLine"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dip"
+            android:textColor="?android:attr/textColorPrimaryInverse" />
 
-    <AutoCompleteTextView
-        android:id="@+id/acDestination"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:imeOptions="actionDone"
-        android:paddingBottom="8dip"
-        android:paddingTop="8dip"
-        android:singleLine="true"
-        android:textColor="?android:attr/textColorPrimary" />
+        <AutoCompleteTextView
+            android:id="@+id/acLine"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:paddingBottom="8dip"
+            android:paddingTop="8dip"
+            android:singleLine="true"
+            android:textColor="?android:attr/textColorPrimary" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvOrigin"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dip"
+            android:textColor="?android:attr/textColorPrimaryInverse" />
+
+        <AutoCompleteTextView
+            android:id="@+id/acOrigin"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:paddingBottom="8dip"
+            android:paddingTop="8dip"
+            android:singleLine="true"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:id="@+id/tvDestination"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dip"
+            android:textColor="?android:attr/textColorPrimaryInverse" />
+
+        <AutoCompleteTextView
+            android:id="@+id/acDestination"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:paddingBottom="8dip"
+            android:paddingTop="8dip"
+            android:singleLine="true"
+            android:textColor="?android:attr/textColorPrimary" />
+    </LinearLayout>
+
+</ScrollView>

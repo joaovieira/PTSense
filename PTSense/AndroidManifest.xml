@@ -4,7 +4,9 @@
     android:versionCode="0714096"
     android:versionName="0.9.6" >
 
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="10"/>
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="10" />
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -48,7 +50,7 @@
             android:name=".activity.Sensing"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/home.title1"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop">
         </activity>
         <activity
             android:name=".activity.TripReviews"
